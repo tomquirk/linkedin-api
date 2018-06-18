@@ -123,7 +123,11 @@ class LinkedinAPI(object):
 
         websites = data.get('websites', [])
         for item in websites:
-            item['label'] = item['type']['com.linkedin.voyager.identity.profile.CustomWebsite']['label']
+            if 'com.linkedin.voyager.identity.profile.StandardWebsite' in item['type']:
+                item['label'] = item['type']['com.linkedin.voyager.identity.profile.StandardWebsite']['category']
+            elif '' in item['type']:
+                item['label'] = item['type']['com.linkedin.voyager.identity.profile.CustomWebsite']['label']
+            
             del item['type']
 
         contact_info['websites'] = websites
@@ -140,15 +144,21 @@ class LinkedinAPI(object):
         res = self.session.get(
             f'{_API_BASE_URL}/identity/profiles/{public_profile_id or profile_urn_id}/profileView',
         )
+
         data = res.json()
+
+        if data and 'status' in data and data['status'] != 200:
+            self.logger.info('request failed: {}'.format(data['message']))
+            return {}
 
         # massage [profile] data
         profile = data['profile']
         if 'miniProfile' in profile:
-            profile['displayPictureUrl'] = (
-                profile['miniProfile']
-                ['picture']['com.linkedin.common.VectorImage']['rootUrl']
-            )
+            if 'picture' in profile['miniProfile']:
+                profile['displayPictureUrl'] = (
+                    profile['miniProfile']
+                    ['picture']['com.linkedin.common.VectorImage']['rootUrl']
+                )
             profile['profile_id'] = profile['miniProfile']['entityUrn'].split(':')[3]
 
             del profile['miniProfile']
@@ -162,10 +172,11 @@ class LinkedinAPI(object):
         experience = data['positionView']['elements']
         for item in experience:
             if 'company' in item:
-                item['company']['logoUrl'] = (
-                    item['company']['miniCompany']
-                    ['logo']['com.linkedin.common.VectorImage']['rootUrl']
-                )
+                if 'logo' in item['company']['miniCompany']:
+                    item['company']['logoUrl'] = (
+                        item['company']['miniCompany']
+                        ['logo']['com.linkedin.common.VectorImage']['rootUrl']
+                    )
                 del item['company']['miniCompany']
 
         profile['experience'] = experience
@@ -179,10 +190,11 @@ class LinkedinAPI(object):
         education = data['educationView']['elements']
         for item in education:
             if 'school' in item:
-                item['school']['logoUrl'] = (
-                    item['school']
-                    ['logo']['com.linkedin.common.VectorImage']['rootUrl']
-                )
+                if 'logo' in item['school']:
+                    item['school']['logoUrl'] = (
+                        item['school']
+                        ['logo']['com.linkedin.common.VectorImage']['rootUrl']
+                    )
                 del item['school']['logo']
 
         profile['education'] = education
@@ -206,17 +218,21 @@ class LinkedinAPI(object):
             params=params
         )
         data = res.json()
-
         total_found = data['paging']['total']
+        if total_found == 0:
+            return []
 
         discovered_connections = []
         for item in data['elements'][0]['elements']:
             search_profile = item['hitInfo']['com.linkedin.voyager.search.SearchProfile']
-
             profile_id = search_profile['id']
             distance = search_profile['distance']['value']
 
-            discovered_connections.append({'profile_id': profile_id, 'distance': distance})
+            discovered_connections.append({
+                'profile_urn_id': profile_id, 
+                'distance': distance, 
+                'public_profile_id': search_profile['miniProfile']['publicIdentifier']
+            })
 
         connections.extend(discovered_connections)
 

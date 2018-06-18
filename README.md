@@ -48,10 +48,10 @@ connections = api.get_profile_connections('1234asc12304', max_connections=200)
 
 1. Using pipenv...
 
-```
-$ pipenv install
-$ pipenv shell
-```
+    ```
+    $ pipenv install
+    $ pipenv shell
+    ```
 
 ## In-depth overview
 
@@ -79,11 +79,11 @@ The most reliable method to find the relevant endpoint is to:
 1. `view source`
 2. `command-f`/search the page for some keyword in the data. This will exist inside of a `<code>` tag.
 3. Scroll down to the **next adjacent element** which will be another `<code>` tag, probably with an `id` that looks something like
-```html
-<code style="display: none" id="datalet-bpr-guid-3900675">
-  {"request":"/voyager/api/identity/profiles/tom-quirk/profileView","status":200,"body":"bpr-guid-3900675"}
-</code>
-```
+    ```html
+    <code style="display: none" id="datalet-bpr-guid-3900675">
+      {"request":"/voyager/api/identity/profiles/tom-quirk/profileView","status":200,"body":"bpr-guid-3900675"}
+    </code>
+    ```
 4. The value of `request` is the url! :woot:
 
 You can also use the `network` tab in you browsers developer tools, but you will encounter mixed results.

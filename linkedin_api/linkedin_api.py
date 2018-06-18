@@ -103,15 +103,15 @@ class LinkedinAPI(object):
 
         self._set_session_cookies(res.cookies)
 
-    def get_profile_contact_info(self, public_profile_id=None, urn_id=None):
+    def get_profile_contact_info(self, public_profile_id=None, profile_urn_id=None):
         """
         Return data for a single profile.
 
         [public_profile_id] - public identifier i.e. tom-quirk-1928345
-        [urn_id] - id provided by the related URN
+        [profile_urn_id] - id provided by the related URN
         """
         res = self.session.get(
-            f'{_API_BASE_URL}/identity/profiles/{public_profile_id or urn_id}/profileContactInfo',
+            f'{_API_BASE_URL}/identity/profiles/{public_profile_id or profile_urn_id}/profileContactInfo',
         )
         data = res.json()
 
@@ -140,7 +140,6 @@ class LinkedinAPI(object):
         res = self.session.get(
             f'{_API_BASE_URL}/identity/profiles/{public_profile_id or profile_urn_id}/profileView',
         )
-        import ipdb; ipdb.set_trace()
         data = res.json()
 
         # massage [profile] data

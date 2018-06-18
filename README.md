@@ -7,13 +7,16 @@
 ## Overview
 
 This project attempts to provide a simple Python interface for the Linkedin API.
+
 > Do you mean the [legit Linkedin API](https://developer.linkedin.com/)?
+
 NO! To retrieve structured data, the [Linkedin Website](https://linkedin.com) uses a service they call **Voyager**. Voyager endpoints give us access to pretty much everything we could want from Linkedin: profiles, companies, connections, messages, etc.
 
 So specifically, this project aims to provide complete coverage for Voyager.
 
-[How do we do it?]()
-[How do I find endpoints?]()
+[How do we do it?](#in-depth-overview)
+
+[How do I find endpoints?](to-find-endpoints)
 
 ## Example usage
 
@@ -59,7 +62,7 @@ https://www.linkedin.com/voyager/api/identity/profileView/tom-quirk
 
 Or, more clearly
 ```
-________________________ _____________ _______________________________
+ _______________________ _____________ _______________________________
 |       base path       | path prefix |            resource           |
 https://www.linkedin.com /voyager/api /identity/profileView/tom-quirk
 ```
@@ -82,3 +85,5 @@ The most reliable method to find the relevant endpoint is to:
 </code>
 ```
 4. The value of `request` is the url! :woot:
+
+You can also use the `network` tab in you browsers developer tools, but you will encounter mixed results.

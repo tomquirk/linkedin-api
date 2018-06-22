@@ -62,9 +62,9 @@ https://www.linkedin.com/voyager/api/identity/profileView/tom-quirk
 
 Or, more clearly
 ```
- _______________________ _____________ _______________________________
-|       base path       | path prefix |            resource           |
-https://www.linkedin.com /voyager/api /identity/profileView/tom-quirk
+ ___________________________________ _______________________________
+|             base path             |            resource           |
+https://www.linkedin.com/voyager/api /identity/profileView/tom-quirk
 ```
 
 They are authenticated with a simple cookie, which we send with every request, along with a bunch of headers.

@@ -3,7 +3,6 @@ Provides linkedin api-related code
 """
 import requests
 import pickle
-import json
 import logging
 import os
 
@@ -173,7 +172,7 @@ class LinkedinAPI(object):
         for item in experience:
             if 'company' in item:
                 if 'logo' in item['company']['miniCompany']:
-                    item['company']['logoUrl'] = (
+                    item['companyLogoUrl'] = (
                         item['company']['miniCompany']
                         ['logo']['com.linkedin.common.VectorImage']['rootUrl']
                     )

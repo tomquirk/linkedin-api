@@ -5,6 +5,8 @@ import requests
 import pickle
 import logging
 import os
+import random
+from time import sleep
 
 REQUEST_HEADERS = {
     'X-Li-User-Agent': 'LIAuthLibrary:3.2.4 \
@@ -126,7 +128,7 @@ class LinkedinAPI(object):
                 item['label'] = item['type']['com.linkedin.voyager.identity.profile.StandardWebsite']['category']
             elif '' in item['type']:
                 item['label'] = item['type']['com.linkedin.voyager.identity.profile.CustomWebsite']['label']
-            
+
             del item['type']
 
         contact_info['websites'] = websites
@@ -140,6 +142,7 @@ class LinkedinAPI(object):
         [public_profile_id] - public identifier i.e. tom-quirk-1928345
         [profile_urn_id] - id provided by the related URN
         """
+        sleep(random.randint(2, 5))  # sleep a random duration to try and evade suspention
         res = self.session.get(
             f'{_API_BASE_URL}/identity/profiles/{public_profile_id or profile_urn_id}/profileView',
         )
@@ -155,8 +158,7 @@ class LinkedinAPI(object):
         if 'miniProfile' in profile:
             if 'picture' in profile['miniProfile']:
                 profile['displayPictureUrl'] = (
-                    profile['miniProfile']
-                    ['picture']['com.linkedin.common.VectorImage']['rootUrl']
+                    profile['miniProfile']['picture']['com.linkedin.common.VectorImage']['rootUrl']
                 )
             profile['profile_id'] = profile['miniProfile']['entityUrn'].split(':')[3]
 
@@ -170,12 +172,14 @@ class LinkedinAPI(object):
         # massage [experience] data
         experience = data['positionView']['elements']
         for item in experience:
-            if 'company' in item:
+            if 'company' in item and 'miniCompany' in item['company']:
                 if 'logo' in item['company']['miniCompany']:
-                    item['companyLogoUrl'] = (
-                        item['company']['miniCompany']
-                        ['logo']['com.linkedin.common.VectorImage']['rootUrl']
-                    )
+                    logo = item['company']['miniCompany']['logo'].get(
+                        'com.linkedin.common.VectorImage')
+                    if logo:
+                        item['companyLogoUrl'] = (
+                            logo['rootUrl']
+                        )
                 del item['company']['miniCompany']
 
         profile['experience'] = experience
@@ -194,51 +198,61 @@ class LinkedinAPI(object):
                         item['school']
                         ['logo']['com.linkedin.common.VectorImage']['rootUrl']
                     )
-                del item['school']['logo']
+                    del item['school']['logo']
 
         profile['education'] = education
 
         return profile
 
-    def get_profile_connections(self, profile_urn_id, connections=[], max_connections=None):
+    def get_profile_connections(self, profile_urn_id, connections=[], max_connections=None, depth='O'):
         """
         Return a list of profile ids connected to profile of given [profile_urn_id]
         """
+        self.logger.debug(f'getting profile connections: {len(connections)}')
+        sleep(random.randint(0, 1))  # sleep a random duration to try and evade suspention
         _MAX_COUNT = 49  # max seems to be 49
+        _MAX_REQUESTS = 200  # VERY conservative max requests count to avoid rate-limit
+
+        max_connections = max_connections if max_connections and max_connections <= _MAX_COUNT else _MAX_COUNT
         params = {
-            'count': max_connections if max_connections and max_connections < _MAX_COUNT else _MAX_COUNT,
-            'guides': f"List(v->PEOPLE,facetNetwork->F|S,facetConnectionOf->{profile_urn_id})",
-            'origin': 'MEMBER_PROFILE_CANNED_SEARCH',
+            'count': max_connections,
+            'guides': f"List(v->PEOPLE,facetNetwork->{depth},facetConnectionOf->{profile_urn_id})",
+            'origin': 'FACETED_SEARCH',
             'q': 'guided',
-            'start': len(connections)
+            'start': len(connections),
+            # '_bustCache': 'ember1211'
         }
         res = self.session.get(
             f'{_API_BASE_URL}/search/cluster',
             params=params
         )
         data = res.json()
-        total_found = data['paging']['total']
-        if total_found == 0:
+        total_found = data.get('paging', {}).get('total')
+        if total_found == 0 or total_found is None:
+            self.logger.debug('\tfound none...')
             return []
 
         discovered_connections = []
-        for item in data['elements'][0]['elements']:
-            search_profile = item['hitInfo']['com.linkedin.voyager.search.SearchProfile']
-            profile_id = search_profile['id']
-            distance = search_profile['distance']['value']
+        if len(data['elements']) >= 1:
+            for item in data['elements'][0]['elements']:
+                search_profile = item['hitInfo']['com.linkedin.voyager.search.SearchProfile']
+                profile_id = search_profile['id']
+                distance = search_profile['distance']['value']
 
-            discovered_connections.append({
-                'profile_urn_id': profile_id, 
-                'distance': distance, 
-                'public_profile_id': search_profile['miniProfile']['publicIdentifier']
-            })
+                discovered_connections.append({
+                    'profile_urn_id': profile_id,
+                    'distance': distance,
+                    'public_profile_id': search_profile['miniProfile']['publicIdentifier']
+                })
 
         connections.extend(discovered_connections)
+        self.logger.debug(f'\tfound {len(discovered_connections)}')
 
         # recursive base case
         if (
             (max_connections is not None and len(connections) >= max_connections) or
-            len(connections) >= total_found
+            len(connections) >= total_found or
+            len(connections) / max_connections >= _MAX_REQUESTS
         ):
             return connections
 

@@ -23,6 +23,9 @@ _COOKIE_FILE_PATH = './tmp/cookies'
 _AUTH_BASE_URL = 'https://www.linkedin.com'
 _API_BASE_URL = 'https://www.linkedin.com/voyager/api'
 
+_MAX_SEARCH_COUNT = 49  # max seems to be 49
+_MAX_REPEATED_REQUESTS = 200  # VERY conservative max requests count to avoid rate-limit
+
 
 class LinkedinAPI(object):
     """
@@ -31,7 +34,7 @@ class LinkedinAPI(object):
 
     logger = None
 
-    def __init__(self):
+    def __init__(self, debug=False):
         self.session = requests.session()
         self.session.headers = {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) \
@@ -40,7 +43,7 @@ class LinkedinAPI(object):
         }
 
         LinkedinAPI.logger = logging.getLogger('LinkedinAPI')
-        logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
 
     @staticmethod
     def _request_session_cookies():
@@ -204,56 +207,87 @@ class LinkedinAPI(object):
 
         return profile
 
-    def get_profile_connections(self, profile_urn_id, connections=[], max_connections=None, depth='O'):
+    def search(self, params, max_results=None, results=[]):
         """
-        Return a list of profile ids connected to profile of given [profile_urn_id]
+        Do a search.
         """
-        self.logger.debug(f'getting profile connections: {len(connections)}')
         sleep(random.randint(0, 1))  # sleep a random duration to try and evade suspention
-        _MAX_COUNT = 49  # max seems to be 49
-        _MAX_REQUESTS = 200  # VERY conservative max requests count to avoid rate-limit
 
-        max_connections = max_connections if max_connections and max_connections <= _MAX_COUNT else _MAX_COUNT
-        params = {
-            'count': max_connections,
-            'guides': f"List(v->PEOPLE,facetNetwork->{depth},facetConnectionOf->{profile_urn_id})",
-            'origin': 'FACETED_SEARCH',
+        max_results = (
+            max_results
+            if max_results and max_results <= _MAX_SEARCH_COUNT
+            else _MAX_SEARCH_COUNT
+        )
+        default_params = {
+            'count': max_results,
+            'guides': 'List()',
+            'origin': 'GLOBAL_SEARCH_HEADER',
+            'keywords': '',
             'q': 'guided',
-            'start': len(connections),
-            # '_bustCache': 'ember1211'
+            'start': len(results),
         }
+
+        default_params.update(params)
+
         res = self.session.get(
             f'{_API_BASE_URL}/search/cluster',
-            params=params
+            params=default_params
         )
         data = res.json()
+
         total_found = data.get('paging', {}).get('total')
         if total_found == 0 or total_found is None:
             self.logger.debug('\tfound none...')
             return []
 
-        discovered_connections = []
         if len(data['elements']) >= 1:
-            for item in data['elements'][0]['elements']:
-                search_profile = item['hitInfo']['com.linkedin.voyager.search.SearchProfile']
-                profile_id = search_profile['id']
-                distance = search_profile['distance']['value']
-
-                discovered_connections.append({
-                    'profile_urn_id': profile_id,
-                    'distance': distance,
-                    'public_profile_id': search_profile['miniProfile']['publicIdentifier']
-                })
-
-        connections.extend(discovered_connections)
-        self.logger.debug(f'\tfound {len(discovered_connections)}')
+            results.extend(data['elements'][0]['elements'])
 
         # recursive base case
         if (
-            (max_connections is not None and len(connections) >= max_connections) or
-            len(connections) >= total_found or
-            len(connections) / max_connections >= _MAX_REQUESTS
+            (max_results is not None and len(results) >= max_results) or
+            len(results) >= total_found or
+            len(results) / max_results >= _MAX_REPEATED_REQUESTS
         ):
-            return connections
+            return results
 
-        return self.get_profile_connections(profile_urn_id, connections, max_connections=max_connections)
+        return self.search(params, results=results, max_results=max_results)
+
+    def get_profile_connections(self, profile_urn_id):
+        """
+        Return a list of profile ids connected to profile of given [profile_urn_id]
+        """
+        return self.search_people(connection_of=profile_urn_id, network_depth='F')
+
+    def search_people(self, keywords=None, connection_of=None, network_depth=None):
+        """
+        Do a people search.
+        """
+        guides = ['v->PEOPLE']
+        if connection_of:
+            guides.append(f'facetConnectionOf->{connection_of}')
+        if network_depth:
+            guides.append(f'facetNetwork->{network_depth}')
+
+        params = {
+            'guides': 'List({})'.format(','.join(guides))
+        }
+
+        if keywords:
+            params['keywords'] = keywords
+
+        data = self.search(params, max_results=49)
+
+        results = []
+        for item in data:
+            search_profile = item['hitInfo']['com.linkedin.voyager.search.SearchProfile']
+            profile_id = search_profile['id']
+            distance = search_profile['distance']['value']
+
+            results.append({
+                'profile_urn_id': profile_id,
+                'distance': distance,
+                'public_profile_id': search_profile['miniProfile']['publicIdentifier']
+            })
+
+        return results

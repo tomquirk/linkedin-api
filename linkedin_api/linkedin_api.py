@@ -213,16 +213,15 @@ class LinkedinAPI(object):
         """
         sleep(random.randint(0, 1))  # sleep a random duration to try and evade suspention
 
-        max_results = (
+        count = (
             max_results
             if max_results and max_results <= _MAX_SEARCH_COUNT
             else _MAX_SEARCH_COUNT
         )
         default_params = {
-            'count': max_results,
+            'count': count,
             'guides': 'List()',
             'origin': 'GLOBAL_SEARCH_HEADER',
-            'keywords': '',
             'q': 'guided',
             'start': len(results),
         }
@@ -237,19 +236,20 @@ class LinkedinAPI(object):
 
         total_found = data.get('paging', {}).get('total')
         if total_found == 0 or total_found is None:
-            self.logger.debug('\tfound none...')
+            self.logger.debug('found none...')
             return []
-
-        if len(data['elements']) >= 1:
-            results.extend(data['elements'][0]['elements'])
 
         # recursive base case
         if (
+            len(data['elements']) == 0 or
             (max_results is not None and len(results) >= max_results) or
             len(results) >= total_found or
             len(results) / max_results >= _MAX_REPEATED_REQUESTS
         ):
             return results
+
+        results.extend(data['elements'][0]['elements'])
+        self.logger.debug(f'results grew: {len(results)}')
 
         return self.search(params, results=results, max_results=max_results)
 
@@ -259,7 +259,7 @@ class LinkedinAPI(object):
         """
         return self.search_people(connection_of=profile_urn_id, network_depth='F')
 
-    def search_people(self, keywords=None, connection_of=None, network_depth=None, region=None, industry=None):
+    def search_people(self, keywords=None, connection_of=None, network_depth=None, regions=None, industries=None):
         """
         Do a people search.
         """
@@ -268,10 +268,10 @@ class LinkedinAPI(object):
             guides.append(f'facetConnectionOf->{connection_of}')
         if network_depth:
             guides.append(f'facetNetwork->{network_depth}')
-        if region:
-            guides.append(f'facetGeoRegion->{region}')
-        if industry:
-            guides.append(f'facetIndustry->{industry}')
+        if regions:
+            guides.append(f'facetGeoRegion->{"|".join(regions)}')
+        if industries:
+            guides.append(f'facetIndustry->{"|".join(industries)}')
 
         params = {
             'guides': 'List({})'.format(','.join(guides))
@@ -280,7 +280,7 @@ class LinkedinAPI(object):
         if keywords:
             params['keywords'] = keywords
 
-        data = self.search(params, max_results=49)
+        data = self.search(params)
 
         results = []
         for item in data:

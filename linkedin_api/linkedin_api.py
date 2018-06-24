@@ -259,7 +259,7 @@ class LinkedinAPI(object):
         """
         return self.search_people(connection_of=profile_urn_id, network_depth='F')
 
-    def search_people(self, keywords=None, connection_of=None, network_depth=None):
+    def search_people(self, keywords=None, connection_of=None, network_depth=None, region=None, industry=None):
         """
         Do a people search.
         """
@@ -268,6 +268,10 @@ class LinkedinAPI(object):
             guides.append(f'facetConnectionOf->{connection_of}')
         if network_depth:
             guides.append(f'facetNetwork->{network_depth}')
+        if region:
+            guides.append(f'facetGeoRegion->{region}')
+        if industry:
+            guides.append(f'facetIndustry->{industry}')
 
         params = {
             'guides': 'List({})'.format(','.join(guides))

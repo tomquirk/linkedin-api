@@ -286,5 +286,5 @@ class Linkedin(object):
             return {}
 
         company = data["elements"][0]
-        import ipdb; ipdb.set_trace()
+
         return company

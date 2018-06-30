@@ -4,6 +4,9 @@
 
 > No "official" access required - just use a valid Linkedin account!
 
+### USE AT YOUR OWN RISK 😉
+This project should only be used as a learning project. Using it would violate Linkedin's Terms of Use. I am not responsible for your account being blocked (which they will definitely do. Hint: **don't use your personal Linkedin account**)
+
 ## Overview
 
 This project attempts to provide a simple Python interface for the Linkedin API.
@@ -16,14 +19,15 @@ So specifically, this project aims to provide complete coverage for Voyager.
 
 [How do we do it?](#in-depth-overview)
 
+### Want to contribute?
 [How do I find endpoints?](to-find-endpoints)
 
 ## Example usage
 
 ```python
 from linkedin_api import Linkedin
-# Authenticate using any Linkedin account credentials
 
+# Authenticate using any Linkedin account credentials
 api = Linkedin('reedhoffman@linkedin.com', 'iheartmicrosoft')
 
 # GET a profile
@@ -41,7 +45,7 @@ connections = api.get_profile_connections('1234asc12304', max_connections=200)
 ### Dependencies
 
 * Python 3
-* A valid Linkedin user account
+* A valid Linkedin user account (don't use your personal account, if possible)
 * Pipenv (optional)
 
 1. Using pipenv...
@@ -85,3 +89,32 @@ The most reliable method to find the relevant endpoint is to:
 4. The value of `request` is the url! :woot:
 
 You can also use the `network` tab in you browsers developer tools, but you will encounter mixed results.
+
+### How Clients query Voyager
+
+Linkedin seems to have developed an internal query language/syntax where Clients (i.e. front-ends like linkedin.com) to specify what data they want (similar to the GraphQL concept). **If anyone knows what this is, I'd love to know!**.
+
+Here's an example of making a request for an organisation's `name` and `groups` (the Linkedin groups it manages):
+
+```
+/voyager/api/organization/companies?decoration=(name,groups*~(entityUrn,largeLogo,groupName,memberCount,websiteUrl,url))&q=universalName&universalName=linkedin
+```
+
+The "querying" happens in the `decoration` parameter, which looks like
+```
+(
+    name,
+    groups*~(entityUrn,largeLogo,groupName,memberCount,websiteUrl,url)
+)
+```
+So here, we request an organisation name, and a list of groups, where for each group we want `largeLogo`, `groupName`, etc.
+
+Different endpoints use different parameters (and perhaps even different syntaxes) to specify these queries. Notice that the above query had a parameter `q` whose value was `universalName`; the query was then specified with the `decoration` parameter. 
+
+In contrast, the `/search/cluster` endpoint uses `q=guided`, and specifies its query with the `guided` parameter, whose value is something like
+```
+List(v->PEOPLE)
+```
+
+It could be possible to document (and implement a nice interface for) this query language - as we add more endpoints to this project, I'm sure it will become more clear if such a thing would be possible (and if it's worth it).
+

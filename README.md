@@ -22,7 +22,12 @@ So specifically, this project aims to provide complete coverage for Voyager.
 ### Want to contribute?
 [How do I find endpoints?](to-find-endpoints)
 
-## Example usage
+## Installation
+```
+$ pip install linkedin_api
+```
+
+### Example usage
 
 ```python
 from linkedin_api import Linkedin

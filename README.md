@@ -21,12 +21,10 @@ So specifically, this project aims to provide complete coverage for Voyager.
 ## Example usage
 
 ```python
-from linkedin_api import LinkedinAPI
-
-api = LinkedinAPI()
-
+from linkedin_api import Linkedin
 # Authenticate using any Linkedin account credentials
-api.authenticate('reedhoffman@linkedin.com', 'iheartmicrosoft')
+
+api = Linkedin('reedhoffman@linkedin.com', 'iheartmicrosoft')
 
 # GET a profile
 profile = api.get_profile('billy-g')

@@ -1,111 +1,27 @@
 """
 Provides linkedin api-related code
 """
-import requests
-import pickle
-import logging
-import os
 import random
+import logging
 from time import sleep
 
-REQUEST_HEADERS = {
-    'X-Li-User-Agent': 'LIAuthLibrary:3.2.4 \
-                        com.linkedin.LinkedIn:8.8.1 \
-                        iPhone:8.3',
-    'User-Agent': 'LinkedIn/8.8.1 CFNetwork/711.3.18 Darwin/14.0.0',
-    'X-User-Language': 'en',
-    'X-User-Locale': 'en_US',
-    'Accept-Language': 'en-us',
-}
+from linkedin_api.client import Client
 
-_COOKIE_FILE_PATH = './tmp/cookies'
-
-_AUTH_BASE_URL = 'https://www.linkedin.com'
-_API_BASE_URL = 'https://www.linkedin.com/voyager/api'
-
-_MAX_SEARCH_COUNT = 49  # max seems to be 49
-_MAX_REPEATED_REQUESTS = 200  # VERY conservative max requests count to avoid rate-limit
+logger = logging.getLogger(__name__)
 
 
-class LinkedinAPI(object):
+class Linkedin(object):
     """
-    Class to authenticate with, and call, the Linkedin API.
+    Class for accessing Linkedin API.
     """
+    _MAX_SEARCH_COUNT = 49  # max seems to be 49
+    _MAX_REPEATED_REQUESTS = 200  # VERY conservative max requests count to avoid rate-limit
 
-    logger = None
+    def __init__(self, username, password):
+        self.client = Client()
+        self.client.authenticate(username, password)
 
-    def __init__(self, debug=False):
-        self.session = requests.session()
-        self.session.headers = {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) \
-                        AppleWebKit/537.36 (KHTML, like Gecko) \
-                        Chrome/66.0.3359.181 Safari/537.36'
-        }
-
-        LinkedinAPI.logger = logging.getLogger('LinkedinAPI')
-        logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
-
-    @staticmethod
-    def _request_session_cookies():
-        """
-        Return a new set of session cookies as given by Linkedin.
-        """
-        try:
-            with open(_COOKIE_FILE_PATH, 'rb') as f:
-                cookies = pickle.load(f)
-                if cookies:
-                    return cookies
-        except FileNotFoundError:
-            LinkedinAPI.logger.debug('Cookie file not found. Requesting new cookies.')
-            os.mkdir('tmp')
-            pass
-
-        res = requests.get(
-            f'{_AUTH_BASE_URL}/uas/authenticate',
-            headers=REQUEST_HEADERS
-        )
-
-        return res.cookies
-
-    def _set_session_cookies(self, cookiejar):
-        """
-        Set cookies of the current session and save them to a file.
-        """
-        self.session.cookies = cookiejar
-        self.session.headers['csrf-token'] = self.session.cookies['JSESSIONID'].strip('\"')
-        with open(_COOKIE_FILE_PATH, 'wb') as f:
-            pickle.dump(cookiejar, f)
-
-    def authenticate(self, username, password):
-        """
-        Authenticate with Linkedin.
-
-        Return a session object that is authenticated.
-        """
-        self._set_session_cookies(self._request_session_cookies())
-
-        payload = {
-            'session_key': username,
-            'session_password': password,
-            'JSESSIONID': self.session.cookies['JSESSIONID'],
-        }
-
-        res = requests.post(
-            f'{_AUTH_BASE_URL}/uas/authenticate',
-            data=payload,
-            cookies=self.session.cookies,
-            headers=REQUEST_HEADERS
-        )
-
-        data = res.json()
-
-        # TODO raise better exceptions
-        if res.status_code != 200:
-            raise Exception()
-        elif data['login_result'] != 'PASS':
-            raise Exception()
-
-        self._set_session_cookies(res.cookies)
+        self.logger = logger
 
     def get_profile_contact_info(self, public_profile_id=None, profile_urn_id=None):
         """
@@ -114,8 +30,8 @@ class LinkedinAPI(object):
         [public_profile_id] - public identifier i.e. tom-quirk-1928345
         [profile_urn_id] - id provided by the related URN
         """
-        res = self.session.get(
-            f'{_API_BASE_URL}/identity/profiles/{public_profile_id or profile_urn_id}/profileContactInfo',
+        res = self.client.session.get(
+            f'{self.client.API_BASE_URL}/identity/profiles/{public_profile_id or profile_urn_id}/profileContactInfo',
         )
         data = res.json()
 
@@ -146,8 +62,8 @@ class LinkedinAPI(object):
         [profile_urn_id] - id provided by the related URN
         """
         sleep(random.randint(2, 5))  # sleep a random duration to try and evade suspention
-        res = self.session.get(
-            f'{_API_BASE_URL}/identity/profiles/{public_profile_id or profile_urn_id}/profileView',
+        res = self.client.session.get(
+            f'{self.client.API_BASE_URL}/identity/profiles/{public_profile_id or profile_urn_id}/profileView',
         )
 
         data = res.json()
@@ -215,8 +131,8 @@ class LinkedinAPI(object):
 
         count = (
             max_results
-            if max_results and max_results <= _MAX_SEARCH_COUNT
-            else _MAX_SEARCH_COUNT
+            if max_results and max_results <= Linkedin._MAX_SEARCH_COUNT
+            else Linkedin._MAX_SEARCH_COUNT
         )
         default_params = {
             'count': count,
@@ -228,8 +144,8 @@ class LinkedinAPI(object):
 
         default_params.update(params)
 
-        res = self.session.get(
-            f'{_API_BASE_URL}/search/cluster',
+        res = self.client.session.get(
+            f'{self.client.API_BASE_URL}/search/cluster',
             params=default_params
         )
         data = res.json()
@@ -244,7 +160,7 @@ class LinkedinAPI(object):
             len(data['elements']) == 0 or
             (max_results is not None and len(results) >= max_results) or
             len(results) >= total_found or
-            len(results) / max_results >= _MAX_REPEATED_REQUESTS
+            len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS
         ):
             return results
 

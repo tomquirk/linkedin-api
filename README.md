@@ -40,6 +40,9 @@ contact_info = api.get_profile_contact_info('billy-g')
 connections = api.get_profile_connections('1234asc12304', max_connections=200)
 ```
 
+## Documentation
+For a complete reference documentation, see the [DOCS.md](https://github.com/tomquirk/linkedin-api/blob/master/DOCS.md)
+
 ## Setup
 
 ### Dependencies

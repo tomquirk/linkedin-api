@@ -24,101 +24,6 @@ class Linkedin(object):
 
         self.logger = logger
 
-    def get_profile_contact_info(self, public_profile_id=None, profile_urn_id=None):
-        """
-        Return data for a single profile.
-
-        [public_profile_id] - public identifier i.e. tom-quirk-1928345
-        [profile_urn_id] - id provided by the related URN
-        """
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/identity/profiles/{public_profile_id or profile_urn_id}/profileContactInfo"
-        )
-        data = res.json()
-
-        contact_info = {
-            "email_address": data.get("emailAddress"),
-            "websites": [],
-            "phone_numbers": data.get("phoneNumbers", []),
-        }
-
-        websites = data.get("websites", [])
-        for item in websites:
-            if "com.linkedin.voyager.identity.profile.StandardWebsite" in item["type"]:
-                item["label"] = item["type"]["com.linkedin.voyager.identity.profile.StandardWebsite"]["category"]
-            elif "" in item["type"]:
-                item["label"] = item["type"]["com.linkedin.voyager.identity.profile.CustomWebsite"]["label"]
-
-            del item["type"]
-
-        contact_info["websites"] = websites
-
-        return contact_info
-
-    def get_profile(self, public_profile_id=None, profile_urn_id=None):
-        """
-        Return data for a single profile.
-
-        [public_profile_id] - public identifier i.e. tom-quirk-1928345
-        [profile_urn_id] - id provided by the related URN
-        """
-        sleep(random.randint(2, 5))  # sleep a random duration to try and evade suspention
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/identity/profiles/{public_profile_id or profile_urn_id}/profileView"
-        )
-
-        data = res.json()
-
-        if data and "status" in data and data["status"] != 200:
-            self.logger.info("request failed: {}".format(data["message"]))
-            return {}
-
-        # massage [profile] data
-        profile = data["profile"]
-        if "miniProfile" in profile:
-            if "picture" in profile["miniProfile"]:
-                profile["displayPictureUrl"] = profile["miniProfile"]["picture"]["com.linkedin.common.VectorImage"][
-                    "rootUrl"
-                ]
-            profile["profile_id"] = profile["miniProfile"]["entityUrn"].split(":")[3]
-
-            del profile["miniProfile"]
-
-        del profile["defaultLocale"]
-        del profile["supportedLocales"]
-        del profile["versionTag"]
-        del profile["showEducationOnProfileTopCard"]
-
-        # massage [experience] data
-        experience = data["positionView"]["elements"]
-        for item in experience:
-            if "company" in item and "miniCompany" in item["company"]:
-                if "logo" in item["company"]["miniCompany"]:
-                    logo = item["company"]["miniCompany"]["logo"].get(
-                        "com.linkedin.common.VectorImage")
-                    if logo:
-                        item["companyLogoUrl"] = logo["rootUrl"]
-                del item["company"]["miniCompany"]
-
-        profile["experience"] = experience
-
-        # massage [skills] data
-        skills = [item["name"] for item in data["skillView"]["elements"]]
-
-        profile["skills"] = skills
-
-        # massage [education] data
-        education = data["educationView"]["elements"]
-        for item in education:
-            if "school" in item:
-                if "logo" in item["school"]:
-                    item["school"]["logoUrl"] = item["school"]["logo"]["com.linkedin.common.VectorImage"]["rootUrl"]
-                    del item["school"]["logo"]
-
-        profile["education"] = education
-
-        return profile
-
     def search(self, params, max_results=None, results=[]):
         """
         Do a search.
@@ -188,19 +93,114 @@ class Linkedin(object):
 
             results.append(
                 {
-                    "profile_urn_id": profile_id,
+                    "urn_id": profile_id,
                     "distance": distance,
-                    "public_profile_id": search_profile["miniProfile"]["publicIdentifier"],
+                    "public_id": search_profile["miniProfile"]["publicIdentifier"],
                 }
             )
 
         return results
 
-    def get_profile_connections(self, profile_urn_id):
+    def get_profile_contact_info(self, public_id=None, urn_id=None):
         """
-        Return a list of profile ids connected to profile of given [profile_urn_id]
+        Return data for a single profile.
+
+        [public_id] - public identifier i.e. tom-quirk-1928345
+        [urn_id] - id provided by the related URN
         """
-        return self.search_people(connection_of=profile_urn_id, network_depth="F")
+        res = self.client.session.get(
+            f"{self.client.API_BASE_URL}/identity/profiles/{public_id or urn_id}/profileContactInfo"
+        )
+        data = res.json()
+
+        contact_info = {
+            "email_address": data.get("emailAddress"),
+            "websites": [],
+            "phone_numbers": data.get("phoneNumbers", []),
+        }
+
+        websites = data.get("websites", [])
+        for item in websites:
+            if "com.linkedin.voyager.identity.profile.StandardWebsite" in item["type"]:
+                item["label"] = item["type"]["com.linkedin.voyager.identity.profile.StandardWebsite"]["category"]
+            elif "" in item["type"]:
+                item["label"] = item["type"]["com.linkedin.voyager.identity.profile.CustomWebsite"]["label"]
+
+            del item["type"]
+
+        contact_info["websites"] = websites
+
+        return contact_info
+
+    def get_profile(self, public_id=None, urn_id=None):
+        """
+        Return data for a single profile.
+
+        [public_id] - public identifier i.e. tom-quirk-1928345
+        [urn_id] - id provided by the related URN
+        """
+        sleep(random.randint(2, 5))  # sleep a random duration to try and evade suspention
+        res = self.client.session.get(
+            f"{self.client.API_BASE_URL}/identity/profiles/{public_id or urn_id}/profileView"
+        )
+
+        data = res.json()
+
+        if data and "status" in data and data["status"] != 200:
+            self.logger.info("request failed: {}".format(data["message"]))
+            return {}
+
+        # massage [profile] data
+        profile = data["profile"]
+        if "miniProfile" in profile:
+            if "picture" in profile["miniProfile"]:
+                profile["displayPictureUrl"] = profile["miniProfile"]["picture"]["com.linkedin.common.VectorImage"][
+                    "rootUrl"
+                ]
+            profile["profile_id"] = profile["miniProfile"]["entityUrn"].split(":")[3]
+
+            del profile["miniProfile"]
+
+        del profile["defaultLocale"]
+        del profile["supportedLocales"]
+        del profile["versionTag"]
+        del profile["showEducationOnProfileTopCard"]
+
+        # massage [experience] data
+        experience = data["positionView"]["elements"]
+        for item in experience:
+            if "company" in item and "miniCompany" in item["company"]:
+                if "logo" in item["company"]["miniCompany"]:
+                    logo = item["company"]["miniCompany"]["logo"].get(
+                        "com.linkedin.common.VectorImage")
+                    if logo:
+                        item["companyLogoUrl"] = logo["rootUrl"]
+                del item["company"]["miniCompany"]
+
+        profile["experience"] = experience
+
+        # massage [skills] data
+        skills = [item["name"] for item in data["skillView"]["elements"]]
+
+        profile["skills"] = skills
+
+        # massage [education] data
+        education = data["educationView"]["elements"]
+        for item in education:
+            if "school" in item:
+                if "logo" in item["school"]:
+                    item["school"]["logoUrl"] = item["school"]["logo"]["com.linkedin.common.VectorImage"]["rootUrl"]
+                    del item["school"]["logo"]
+
+        profile["education"] = education
+
+        return profile
+
+    def get_profile_connections(self, urn_id):
+        """
+        Return a list of profile ids connected to profile of given [urn_id]
+        """
+        return self.search_people(connection_of=urn_id, network_depth="F")
 
     def get_school(self, public_id):
         """

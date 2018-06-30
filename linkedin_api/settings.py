@@ -1,1 +1,1 @@
-COOKIE_FILE_PATH = './tmp/cookies'
+COOKIE_FILE_PATH = "./tmp/cookies"

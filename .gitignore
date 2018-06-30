@@ -1,4 +1,12 @@
-*.pyc
+# Linkedin-api
 **tmp/
 credentials.json
+
+# Dev
+*.pyc
 .vscode
+
+# PyPI
+dist
+build
+*.egg-info

@@ -40,8 +40,7 @@ class Client(object):
         self.logger = logger
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
 
-    @staticmethod
-    def _request_session_cookies():
+    def _request_session_cookies(self):
         """
         Return a new set of session cookies as given by Linkedin.
         """
@@ -51,7 +50,7 @@ class Client(object):
                 if cookies:
                     return cookies
         except FileNotFoundError:
-            Client.logger.debug("Cookie file not found. Requesting new cookies.")
+            self.logger.debug("Cookie file not found. Requesting new cookies.")
             os.mkdir("tmp")
             pass
 

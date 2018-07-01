@@ -1,7 +1,6 @@
 import requests
 import pickle
 import logging
-import os
 
 import linkedin_api.settings as settings
 
@@ -16,9 +15,14 @@ class Client(object):
     # Settings for general Linkedin API calls
     API_BASE_URL = "https://www.linkedin.com/voyager/api"
     REQUEST_HEADERS = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) \
-                        AppleWebKit/537.36 (KHTML, like Gecko) \
-                        Chrome/66.0.3359.181 Safari/537.36",
+        "user-agent": " ".join(
+            [
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5)",
+                "AppleWebKit/537.36 (KHTML, like Gecko)",
+                "Chrome/66.0.3359.181 Safari/537.36",
+            ]
+        ),
+        "x-restli-protocol-version": "2.0.0",
     }
 
     # Settings for authenticating with Linkedin
@@ -52,8 +56,10 @@ class Client(object):
         except FileNotFoundError:
             self.logger.debug("Cookie file not found. Requesting new cookies.")
 
-        res = requests.get(f"{Client.AUTH_BASE_URL}/uas/authenticate",
-                           headers=Client.AUTH_REQUEST_HEADERS)
+        res = requests.get(
+            f"{Client.AUTH_BASE_URL}/uas/authenticate",
+            headers=Client.AUTH_REQUEST_HEADERS,
+        )
 
         return res.cookies
 

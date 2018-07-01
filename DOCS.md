@@ -107,7 +107,7 @@ linkedin.get_company('linkedin')
 ---------------------------------------
 
 <a name="search"></a>
-### linkedin.search(self, params, max_results=None, results=[])
+### linkedin.search(params, max_results=None, results=[])
 
 Perform a Linkedin search and return the results.
 
@@ -125,8 +125,71 @@ linkedin.search({keywords: 'software'}, 200)
 
 ---------------------------------------
 
+<a name="get_conversations"></a>
+### linkedin.get_conversations()
+
+Return a list of metadata of the user's conversations.
+
+__Example__
+
+```python
+linkedin = Linkedin(credentials['username'], credentials['password'])
+
+linkedin.get_conversations()
+```
+
+---------------------------------------
+
+<a name="get_conversation_details"></a>
+### linkedin.get_conversation_details(profile_urn_id)
+
+Return the conversation details for a given profile_urn_id.
+Use this endpoint to get the `conversation id` to send messages (see example).
+
+__Arguments__
+* `profile_urn_id`<str> - the urn id of the profile
+
+__Example__
+
+```python
+linkedin = Linkedin(credentials['username'], credentials['password'])
+
+profile = linkedin.get_profile('bill-g')
+profile_urn_id = profile['profile_id']
+
+conversation = linkedin.get_conversation_details(profile_urn_id)
+conversation_id = conversation['id']
+```
+
+---------------------------------------
+
+<a name="send_message"></a>
+### linkedin.send_message(conversation_urn_id, message_body)
+
+Sends a message to the given [conversation_urn_id]
+
+__Arguments__
+* `conversation_urn_id`<str> - the urn id of the conversation
+* `message_body`<str> - the message to send
+
+__Example__
+
+```python
+linkedin = Linkedin(credentials['username'], credentials['password'])
+
+profile = linkedin.get_profile('bill-g')
+profile_urn_id = profile['profile_id']
+
+conversation = linkedin.get_conversation_details(profile_urn_id)
+conversation_id = conversation['id']
+
+linkedin.send_message(conversation_id, "Can I haz job??")
+```
+
+---------------------------------------
+
 <a name="search_people"></a>
-### linkedin.search_people(self, keywords=None, connection_of=None, network_depth=None, regions=None, industries=None)
+### linkedin.search_people(keywords=None, connection_of=None, network_depth=None, regions=None, industries=None)
 
 Perform a Linkedin search and return the results.
 

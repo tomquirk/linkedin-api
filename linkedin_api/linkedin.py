@@ -4,6 +4,9 @@ Provides linkedin api-related code
 import random
 import logging
 from time import sleep
+import json
+
+from linkedin_api.utils.helpers import get_id_from_urn
 
 from linkedin_api.client import Client
 
@@ -16,7 +19,9 @@ class Linkedin(object):
     """
 
     _MAX_SEARCH_COUNT = 49  # max seems to be 49
-    _MAX_REPEATED_REQUESTS = 200  # VERY conservative max requests count to avoid rate-limit
+    _MAX_REPEATED_REQUESTS = (
+        200
+    )  # VERY conservative max requests count to avoid rate-limit
 
     def __init__(self, username, password):
         self.client = Client()
@@ -28,9 +33,15 @@ class Linkedin(object):
         """
         Do a search.
         """
-        sleep(random.randint(0, 1))  # sleep a random duration to try and evade suspention
+        sleep(
+            random.randint(0, 1)
+        )  # sleep a random duration to try and evade suspention
 
-        count = max_results if max_results and max_results <= Linkedin._MAX_SEARCH_COUNT else Linkedin._MAX_SEARCH_COUNT
+        count = (
+            max_results
+            if max_results and max_results <= Linkedin._MAX_SEARCH_COUNT
+            else Linkedin._MAX_SEARCH_COUNT
+        )
         default_params = {
             "count": count,
             "guides": "List()",
@@ -42,7 +53,8 @@ class Linkedin(object):
         default_params.update(params)
 
         res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/search/cluster", params=default_params)
+            f"{self.client.API_BASE_URL}/search/cluster", params=default_params
+        )
         data = res.json()
 
         total_found = data.get("paging", {}).get("total")
@@ -64,7 +76,14 @@ class Linkedin(object):
 
         return self.search(params, results=results, max_results=max_results)
 
-    def search_people(self, keywords=None, connection_of=None, network_depth=None, regions=None, industries=None):
+    def search_people(
+        self,
+        keywords=None,
+        connection_of=None,
+        network_depth=None,
+        regions=None,
+        industries=None,
+    ):
         """
         Do a people search.
         """
@@ -87,7 +106,9 @@ class Linkedin(object):
 
         results = []
         for item in data:
-            search_profile = item["hitInfo"]["com.linkedin.voyager.search.SearchProfile"]
+            search_profile = item["hitInfo"][
+                "com.linkedin.voyager.search.SearchProfile"
+            ]
             profile_id = search_profile["id"]
             distance = search_profile["distance"]["value"]
 
@@ -122,9 +143,13 @@ class Linkedin(object):
         websites = data.get("websites", [])
         for item in websites:
             if "com.linkedin.voyager.identity.profile.StandardWebsite" in item["type"]:
-                item["label"] = item["type"]["com.linkedin.voyager.identity.profile.StandardWebsite"]["category"]
+                item["label"] = item["type"][
+                    "com.linkedin.voyager.identity.profile.StandardWebsite"
+                ]["category"]
             elif "" in item["type"]:
-                item["label"] = item["type"]["com.linkedin.voyager.identity.profile.CustomWebsite"]["label"]
+                item["label"] = item["type"][
+                    "com.linkedin.voyager.identity.profile.CustomWebsite"
+                ]["label"]
 
             del item["type"]
 
@@ -139,7 +164,9 @@ class Linkedin(object):
         [public_id] - public identifier i.e. tom-quirk-1928345
         [urn_id] - id provided by the related URN
         """
-        sleep(random.randint(2, 5))  # sleep a random duration to try and evade suspention
+        sleep(
+            random.randint(2, 5)
+        )  # sleep a random duration to try and evade suspention
         res = self.client.session.get(
             f"{self.client.API_BASE_URL}/identity/profiles/{public_id or urn_id}/profileView"
         )
@@ -154,10 +181,10 @@ class Linkedin(object):
         profile = data["profile"]
         if "miniProfile" in profile:
             if "picture" in profile["miniProfile"]:
-                profile["displayPictureUrl"] = profile["miniProfile"]["picture"]["com.linkedin.common.VectorImage"][
-                    "rootUrl"
-                ]
-            profile["profile_id"] = profile["miniProfile"]["entityUrn"].split(":")[3]
+                profile["displayPictureUrl"] = profile["miniProfile"]["picture"][
+                    "com.linkedin.common.VectorImage"
+                ]["rootUrl"]
+            profile["profile_id"] = get_id_from_urn(profile["miniProfile"]["entityUrn"])
 
             del profile["miniProfile"]
 
@@ -172,7 +199,8 @@ class Linkedin(object):
             if "company" in item and "miniCompany" in item["company"]:
                 if "logo" in item["company"]["miniCompany"]:
                     logo = item["company"]["miniCompany"]["logo"].get(
-                        "com.linkedin.common.VectorImage")
+                        "com.linkedin.common.VectorImage"
+                    )
                     if logo:
                         item["companyLogoUrl"] = logo["rootUrl"]
                 del item["company"]["miniCompany"]
@@ -189,7 +217,9 @@ class Linkedin(object):
         for item in education:
             if "school" in item:
                 if "logo" in item["school"]:
-                    item["school"]["logoUrl"] = item["school"]["logo"]["com.linkedin.common.VectorImage"]["rootUrl"]
+                    item["school"]["logoUrl"] = item["school"]["logo"][
+                        "com.linkedin.common.VectorImage"
+                    ]["rootUrl"]
                     del item["school"]["logo"]
 
         profile["education"] = education
@@ -208,7 +238,9 @@ class Linkedin(object):
 
         [public_id] - public identifier i.e. uq
         """
-        sleep(random.randint(2, 5))  # sleep a random duration to try and evade suspention
+        sleep(
+            random.randint(2, 5)
+        )  # sleep a random duration to try and evade suspention
         params = {
             "decoration": (
                 """
@@ -227,12 +259,11 @@ class Linkedin(object):
                 """
             ),
             "q": "universalName",
-            "universalName": public_id
+            "universalName": public_id,
         }
 
         res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/organization/companies",
-            params=params
+            f"{self.client.API_BASE_URL}/organization/companies", params=params
         )
 
         data = res.json()
@@ -251,7 +282,9 @@ class Linkedin(object):
 
         [public_id] - public identifier i.e. univeristy-of-queensland
         """
-        sleep(random.randint(2, 5))  # sleep a random duration to try and evade suspention
+        sleep(
+            random.randint(2, 5)
+        )  # sleep a random duration to try and evade suspention
         params = {
             "decoration": (
                 """
@@ -271,12 +304,11 @@ class Linkedin(object):
                 """
             ),
             "q": "universalName",
-            "universalName": public_id
+            "universalName": public_id,
         }
 
         res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/organization/companies",
-            params=params
+            f"{self.client.API_BASE_URL}/organization/companies", params=params
         )
 
         data = res.json()
@@ -288,3 +320,72 @@ class Linkedin(object):
         company = data["elements"][0]
 
         return company
+
+    def get_conversation_details(self, profile_urn_id):
+        """
+        Return the conversation (or "message thread") details for a given [public_profile_id]
+        """
+        # passing `params` doesn't work properly, think it's to do with List().
+        # Might be a bug in `requests`?
+        res = self.client.session.get(
+            f"{self.client.API_BASE_URL}/messaging/conversations?\
+            keyVersion=LEGACY_INBOX&q=participants&recipients=List({profile_urn_id})"
+        )
+
+        data = res.json()
+
+        item = data["elements"][0]
+        item["id"] = get_id_from_urn(item["entityUrn"])
+
+        return item
+
+    def get_conversations(self):
+        """
+        Return list of conversations the user is in.
+        """
+        params = {"keyVersion": "LEGACY_INBOX"}
+
+        res = self.client.session.get(
+            f"{self.client.API_BASE_URL}/messaging/conversations", params=params
+        )
+
+        return res.json()
+
+    def get_conversation(self, conversation_urn_id):
+        """
+        Return the full conversation at a given [conversation_urn_id]
+        """
+        res = self.client.session.get(
+            f"{self.client.API_BASE_URL}/messaging/conversations/{conversation_urn_id}/events"
+        )
+
+        return res.json()
+
+    def send_message(self, conversation_urn_id, message_body):
+        """
+        Return the full conversation at a given [conversation_urn_id]
+        """
+        params = {"action": "create"}
+
+        payload = json.dumps(
+            {
+                "eventCreate": {
+                    "value": {
+                        "com.linkedin.voyager.messaging.create.MessageCreate": {
+                            "body": message_body,
+                            "attachments": [],
+                            "attributedBody": {"text": message_body, "attributes": []},
+                            "mediaAttachments": [],
+                        }
+                    }
+                }
+            }
+        )
+
+        res = self.client.session.post(
+            f"{self.client.API_BASE_URL}/messaging/conversations/{conversation_urn_id}/events",
+            params=params,
+            data=payload,
+        )
+
+        return res.status_code == 201

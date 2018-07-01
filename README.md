@@ -2,9 +2,11 @@
 
 👨‍💼 Python Wrapper for the Linkedin API
 
-> No "official" access required - just use a valid Linkedin account!
+> No "official" API access required - just use a valid Linkedin account!
 
-### USE AT YOUR OWN RISK 😉
+Programmatically send messages, perform searchs, get profile data and more, all with only your Linkedin account!
+
+##### USE AT YOUR OWN RISK 😉
 This project should only be used as a learning project. Using it would violate Linkedin's Terms of Use. I am not responsible for your account being blocked (which they will definitely do. Hint: **don't use your personal Linkedin account**)
 
 ## Overview

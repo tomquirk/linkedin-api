@@ -18,7 +18,7 @@ class Client(object):
     REQUEST_HEADERS = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) \
                         AppleWebKit/537.36 (KHTML, like Gecko) \
-                        Chrome/66.0.3359.181 Safari/537.36"
+                        Chrome/66.0.3359.181 Safari/537.36",
     }
 
     # Settings for authenticating with Linkedin
@@ -51,10 +51,9 @@ class Client(object):
                     return cookies
         except FileNotFoundError:
             self.logger.debug("Cookie file not found. Requesting new cookies.")
-            os.mkdir("tmp")
-            pass
 
-        res = requests.get(f"{Client._AUTH_BASE_URL}/uas/authenticate", headers=Client.AUTH_REQUEST_HEADERS)
+        res = requests.get(f"{Client.AUTH_BASE_URL}/uas/authenticate",
+                           headers=Client.AUTH_REQUEST_HEADERS)
 
         return res.cookies
 

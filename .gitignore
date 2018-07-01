@@ -5,6 +5,8 @@ credentials.json
 # Dev
 *.pyc
 .vscode
+/playground.py
+.cookies
 
 # PyPI
 dist

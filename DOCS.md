@@ -4,6 +4,10 @@
 * [`linkedin.get_profile_connections`](#get_profile_connections)
 * [`linkedin.get_profile_contact_info`](#get_profile_contact_info)
 
+* [`linkedin.get_conversations`](#get_conversations)
+* [`linkedin.get_conversation_details`](#get_conversation_details)
+* [`linkedin.send_message`](#send_message)
+
 * [`linkedin.get_school`](#get_school)
 * [`linkedin.get_company`](#get_company)
 

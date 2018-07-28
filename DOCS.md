@@ -8,6 +8,8 @@
 * [`linkedin.get_conversation_details`](#get_conversation_details)
 * [`linkedin.send_message`](#send_message)
 
+* ['linkedin.get_current_profile_views](#get_current_profile_views)
+
 * [`linkedin.get_school`](#get_school)
 * [`linkedin.get_company`](#get_company)
 
@@ -188,6 +190,21 @@ conversation = linkedin.get_conversation_details(profile_urn_id)
 conversation_id = conversation['id']
 
 linkedin.send_message(conversation_id, "Can I haz job??")
+```
+
+---------------------------------------
+
+<a name="get_current_profile_views"></a>
+### linkedin.get_current_profile_views()
+
+Get view statistics for the current profile. Includes views over time (chart data)
+
+__Example__
+
+```python
+linkedin = Linkedin(credentials['username'], credentials['password'])
+
+linkedin.get_current_profile_views()
 ```
 
 ---------------------------------------

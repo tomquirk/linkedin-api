@@ -1,6 +1,6 @@
 # Linkedin-api
 **tmp/
-credentials.json
+credentials*
 
 # Dev
 *.pyc
@@ -12,3 +12,6 @@ credentials.json
 dist
 build
 *.egg-info
+
+# Misc
+.DS_Store

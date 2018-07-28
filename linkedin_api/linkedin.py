@@ -67,7 +67,7 @@ class Linkedin(object):
             len(data["elements"]) == 0
             or (max_results is not None and len(results) >= max_results)
             or len(results) >= total_found
-            or len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS
+            or (max_results is not None and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS)
         ):
             return results
 
@@ -231,6 +231,19 @@ class Linkedin(object):
         Return a list of profile ids connected to profile of given [urn_id]
         """
         return self.search_people(connection_of=urn_id, network_depth="F")
+
+    def get_current_profile_views(self):
+        """
+        Get profile view statistics, including chart data.
+        """
+        res = self.client.session.get(
+            f"{self.client.API_BASE_URL}/identity/panels"
+        )
+
+        data = res.json()
+
+        return data['elements'][0]['value']['com.linkedin.voyager.identity.me.ProfileViewsByTimePanel']
+
 
     def get_school(self, public_id):
         """

@@ -232,6 +232,23 @@ class Linkedin(object):
         """
         return self.search_people(connection_of=urn_id, network_depth="F")
 
+    def get_profile_updates(self, public_id=None, urn_id=None):
+        """"
+        Return a list of profile posts
+
+        [public_id] - public identifier i.e. tom-quirk-1928345
+        [urn_id] - id provided by the related URN
+        """
+
+        res = self.client.session.get(
+            f"{self.client.API_BASE_URL}/feed/updates?count=20&includeLongTermHistory=true&profile_id={public_id or urn_id}&q=memberShareFeed"
+        )
+
+        data = res.json()
+
+        return data
+
+
     def get_current_profile_views(self):
         """
         Get profile view statistics, including chart data.

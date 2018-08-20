@@ -41,6 +41,10 @@ class Client(object):
         self.session = requests.session()
         self.session.headers = Client.REQUEST_HEADERS
 
+        #my_config = {'verbose': sys.stderr}
+
+        #self.session.config=my_config
+
         self.logger = logger
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
 

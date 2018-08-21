@@ -1,7 +1,6 @@
 import json
 from linkedin_api import Linkedin
 
-
 with open('credentials.json', 'r') as f:
     credentials = json.load(f)
 
@@ -15,4 +14,7 @@ if credentials:
 
     updates = linkedin.get_profile_updates(public_id='danchungcfa')
 
-    print(updates)
+    f = open('temp.json', 'w')
+
+    json.dump(updates,f)
+    

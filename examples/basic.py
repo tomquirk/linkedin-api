@@ -12,7 +12,7 @@ if credentials:
     #    linkedin.get_profile_contact_info('ACoAABQ11fIBQLGQbB1V1XPBZJsRwfK5r1U2Rzw')
     #connections = linkedin.get_profile_connections(profile['profile_id'])
 
-    updates = linkedin.get_profile_updates(public_id='danchungcfa')
+    updates = linkedin.get_company_updates(public_id='microsoft', max_results=100)
 
     f = open('temp.json', 'w')
 

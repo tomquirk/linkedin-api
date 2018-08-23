@@ -7,14 +7,7 @@ with open('credentials.json', 'r') as f:
 if credentials:
     linkedin = Linkedin(credentials['username'], credentials['password'])
 
-    #profile = linkedin.get_profile('ACoAABQ11fIBQLGQbB1V1XPBZJsRwfK5r1U2Rzw')
-    #profile['contact_info'] = \
-    #    linkedin.get_profile_contact_info('ACoAABQ11fIBQLGQbB1V1XPBZJsRwfK5r1U2Rzw')
-    #connections = linkedin.get_profile_connections(profile['profile_id'])
-
-    updates = linkedin.get_company_updates(public_id='microsoft', max_results=100)
-
-    f = open('temp.json', 'w')
-
-    json.dump(updates,f)
-    
+    profile = linkedin.get_profile('ACoAABQ11fIBQLGQbB1V1XPBZJsRwfK5r1U2Rzw')
+    profile['contact_info'] = \
+        linkedin.get_profile_contact_info('ACoAABQ11fIBQLGQbB1V1XPBZJsRwfK5r1U2Rzw')
+    connections = linkedin.get_profile_connections(profile['profile_id'])

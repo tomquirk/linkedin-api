@@ -232,22 +232,63 @@ class Linkedin(object):
         """
         return self.search_people(connection_of=urn_id, network_depth="F")
 
-    def get_profile_updates(self, public_id=None, urn_id=None):
+    def get_company_updates(self, public_id=None, urn_id=None, max_results=None, results=[]):
+        """"
+        Return a list of company posts
+
+        [public_id] - public identifier ie - microsoft
+        [urn_id] - id provided by the related URN
+        """
+        sleep(
+            random.randint(2, 5)
+        )  # sleep a random duration to try and evade suspention
+
+        res = self.client.session.get(
+            f"{self.client.API_BASE_URL}/feed/updates?companyUniversalName={public_id or urn_id}&q=companyFeedByUniversalName&count=100&start={len(results)}"
+        )
+
+        data = res.json()
+        
+        if (
+            len(data["elements"]) == 0
+            or (max_results is not None and len(results) >= max_results)
+            or (max_results is not None and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS)
+        ):
+            return results
+
+        results.extend(data["elements"])
+        self.logger.debug(f"results grew: {len(results)}")
+
+        return self.get_company_updates(public_id = public_id, urn_id = urn_id, results=results, max_results=max_results)
+
+    def get_profile_updates(self, public_id=None, urn_id=None, max_results=None, results=[]):
         """"
         Return a list of profile posts
 
         [public_id] - public identifier i.e. tom-quirk-1928345
         [urn_id] - id provided by the related URN
         """
+        sleep(
+            random.randint(2, 5)
+        )  # sleep a random duration to try and evade suspention
 
         res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/feed/updates?count=20&includeLongTermHistory=true&profile_id={public_id or urn_id}&q=memberShareFeed"
+            f"{self.client.API_BASE_URL}/feed/updates?profileId={public_id or urn_id}&q=memberShareFeed&moduleKey=member-shares&count=100&start={len(results)}"
         )
 
         data = res.json()
+        
+        if (
+            len(data["elements"]) == 0
+            or (max_results is not None and len(results) >= max_results)
+            or (max_results is not None and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS)
+        ):
+            return results
 
-        return data
+        results.extend(data["elements"])
+        self.logger.debug(f"results grew: {len(results)}")
 
+        return self.get_profile_updates(public_id = public_id, urn_id = urn_id, results=results, max_results=max_results)
 
     def get_current_profile_views(self):
         """

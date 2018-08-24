@@ -40,7 +40,7 @@ class Client(object):
     def __init__(self, debug=False):
         self.session = requests.session()
         self.session.headers = Client.REQUEST_HEADERS
-        
+
         self.logger = logger
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
 

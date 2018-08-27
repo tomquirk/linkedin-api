@@ -18,6 +18,7 @@ class Linkedin(object):
     Class for accessing Linkedin API.
     """
 
+    _MAX_UPDATE_COUNT = 100 # max seems to be 100
     _MAX_SEARCH_COUNT = 49  # max seems to be 49
     _MAX_REPEATED_REQUESTS = (
         200
@@ -231,6 +232,80 @@ class Linkedin(object):
         Return a list of profile ids connected to profile of given [urn_id]
         """
         return self.search_people(connection_of=urn_id, network_depth="F")
+
+    def get_company_updates(self, public_id=None, urn_id=None, max_results=None, results=[]):
+        """"
+        Return a list of company posts
+
+        [public_id] - public identifier ie - microsoft
+        [urn_id] - id provided by the related URN
+        """
+        sleep(
+            random.randint(2, 5)
+        )  # sleep a random duration to try and evade suspention
+
+        params = {
+            "companyUniversalName": {public_id or urn_id},
+            "q": "companyFeedByUniversalName",
+            "moduleKey": "member-share",
+            "count": Linkedin._MAX_UPDATE_COUNT,
+            "start": len(results),
+        }
+
+        res = self.client.session.get(
+            f"{self.client.API_BASE_URL}/feed/updates", params=params
+        )
+
+        data = res.json()
+        
+        if (
+            len(data["elements"]) == 0
+            or (max_results is not None and len(results) >= max_results)
+            or (max_results is not None and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS)
+        ):
+            return results
+
+        results.extend(data["elements"])
+        self.logger.debug(f"results grew: {len(results)}")
+
+        return self.get_company_updates(public_id=public_id, urn_id=urn_id, results=results, max_results=max_results)
+
+    def get_profile_updates(self, public_id=None, urn_id=None, max_results=None, results=[]):
+        """"
+        Return a list of profile posts
+
+        [public_id] - public identifier i.e. tom-quirk-1928345
+        [urn_id] - id provided by the related URN
+        """
+        sleep(
+            random.randint(2, 5)
+        )  # sleep a random duration to try and evade suspention
+
+        params = {
+            "profileId": {public_id or urn_id},
+            "q": "memberShareFeed",
+            "moduleKey": "member-share",
+            "count": Linkedin._MAX_UPDATE_COUNT,
+            "start": len(results),
+        }
+
+        res = self.client.session.get(
+            f"{self.client.API_BASE_URL}/feed/updates", params=params
+        )
+
+        data = res.json()
+        
+        if (
+            len(data["elements"]) == 0
+            or (max_results is not None and len(results) >= max_results)
+            or (max_results is not None and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS)
+        ):
+            return results
+
+        results.extend(data["elements"])
+        self.logger.debug(f"results grew: {len(results)}")
+
+        return self.get_profile_updates(public_id=public_id, urn_id=urn_id, results=results, max_results=max_results)
 
     def get_current_profile_views(self):
         """

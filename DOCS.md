@@ -8,7 +8,7 @@
 * [`linkedin.get_conversation_details`](#get_conversation_details)
 * [`linkedin.send_message`](#send_message)
 
-* ['linkedin.get_current_profile_views](#get_current_profile_views)
+* [`linkedin.get_current_profile_views`](#get_current_profile_views)
 
 * [`linkedin.get_school`](#get_school)
 * [`linkedin.get_company`](#get_company)
@@ -25,11 +25,11 @@ Returns a Linkedin profile.
 
 __Arguments__
 One of:
-* `public_id`<str> - public identifier i.e. tom-quirk-1928345
-* `urn_id`<str> - id provided by the Linkedin URN
+* `public_id <str>` - public identifier i.e. tom-quirk-1928345
+* `urn_id <str>` - id provided by the Linkedin URN
 
 __Return__
-* <dict>
+* `<dict>`
 
 __Example__
 
@@ -47,10 +47,10 @@ profile = linkedin.get_profile('tom-quirk')
 Returns a Linkedin profile's first degree (direct) connections
 
 __Arguments__
-* `urn_id`<str> - id provided by the Linkedin URN
+* `urn_id <str>` - id provided by the Linkedin URN
 
 __Return__
-* <list>
+* `<list>`
 
 __Example__
 
@@ -69,11 +69,11 @@ Returns a Linkedin profile's contact information.
 
 __Arguments__
 One of:
-* `public_id`<str> - public identifier i.e. tom-quirk-1928345
-* `urn_id`<str> - id provided by the Linkedin URN
+* `public_id <str>` - public identifier i.e. tom-quirk-1928345
+* `urn_id <str>` - id provided by the Linkedin URN
 
 __Return__
-* <dict>
+* `<dict>`
 
 __Example__
 
@@ -91,10 +91,10 @@ profile_info = linkedin.get_profile_contact_info('tom-quirk')
 Returns a school's Linkedin profile.
 
 __Arguments__
-* `public_id`<str> - public identifier i.e. university-of-queensland
+* `public_id <str>` - public identifier i.e. university-of-queensland
 
 __Return__
-* <dict>
+* `<dict>`
 
 __Example__
 
@@ -112,10 +112,10 @@ school = linkedin.get_school('university-of-queensland')
 Returns a company's Linkedin profile.
 
 __Arguments__
-* `public_id`<str> - public identifier i.e. linkedin
+* `public_id <str>` - public identifier i.e. linkedin
 
 __Return__
-* <dict>
+* `<dict>`
 
 __Example__
 
@@ -133,11 +133,11 @@ company = linkedin.get_company('linkedin')
 Perform a Linkedin search and return the results.
 
 __Arguments__
-* `params`<dict> - search parameters (see implementation of [search_people](#search_people) for a reference)
+* `params <dict>` - search parameters (see implementation of [search_people](#search_people) for a reference)
 * `max_results`<int> - the max number of results to return
 
 __Return__
-* <list>
+* `<list>`
 
 __Example__
 
@@ -155,7 +155,7 @@ results = linkedin.search({'keywords': 'software'}, 200)
 Return a list of metadata of the user's conversations.
 
 __Return__
-* <list>
+* `<list>`
 
 __Example__
 
@@ -174,10 +174,10 @@ Return the conversation details for a given profile_urn_id.
 Use this endpoint to get the `conversation id` to send messages (see example).
 
 __Arguments__
-* `profile_urn_id`<str> - the urn id of the profile
+* `profile_urn_id <str>` - the urn id of the profile
 
 __Return__
-* <dict>
+* `<dict>`
 
 __Example__
 
@@ -200,11 +200,11 @@ conversation_id = conversation['id']
 Sends a message to the given [conversation_urn_id]
 
 __Arguments__
-* `conversation_urn_id`<str> - the urn id of the conversation
-* `message_body`<str> - the message to send
+* `conversation_urn_id <str>` - the urn id of the conversation
+* `message_body <str>` - the message to send
 
 __Return__
-* <boolean> - True if error
+* `<boolean>` - True if error
 
 __Example__
 
@@ -246,14 +246,14 @@ views = linkedin.get_current_profile_views()
 Perform a Linkedin search and return the results.
 
 __Arguments__
-* `keywords`<str> - keywords, comma seperated
-* `connection_of`<str> - urn id of a profile. Only people connected to this profile are returned
-* `network_depth`<str> - the network depth to search within. One of {`F`, `S`, or `O`} (first, second and third+ respectively)
-* `regions`<list> - list of Linkedin region ids
-* `industries`<list> - list of Linkedin industry ids
+* `keywords <str>` - keywords, comma seperated
+* `connection_of <str>` - urn id of a profile. Only people connected to this profile are returned
+* `network_depth <str>` - the network depth to search within. One of {`F`, `S`, or `O`} (first, second and third+ respectively)
+* `regions <list>` - list of Linkedin region ids
+* `industries <list>` - list of Linkedin industry ids
 
 __Return__
-* <list>
+* `<list>`
 
 __Example__
 

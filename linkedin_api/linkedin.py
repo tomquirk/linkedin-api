@@ -18,7 +18,7 @@ class Linkedin(object):
     Class for accessing Linkedin API.
     """
 
-    _MAX_UPDATE_COUNT = 100 # max seems to be 100
+    _MAX_UPDATE_COUNT = 100  # max seems to be 100
     _MAX_SEARCH_COUNT = 49  # max seems to be 49
     _MAX_REPEATED_REQUESTS = (
         200
@@ -257,7 +257,7 @@ class Linkedin(object):
         )
 
         data = res.json()
-        
+
         if (
             len(data["elements"]) == 0
             or (max_results is not None and len(results) >= max_results)
@@ -294,7 +294,7 @@ class Linkedin(object):
         )
 
         data = res.json()
-        
+
         if (
             len(data["elements"]) == 0
             or (max_results is not None and len(results) >= max_results)
@@ -318,7 +318,6 @@ class Linkedin(object):
         data = res.json()
 
         return data['elements'][0]['value']['com.linkedin.voyager.identity.me.ProfileViewsByTimePanel']
-
 
     def get_school(self, public_id):
         """
@@ -451,7 +450,7 @@ class Linkedin(object):
 
     def send_message(self, conversation_urn_id, message_body):
         """
-        Return the full conversation at a given [conversation_urn_id]
+        Send a message to a given conversation. If error, return true.
         """
         params = {"action": "create"}
 
@@ -476,4 +475,4 @@ class Linkedin(object):
             data=payload,
         )
 
-        return res.status_code == 201
+        return res.status_code != 201

@@ -28,12 +28,15 @@ One of:
 * `public_id`<str> - public identifier i.e. tom-quirk-1928345
 * `urn_id`<str> - id provided by the Linkedin URN
 
+__Return__
+* <dict>
+
 __Example__
 
 ```python
 linkedin = Linkedin(credentials['username'], credentials['password'])
 
-linkedin.get_profile('tom-quirk')
+profile = linkedin.get_profile('tom-quirk')
 ```
 
 ---------------------------------------
@@ -46,12 +49,15 @@ Returns a Linkedin profile's first degree (direct) connections
 __Arguments__
 * `urn_id`<str> - id provided by the Linkedin URN
 
+__Return__
+* <list>
+
 __Example__
 
 ```python
 linkedin = Linkedin(credentials['username'], credentials['password'])
 
-linkedin.get_profile_connections('AC000102305')
+connections = linkedin.get_profile_connections('AC000102305')
 ```
 
 ---------------------------------------
@@ -66,12 +72,15 @@ One of:
 * `public_id`<str> - public identifier i.e. tom-quirk-1928345
 * `urn_id`<str> - id provided by the Linkedin URN
 
+__Return__
+* <dict>
+
 __Example__
 
 ```python
 linkedin = Linkedin(credentials['username'], credentials['password'])
 
-linkedin.get_profile_contact_info('tom-quirk')
+profile_info = linkedin.get_profile_contact_info('tom-quirk')
 ```
 
 ---------------------------------------
@@ -84,12 +93,15 @@ Returns a school's Linkedin profile.
 __Arguments__
 * `public_id`<str> - public identifier i.e. university-of-queensland
 
+__Return__
+* <dict>
+
 __Example__
 
 ```python
 linkedin = Linkedin(credentials['username'], credentials['password'])
 
-linkedin.get_school('university-of-queensland')
+school = linkedin.get_school('university-of-queensland')
 ```
 
 ---------------------------------------
@@ -102,12 +114,15 @@ Returns a company's Linkedin profile.
 __Arguments__
 * `public_id`<str> - public identifier i.e. linkedin
 
+__Return__
+* <dict>
+
 __Example__
 
 ```python
 linkedin = Linkedin(credentials['username'], credentials['password'])
 
-linkedin.get_company('linkedin')
+company = linkedin.get_company('linkedin')
 ```
 
 ---------------------------------------
@@ -121,12 +136,15 @@ __Arguments__
 * `params`<dict> - search parameters (see implementation of [search_people](#search_people) for a reference)
 * `max_results`<int> - the max number of results to return
 
+__Return__
+* <list>
+
 __Example__
 
 ```python
 linkedin = Linkedin(credentials['username'], credentials['password'])
 
-linkedin.search({keywords: 'software'}, 200)
+results = linkedin.search({'keywords': 'software'}, 200)
 ```
 
 ---------------------------------------
@@ -136,12 +154,15 @@ linkedin.search({keywords: 'software'}, 200)
 
 Return a list of metadata of the user's conversations.
 
+__Return__
+* <list>
+
 __Example__
 
 ```python
 linkedin = Linkedin(credentials['username'], credentials['password'])
 
-linkedin.get_conversations()
+conversations = linkedin.get_conversations()
 ```
 
 ---------------------------------------
@@ -155,6 +176,9 @@ Use this endpoint to get the `conversation id` to send messages (see example).
 __Arguments__
 * `profile_urn_id`<str> - the urn id of the profile
 
+__Return__
+* <dict>
+
 __Example__
 
 ```python
@@ -164,6 +188,7 @@ profile = linkedin.get_profile('bill-g')
 profile_urn_id = profile['profile_id']
 
 conversation = linkedin.get_conversation_details(profile_urn_id)
+# example: getting the conversation_id
 conversation_id = conversation['id']
 ```
 
@@ -178,6 +203,9 @@ __Arguments__
 * `conversation_urn_id`<str> - the urn id of the conversation
 * `message_body`<str> - the message to send
 
+__Return__
+* <boolean> - True if error
+
 __Example__
 
 ```python
@@ -189,7 +217,10 @@ profile_urn_id = profile['profile_id']
 conversation = linkedin.get_conversation_details(profile_urn_id)
 conversation_id = conversation['id']
 
-linkedin.send_message(conversation_id, "Can I haz job??")
+err = linkedin.send_message(conversation_id, "No I will not be your technical cofounder")
+if err:
+    # handle error
+    return
 ```
 
 ---------------------------------------
@@ -204,7 +235,7 @@ __Example__
 ```python
 linkedin = Linkedin(credentials['username'], credentials['password'])
 
-linkedin.get_current_profile_views()
+views = linkedin.get_current_profile_views()
 ```
 
 ---------------------------------------
@@ -221,12 +252,15 @@ __Arguments__
 * `regions`<list> - list of Linkedin region ids
 * `industries`<list> - list of Linkedin industry ids
 
+__Return__
+* <list>
+
 __Example__
 
 ```python
 linkedin = Linkedin(credentials['username'], credentials['password'])
 
-linkedin.search_people(
+results = linkedin.search_people(
   keywords='software,lol', 
   connection_of='AC000120303',
   network_depth='F',

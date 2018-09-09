@@ -134,7 +134,7 @@ Perform a Linkedin search and return the results.
 
 __Arguments__
 * `params <dict>` - search parameters (see implementation of [search_people](#search_people) for a reference)
-* `max_results`<int> - the max number of results to return
+* `max_results <int> - the max number of results to return
 
 __Return__
 * `<list>`

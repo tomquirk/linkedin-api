@@ -59,7 +59,7 @@ class Linkedin(object):
         data = res.json()
 
         total_found = data.get("paging", {}).get("total")
-        if total_found == 0 or total_found is None:
+        if results == [] and (total_found == 0 or total_found is None):
             self.logger.debug("found none...")
             return []
 

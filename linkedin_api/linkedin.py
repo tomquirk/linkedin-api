@@ -59,14 +59,12 @@ class Linkedin(object):
         data = res.json()
 
         total_found = data.get("paging", {}).get("total")
-        if total_found == 0 or total_found is None:
-            self.logger.debug("found none...")
-            return []
 
         # recursive base case
         if (
             len(data["elements"]) == 0
             or (max_results is not None and len(results) >= max_results)
+            or total_found is None
             or len(results) >= total_found
             or (max_results is not None and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS)
         ):

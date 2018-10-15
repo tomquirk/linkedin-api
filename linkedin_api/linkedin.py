@@ -474,3 +474,22 @@ class Linkedin(object):
         )
 
         return res.status_code != 201
+
+    def send_seen(self, conversation_urn_id):
+        """
+        Send seen to a given conversation. If error, return True.
+        """
+        payload = json.dumps({
+            "patch": {
+                "$set": {
+                    "read": True
+                }
+            }
+        })
+
+        res = self.client.session.post(
+            f"{self.client.API_BASE_URL}/messaging/conversations/{conversation_urn_id}",
+            data=payload
+        )
+
+        return res.status_code != 200

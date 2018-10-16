@@ -475,7 +475,7 @@ class Linkedin(object):
 
         return res.status_code != 201
 
-    def send_seen(self, conversation_urn_id):
+    def mark_conversation_as_seen(self, conversation_urn_id):
         """
         Send seen to a given conversation. If error, return True.
         """

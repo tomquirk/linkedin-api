@@ -8,6 +8,7 @@
 - [`linkedin.get_conversation_details`](#get_conversation_details)
 - [`linkedin.get_conversation`](#get_conversation)
 - [`linkedin.send_message`](#send_message)
+- [`linkedin.mark_conversation_as_seen`](#mark_conversation_as_seen)
 
 - [`linkedin.get_current_profile_views`](#get_current_profile_views)
 
@@ -269,6 +270,39 @@ conversation = linkedin.get_conversation_details(profile_urn_id)
 conversation_id = conversation['id']
 
 err = linkedin.send_message(conversation_id, "No I will not be your technical cofounder")
+if err:
+    # handle error
+    return
+```
+
+---
+
+<a name="mark_conversation_as_seen"></a>
+
+### linkedin.mark_conversation_as_seen(conversation_urn_id)
+
+Mark a given conversation as seen. 
+
+**Arguments**
+
+- `conversation_urn_id <str>` - the urn id of the conversation
+
+**Return**
+
+- `<boolean>` - True if error
+
+**Example**
+
+```python
+linkedin = Linkedin(credentials['username'], credentials['password'])
+
+profile = linkedin.get_profile('bill-g')
+profile_urn_id = profile['profile_id']
+
+conversation = linkedin.get_conversation_details(profile_urn_id)
+conversation_id = conversation['id']
+
+err = linkedin.mark_conversation_as_seen(conversation_id)
 if err:
     # handle error
     return

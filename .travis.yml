@@ -1,11 +1,11 @@
 language: python
 
 before_install:
-  - pip install pipenv
+  - pip install --user pipenv
 
 install:
+  - pipenv --python 3
   - pipenv install
 
-script:
-  - pipenv shell
-  - python -m pytest tests -s
+test_script:
+  - pipenv run pytest

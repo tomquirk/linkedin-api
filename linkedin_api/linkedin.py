@@ -175,13 +175,10 @@ class Linkedin(object):
         [public_id] - public identifier i.e. tom-quirk-1928345
         [urn_id] - id provided by the related URN
         """
-        params = {
-            "count": 100,
-            "start": 0,
-        }
-
+        params = {"count": 100, "start": 0}
         res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/identity/profiles/{public_id or urn_id}/skills", params=params
+            f"{self.client.API_BASE_URL}/identity/profiles/{public_id or urn_id}/skills",
+            params=params,
         )
         data = res.json()
 
@@ -240,8 +237,8 @@ class Linkedin(object):
         profile["experience"] = experience
 
         # massage [skills] data
-        #skills = [item["name"] for item in data["skillView"]["elements"]]
-        #profile["skills"] = skills
+        # skills = [item["name"] for item in data["skillView"]["elements"]]
+        # profile["skills"] = skills
 
         profile["skills"] = self.get_profile_skills(public_id=public_id, urn_id=urn_id)
 
@@ -512,9 +509,7 @@ class Linkedin(object):
             random.randint(0, 1)
         )  # sleep a random duration to try and evade suspention
 
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/me"
-        )
+        res = self.client.session.get(f"{self.client.API_BASE_URL}/me")
 
         data = res.json()
 

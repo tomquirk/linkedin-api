@@ -3,6 +3,7 @@
 - [`linkedin.get_profile`](#get_profile)
 - [`linkedin.get_profile_connections`](#get_profile_connections)
 - [`linkedin.get_profile_contact_info`](#get_profile_contact_info)
+- [`linkedin.get_profile_skills`](#get_profile_skills)
 
 - [`linkedin.get_conversations`](#get_conversations)
 - [`linkedin.get_conversation_details`](#get_conversation_details)
@@ -92,6 +93,32 @@ One of:
 linkedin = Linkedin(credentials['username'], credentials['password'])
 
 profile_info = linkedin.get_profile_contact_info('tom-quirk')
+```
+
+---
+
+<a name="get_profile_skills"></a>
+
+### linkedin.get_profile_skills(urn_id)
+
+Returns a Linkedin profile's skills.
+
+**Arguments**
+One of:
+
+- `public_id <str>` - public identifier i.e. tom-quirk-1928345
+- `urn_id <str>` - id provided by the Linkedin URN
+
+**Return**
+
+- `<dict>`
+
+**Example**
+
+```python
+linkedin = Linkedin(credentials['username'], credentials['password'])
+
+profile_info = linkedin.get_profile_skills('AC000102305')
 ```
 
 ---

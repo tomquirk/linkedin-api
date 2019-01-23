@@ -7,4 +7,5 @@ install:
   - pipenv install
 
 script:
-- python -m pytest tests -s
+  - pipenv shell
+  - python -m pytest tests -s

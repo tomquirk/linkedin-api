@@ -35,7 +35,7 @@ class Linkedin(object):
         Do a search.
         """
         sleep(
-            random.randint(0, 1)
+            random.randint(0, 2)
         )  # sleep a random duration to try and evade suspention
 
         count = (

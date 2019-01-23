@@ -1,7 +1,7 @@
 language: python
 
 before_install:
-  - pip install --user pipenv
+  - pip install pipenv
 
 install:
   - pipenv --python 3

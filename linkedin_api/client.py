@@ -7,6 +7,14 @@ import linkedin_api.settings as settings
 logger = logging.getLogger(__name__)
 
 
+class ChallengeException(Exception):
+    pass
+
+
+class UnauthorizedException(Exception):
+    pass
+
+
 class Client(object):
     """
     Class to act as a client for the Linkedin API.
@@ -37,24 +45,26 @@ class Client(object):
         "Accept-Language": "en-us",
     }
 
-    def __init__(self, debug=False):
+    def __init__(self, debug=False, refresh_cookies=False):
         self.session = requests.session()
         self.session.headers = Client.REQUEST_HEADERS
 
         self.logger = logger
+        self._use_cookie_cache = not refresh_cookies
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
 
     def _request_session_cookies(self):
         """
         Return a new set of session cookies as given by Linkedin.
         """
-        try:
-            with open(settings.COOKIE_FILE_PATH, "rb") as f:
-                cookies = pickle.load(f)
-                if cookies:
-                    return cookies
-        except FileNotFoundError:
-            self.logger.debug("Cookie file not found. Requesting new cookies.")
+        if self._use_cookie_cache:
+            try:
+                with open(settings.COOKIE_FILE_PATH, "rb") as f:
+                    cookies = pickle.load(f)
+                    if cookies:
+                        return cookies
+            except FileNotFoundError:
+                self.logger.debug("Cookie file not found. Requesting new cookies.")
 
         res = requests.get(
             f"{Client.AUTH_BASE_URL}/uas/authenticate",
@@ -68,7 +78,9 @@ class Client(object):
         Set cookies of the current session and save them to a file.
         """
         self.session.cookies = cookiejar
-        self.session.headers["csrf-token"] = self.session.cookies["JSESSIONID"].strip('"')
+        self.session.headers["csrf-token"] = self.session.cookies["JSESSIONID"].strip(
+            '"'
+        )
         with open(settings.COOKIE_FILE_PATH, "wb") as f:
             pickle.dump(cookiejar, f)
 
@@ -95,10 +107,11 @@ class Client(object):
 
         data = res.json()
 
-        # TODO raise better exceptions
+        if res.status_code == 401:
+            raise UnauthorizedException()
         if res.status_code != 200:
             raise Exception()
-        elif data["login_result"] != "PASS":
-            raise Exception()
+        if data["login_result"] != "PASS":
+            raise ChallengeException(data["login_result"])
 
         self._set_session_cookies(res.cookies)

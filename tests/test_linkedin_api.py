@@ -6,7 +6,11 @@ from linkedin_api import Linkedin
 
 @pytest.fixture
 def linkedin():
-    return Linkedin(os.environ["LINKEDIN_USERNAME"], os.environ["LINKEDIN_PASSWORD"])
+    return Linkedin(
+        os.environ["LINKEDIN_USERNAME"],
+        os.environ["LINKEDIN_PASSWORD"],
+        refresh_cookies=True,
+    )
 
 
 def test_get_profile(linkedin):

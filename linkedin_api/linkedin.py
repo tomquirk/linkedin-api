@@ -24,8 +24,8 @@ class Linkedin(object):
         200
     )  # VERY conservative max requests count to avoid rate-limit
 
-    def __init__(self, username, password):
-        self.client = Client()
+    def __init__(self, username, password, refresh_cookies=False):
+        self.client = Client(refresh_cookies=False)
         self.client.authenticate(username, password)
 
         self.logger = logger

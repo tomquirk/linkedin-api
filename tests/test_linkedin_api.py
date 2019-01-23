@@ -87,3 +87,8 @@ def test_search_people(linkedin):
     )
     assert results
 
+
+def test_get_profile_skills(linkedin):
+    skills = linkedin.get_profile_skills(TEST_PROFILE_ID)
+    assert skills
+

@@ -1,16 +1,15 @@
 [[source]]
-url = "https://pypi.python.org/simple"
-verify_ssl = true
 name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+ipdb = "*"
+black = "*"
+pylint = "*"
 
 [packages]
 requests = "*"
-
-[dev-packages]
-"flake8" = "*"
-ipdb = "*"
-"autopep8" = "*"
-black = "*"
 
 [requires]
 python_version = "3.7"

@@ -10,4 +10,5 @@ install:
   - pipenv install --pre
 
 script:
-  - pipenv run pytest
+  - pipenv shell
+  - python -m pytest tests -s

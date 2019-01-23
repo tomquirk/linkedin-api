@@ -10,6 +10,7 @@ def client():
 
 
 def test_authenticate(client):
+    print(os.environ["LINKEDIN_USERNAME"], os.environ["LINKEDIN_PASSWORD"])
     client.authenticate(
         os.environ["LINKEDIN_USERNAME"], os.environ["LINKEDIN_PASSWORD"]
     )

@@ -58,6 +58,7 @@ class Client(object):
         Return a new set of session cookies as given by Linkedin.
         """
         if self._use_cookie_cache:
+            self.logger.debug("Attempting to use cached cookies")
             try:
                 with open(settings.COOKIE_FILE_PATH, "rb") as f:
                     cookies = pickle.load(f)
@@ -108,6 +109,7 @@ class Client(object):
         data = res.json()
 
         if res.status_code == 401:
+            print(data)
             raise UnauthorizedException()
 
         if res.status_code != 200:

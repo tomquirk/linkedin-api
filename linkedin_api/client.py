@@ -108,14 +108,13 @@ class Client(object):
 
         data = res.json()
 
+        if data and data["login_result"] != "PASS":
+            raise ChallengeException(data["login_result"])
+
         if res.status_code == 401:
-            print(data)
             raise UnauthorizedException()
 
         if res.status_code != 200:
             raise Exception()
-
-        if data["login_result"] != "PASS":
-            raise ChallengeException(data["login_result"])
 
         self._set_session_cookies(res.cookies)

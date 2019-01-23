@@ -13,6 +13,14 @@ from linkedin_api.client import Client
 logger = logging.getLogger(__name__)
 
 
+def evade():
+    """
+    A catch-all method to try and evade suspension from Linkedin.
+    Currenly, just delays the request by a random (bounded) time
+    """
+    sleep(random.randint(2, 5))  # sleep a random duration to try and evade suspention
+
+
 class Linkedin(object):
     """
     Class for accessing Linkedin API.
@@ -34,9 +42,7 @@ class Linkedin(object):
         """
         Do a search.
         """
-        sleep(
-            random.randint(0, 2)
-        )  # sleep a random duration to try and evade suspention
+        evade()
 
         count = (
             max_results
@@ -166,9 +172,7 @@ class Linkedin(object):
         [public_id] - public identifier i.e. tom-quirk-1928345
         [urn_id] - id provided by the related URN
         """
-        sleep(
-            random.randint(2, 5)
-        )  # sleep a random duration to try and evade suspention
+        evade()
         res = self.client.session.get(
             f"{self.client.API_BASE_URL}/identity/profiles/{public_id or urn_id}/profileView"
         )
@@ -243,9 +247,7 @@ class Linkedin(object):
         [public_id] - public identifier ie - microsoft
         [urn_id] - id provided by the related URN
         """
-        sleep(
-            random.randint(2, 5)
-        )  # sleep a random duration to try and evade suspention
+        evade()
 
         params = {
             "companyUniversalName": {public_id or urn_id},
@@ -287,9 +289,7 @@ class Linkedin(object):
         [public_id] - public identifier i.e. tom-quirk-1928345
         [urn_id] - id provided by the related URN
         """
-        sleep(
-            random.randint(2, 5)
-        )  # sleep a random duration to try and evade suspention
+        evade()
 
         params = {
             "profileId": {public_id or urn_id},
@@ -344,9 +344,8 @@ class Linkedin(object):
 
         [public_id] - public identifier i.e. uq
         """
-        sleep(
-            random.randint(2, 5)
-        )  # sleep a random duration to try and evade suspention
+        evade()
+
         params = {
             "decorationId": "com.linkedin.voyager.deco.organization.web.WebFullCompanyMain-12",
             "q": "universalName",
@@ -374,9 +373,8 @@ class Linkedin(object):
 
         [public_id] - public identifier i.e. univeristy-of-queensland
         """
-        sleep(
-            random.randint(2, 5)
-        )  # sleep a random duration to try and evade suspention
+        evade()
+
         params = {
             "decorationId": "com.linkedin.voyager.deco.organization.web.WebFullCompanyMain-12",
             "q": "universalName",

@@ -1,0 +1,10 @@
+language: python
+
+before_install:
+  - pip install pipenv
+
+install:
+  - pipenv install
+
+script:
+- python -m pytest tests -s

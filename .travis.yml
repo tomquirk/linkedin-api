@@ -7,7 +7,7 @@ before_install:
 
 install:
   - pipenv --python 3
-  - pipenv install
+  - pipenv install --pre
 
 script:
   - pipenv run pytest

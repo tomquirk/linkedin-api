@@ -109,8 +109,10 @@ class Client(object):
 
         if res.status_code == 401:
             raise UnauthorizedException()
+
         if res.status_code != 200:
             raise Exception()
+
         if data["login_result"] != "PASS":
             raise ChallengeException(data["login_result"])
 

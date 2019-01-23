@@ -66,7 +66,10 @@ class Linkedin(object):
             or (max_results is not None and len(results) >= max_results)
             or total_found is None
             or len(results) >= total_found
-            or (max_results is not None and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS)
+            or (
+                max_results is not None
+                and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS
+            )
         ):
             return results
 
@@ -231,7 +234,9 @@ class Linkedin(object):
         """
         return self.search_people(connection_of=urn_id, network_depth="F")
 
-    def get_company_updates(self, public_id=None, urn_id=None, max_results=None, results=[]):
+    def get_company_updates(
+        self, public_id=None, urn_id=None, max_results=None, results=[]
+    ):
         """"
         Return a list of company posts
 
@@ -259,16 +264,23 @@ class Linkedin(object):
         if (
             len(data["elements"]) == 0
             or (max_results is not None and len(results) >= max_results)
-            or (max_results is not None and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS)
+            or (
+                max_results is not None
+                and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS
+            )
         ):
             return results
 
         results.extend(data["elements"])
         self.logger.debug(f"results grew: {len(results)}")
 
-        return self.get_company_updates(public_id=public_id, urn_id=urn_id, results=results, max_results=max_results)
+        return self.get_company_updates(
+            public_id=public_id, urn_id=urn_id, results=results, max_results=max_results
+        )
 
-    def get_profile_updates(self, public_id=None, urn_id=None, max_results=None, results=[]):
+    def get_profile_updates(
+        self, public_id=None, urn_id=None, max_results=None, results=[]
+    ):
         """"
         Return a list of profile posts
 
@@ -296,26 +308,35 @@ class Linkedin(object):
         if (
             len(data["elements"]) == 0
             or (max_results is not None and len(results) >= max_results)
-            or (max_results is not None and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS)
+            or (
+                max_results is not None
+                and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS
+            )
         ):
             return results
 
         results.extend(data["elements"])
         self.logger.debug(f"results grew: {len(results)}")
 
-        return self.get_profile_updates(public_id=public_id, urn_id=urn_id, results=results, max_results=max_results)
+        return self.get_profile_updates(
+            public_id=public_id, urn_id=urn_id, results=results, max_results=max_results
+        )
 
     def get_current_profile_views(self):
         """
         Get profile view statistics, including chart data.
         """
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/identity/panels"
-        )
+        res = self.client.session.get(f"{self.client.API_BASE_URL}/identity/wvmpCards")
 
         data = res.json()
 
-        return data['elements'][0]['value']['com.linkedin.voyager.identity.me.ProfileViewsByTimePanel']
+        return data["elements"][0]["value"][
+            "com.linkedin.voyager.identity.me.wvmpOverview.WvmpViewersCard"
+        ]["insightCards"][0]["value"][
+            "com.linkedin.voyager.identity.me.wvmpOverview.WvmpSummaryInsightCard"
+        ][
+            "numViews"
+        ]
 
     def get_school(self, public_id):
         """
@@ -354,7 +375,8 @@ class Linkedin(object):
         data = res.json()
 
         if data and "status" in data and data["status"] != 200:
-            self.logger.info("request failed: {}".format(data["message"]))
+            print(data)
+            self.logger.info("request failed: {}".format(data))
             return {}
 
         school = data["elements"][0]
@@ -479,17 +501,11 @@ class Linkedin(object):
         """
         Send seen to a given conversation. If error, return True.
         """
-        payload = json.dumps({
-            "patch": {
-                "$set": {
-                    "read": True
-                }
-            }
-        })
+        payload = json.dumps({"patch": {"$set": {"read": True}}})
 
         res = self.client.session.post(
             f"{self.client.API_BASE_URL}/messaging/conversations/{conversation_urn_id}",
-            data=payload
+            data=payload,
         )
 
         return res.status_code != 200

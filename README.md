@@ -67,6 +67,12 @@ For a complete reference documentation, see the [DOCS.md](https://github.com/tom
     $ pipenv shell
     ```
 
+### Troubleshooting
+
+#### > I can't authenticate - I keep getting a CHALLENGE!?!
+
+Linkedin will throw you a curve ball in the form of a challenge URL. We currently don't handle this, and so you're kinda screwed. We think it could be only IP-based (i.e. logging in from different location). Your best chance at resolution is to log out and log back in on your browser.
+
 ## In-depth overview
 
 Voyager endpoints look like this:

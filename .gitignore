@@ -1,12 +1,14 @@
 # Linkedin-api
 **tmp/
-credentials*
+.env
 
 # Dev
 *.pyc
 .vscode
 /playground.py
 .cookies
+.pytest_cache
+**__pycache__/
 
 # PyPI
 dist

@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="linkedin_api",
-    version="0.1.0",
+    version="0.2.0",
     author="Tom Quirk",
     author_email="tomquirkacc@gmail.com",
     description="Python wrapper for the Linkedin API",

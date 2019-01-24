@@ -2,7 +2,7 @@
 
 👨‍💼 Python Wrapper for the Linkedin API
 
-![v0.1.0](https://img.shields.io/badge/PyPI-v0.1.0-blue.svg)
+![v0.2.0](https://img.shields.io/badge/PyPI-v0.2.0-blue.svg)
 
 > No "official" API access required - just use a valid Linkedin account!
 
@@ -66,6 +66,12 @@ For a complete reference documentation, see the [DOCS.md](https://github.com/tom
     $ pipenv install
     $ pipenv shell
     ```
+
+### Troubleshooting
+
+#### > I can't authenticate - I keep getting a CHALLENGE!?!
+
+Linkedin will throw you a curve ball in the form of a challenge URL. We currently don't handle this, and so you're kinda screwed. We think it could be only IP-based (i.e. logging in from different location). Your best chance at resolution is to log out and log back in on your browser.
 
 ## In-depth overview
 

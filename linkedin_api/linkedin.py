@@ -13,6 +13,14 @@ from linkedin_api.client import Client
 logger = logging.getLogger(__name__)
 
 
+def evade():
+    """
+    A catch-all method to try and evade suspension from Linkedin.
+    Currenly, just delays the request by a random (bounded) time
+    """
+    sleep(random.randint(2, 5))  # sleep a random duration to try and evade suspention
+
+
 class Linkedin(object):
     """
     Class for accessing Linkedin API.
@@ -24,8 +32,8 @@ class Linkedin(object):
         200
     )  # VERY conservative max requests count to avoid rate-limit
 
-    def __init__(self, username, password):
-        self.client = Client()
+    def __init__(self, username, password, refresh_cookies=False):
+        self.client = Client(refresh_cookies=False)
         self.client.authenticate(username, password)
 
         self.logger = logger
@@ -34,9 +42,7 @@ class Linkedin(object):
         """
         Do a search.
         """
-        sleep(
-            random.randint(0, 1)
-        )  # sleep a random duration to try and evade suspention
+        evade()
 
         count = (
             max_results
@@ -66,7 +72,10 @@ class Linkedin(object):
             or (max_results is not None and len(results) >= max_results)
             or total_found is None
             or len(results) >= total_found
-            or (max_results is not None and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS)
+            or (
+                max_results is not None
+                and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS
+            )
         ):
             return results
 
@@ -136,6 +145,9 @@ class Linkedin(object):
         contact_info = {
             "email_address": data.get("emailAddress"),
             "websites": [],
+            "twitter": data.get("twitterHandles"),
+            "birthdate": data.get("birthDateOn"),
+            "ims": data.get("ims"),
             "phone_numbers": data.get("phoneNumbers", []),
         }
 
@@ -156,6 +168,26 @@ class Linkedin(object):
 
         return contact_info
 
+    def get_profile_skills(self, public_id=None, urn_id=None):
+        """
+        Return the skills of a profile.
+
+        [public_id] - public identifier i.e. tom-quirk-1928345
+        [urn_id] - id provided by the related URN
+        """
+        params = {"count": 100, "start": 0}
+        res = self.client.session.get(
+            f"{self.client.API_BASE_URL}/identity/profiles/{public_id or urn_id}/skills",
+            params=params,
+        )
+        data = res.json()
+
+        skills = data.get("elements", [])
+        for item in skills:
+            del item["entityUrn"]
+
+        return skills
+
     def get_profile(self, public_id=None, urn_id=None):
         """
         Return data for a single profile.
@@ -163,9 +195,7 @@ class Linkedin(object):
         [public_id] - public identifier i.e. tom-quirk-1928345
         [urn_id] - id provided by the related URN
         """
-        sleep(
-            random.randint(2, 5)
-        )  # sleep a random duration to try and evade suspention
+        evade()
         res = self.client.session.get(
             f"{self.client.API_BASE_URL}/identity/profiles/{public_id or urn_id}/profileView"
         )
@@ -207,9 +237,10 @@ class Linkedin(object):
         profile["experience"] = experience
 
         # massage [skills] data
-        skills = [item["name"] for item in data["skillView"]["elements"]]
+        # skills = [item["name"] for item in data["skillView"]["elements"]]
+        # profile["skills"] = skills
 
-        profile["skills"] = skills
+        profile["skills"] = self.get_profile_skills(public_id=public_id, urn_id=urn_id)
 
         # massage [education] data
         education = data["educationView"]["elements"]
@@ -231,16 +262,16 @@ class Linkedin(object):
         """
         return self.search_people(connection_of=urn_id, network_depth="F")
 
-    def get_company_updates(self, public_id=None, urn_id=None, max_results=None, results=[]):
+    def get_company_updates(
+        self, public_id=None, urn_id=None, max_results=None, results=[]
+    ):
         """"
         Return a list of company posts
 
         [public_id] - public identifier ie - microsoft
         [urn_id] - id provided by the related URN
         """
-        sleep(
-            random.randint(2, 5)
-        )  # sleep a random duration to try and evade suspention
+        evade()
 
         params = {
             "companyUniversalName": {public_id or urn_id},
@@ -259,25 +290,30 @@ class Linkedin(object):
         if (
             len(data["elements"]) == 0
             or (max_results is not None and len(results) >= max_results)
-            or (max_results is not None and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS)
+            or (
+                max_results is not None
+                and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS
+            )
         ):
             return results
 
         results.extend(data["elements"])
         self.logger.debug(f"results grew: {len(results)}")
 
-        return self.get_company_updates(public_id=public_id, urn_id=urn_id, results=results, max_results=max_results)
+        return self.get_company_updates(
+            public_id=public_id, urn_id=urn_id, results=results, max_results=max_results
+        )
 
-    def get_profile_updates(self, public_id=None, urn_id=None, max_results=None, results=[]):
+    def get_profile_updates(
+        self, public_id=None, urn_id=None, max_results=None, results=[]
+    ):
         """"
         Return a list of profile posts
 
         [public_id] - public identifier i.e. tom-quirk-1928345
         [urn_id] - id provided by the related URN
         """
-        sleep(
-            random.randint(2, 5)
-        )  # sleep a random duration to try and evade suspention
+        evade()
 
         params = {
             "profileId": {public_id or urn_id},
@@ -296,26 +332,35 @@ class Linkedin(object):
         if (
             len(data["elements"]) == 0
             or (max_results is not None and len(results) >= max_results)
-            or (max_results is not None and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS)
+            or (
+                max_results is not None
+                and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS
+            )
         ):
             return results
 
         results.extend(data["elements"])
         self.logger.debug(f"results grew: {len(results)}")
 
-        return self.get_profile_updates(public_id=public_id, urn_id=urn_id, results=results, max_results=max_results)
+        return self.get_profile_updates(
+            public_id=public_id, urn_id=urn_id, results=results, max_results=max_results
+        )
 
     def get_current_profile_views(self):
         """
         Get profile view statistics, including chart data.
         """
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/identity/panels"
-        )
+        res = self.client.session.get(f"{self.client.API_BASE_URL}/identity/wvmpCards")
 
         data = res.json()
 
-        return data['elements'][0]['value']['com.linkedin.voyager.identity.me.ProfileViewsByTimePanel']
+        return data["elements"][0]["value"][
+            "com.linkedin.voyager.identity.me.wvmpOverview.WvmpViewersCard"
+        ]["insightCards"][0]["value"][
+            "com.linkedin.voyager.identity.me.wvmpOverview.WvmpSummaryInsightCard"
+        ][
+            "numViews"
+        ]
 
     def get_school(self, public_id):
         """
@@ -323,26 +368,10 @@ class Linkedin(object):
 
         [public_id] - public identifier i.e. uq
         """
-        sleep(
-            random.randint(2, 5)
-        )  # sleep a random duration to try and evade suspention
+        evade()
+
         params = {
-            "decoration": (
-                """
-                (
-                autoGenerated,backgroundCoverImage,
-                companyEmployeesSearchPageUrl,companyPageUrl,confirmedLocations*,coverPhoto,dataVersion,description,
-                entityUrn,followingInfo,foundedOn,headquarter,jobSearchPageUrl,lcpTreatment,logo,name,type,overviewPhoto,
-                paidCompany,partnerCompanyUrl,partnerLogo,partnerLogoImage,rankForTopCompanies,salesNavigatorCompanyUrl,
-                school,showcase,staffCount,staffCountRange,staffingCompany,topCompaniesListName,universalName,url,
-                companyIndustries*,industries,specialities,
-                acquirerCompany~(entityUrn,logo,name,industries,followingInfo,url,paidCompany,universalName),
-                affiliatedCompanies*~(entityUrn,logo,name,industries,followingInfo,url,paidCompany,universalName),
-                groups*~(entityUrn,largeLogo,groupName,memberCount,websiteUrl,url),
-                showcasePages*~(entityUrn,logo,name,industries,followingInfo,url,description,universalName)
-                )
-                """
-            ),
+            "decorationId": "com.linkedin.voyager.deco.organization.web.WebFullCompanyMain-12",
             "q": "universalName",
             "universalName": public_id,
         }
@@ -354,7 +383,8 @@ class Linkedin(object):
         data = res.json()
 
         if data and "status" in data and data["status"] != 200:
-            self.logger.info("request failed: {}".format(data["message"]))
+            print(data)
+            self.logger.info("request failed: {}".format(data))
             return {}
 
         school = data["elements"][0]
@@ -367,27 +397,10 @@ class Linkedin(object):
 
         [public_id] - public identifier i.e. univeristy-of-queensland
         """
-        sleep(
-            random.randint(2, 5)
-        )  # sleep a random duration to try and evade suspention
+        evade()
+
         params = {
-            "decoration": (
-                """
-                (
-                affiliatedCompaniesWithEmployeesRollup,affiliatedCompaniesWithJobsRollup,articlePermalinkForTopCompanies,
-                autoGenerated,backgroundCoverImage,companyEmployeesSearchPageUrl,
-                companyPageUrl,confirmedLocations*,coverPhoto,dataVersion,description,entityUrn,followingInfo,
-                foundedOn,headquarter,jobSearchPageUrl,lcpTreatment,logo,name,type,overviewPhoto,paidCompany,
-                partnerCompanyUrl,partnerLogo,partnerLogoImage,permissions,rankForTopCompanies,
-                salesNavigatorCompanyUrl,school,showcase,staffCount,staffCountRange,staffingCompany,
-                topCompaniesListName,universalName,url,companyIndustries*,industries,specialities,
-                acquirerCompany~(entityUrn,logo,name,industries,followingInfo,url,paidCompany,universalName),
-                affiliatedCompanies*~(entityUrn,logo,name,industries,followingInfo,url,paidCompany,universalName),
-                groups*~(entityUrn,largeLogo,groupName,memberCount,websiteUrl,url),
-                showcasePages*~(entityUrn,logo,name,industries,followingInfo,url,description,universalName)
-                )
-                """
-            ),
+            "decorationId": "com.linkedin.voyager.deco.organization.web.WebFullCompanyMain-12",
             "q": "universalName",
             "universalName": public_id,
         }
@@ -479,17 +492,25 @@ class Linkedin(object):
         """
         Send seen to a given conversation. If error, return True.
         """
-        payload = json.dumps({
-            "patch": {
-                "$set": {
-                    "read": True
-                }
-            }
-        })
+        payload = json.dumps({"patch": {"$set": {"read": True}}})
 
         res = self.client.session.post(
             f"{self.client.API_BASE_URL}/messaging/conversations/{conversation_urn_id}",
-            data=payload
+            data=payload,
         )
 
         return res.status_code != 200
+
+    def get_user_profile(self):
+        """"
+        Return current user profile
+        """
+        sleep(
+            random.randint(0, 1)
+        )  # sleep a random duration to try and evade suspention
+
+        res = self.client.session.get(f"{self.client.API_BASE_URL}/me")
+
+        data = res.json()
+
+        return data

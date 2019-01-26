@@ -6,7 +6,7 @@
 *.pyc
 .vscode
 /playground.py
-.cookies
+.cookie.jr
 .pytest_cache
 **__pycache__/
 

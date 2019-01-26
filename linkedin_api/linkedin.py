@@ -13,6 +13,13 @@ from linkedin_api.client import Client
 logger = logging.getLogger(__name__)
 
 
+def toqs(params):
+    """
+    Takes a dictionary of params and returns a query string
+    """
+    return "&".join([f"{key}={params[key]}" for key in params.keys()])
+
+
 def evade():
     """
     A catch-all method to try and evade suspension from Linkedin.
@@ -32,80 +39,102 @@ class Linkedin(object):
         200
     )  # VERY conservative max requests count to avoid rate-limit
 
-    def __init__(self, username, password, refresh_cookies=False):
-        self.client = Client(refresh_cookies=False)
+    def __init__(self, username, password, refresh_cookies=False, debug=False):
+        self.client = Client(refresh_cookies=refresh_cookies, debug=debug)
         self.client.authenticate(username, password)
+        logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
 
         self.logger = logger
 
-    def search(self, params, max_results=None, results=[]):
+    def search(self, params, limit=None, results=[]):
         """
         Do a search.
         """
         evade()
 
         count = (
-            max_results
-            if max_results and max_results <= Linkedin._MAX_SEARCH_COUNT
+            limit
+            if limit and limit <= Linkedin._MAX_SEARCH_COUNT
             else Linkedin._MAX_SEARCH_COUNT
         )
         default_params = {
             "count": count,
-            "guides": "List()",
+            "filters": "List()",
             "origin": "GLOBAL_SEARCH_HEADER",
-            "q": "guided",
+            "q": "all",
             "start": len(results),
         }
 
         default_params.update(params)
 
         res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/search/cluster", params=default_params
+            f"{self.client.API_BASE_URL}/search/blended?{toqs(default_params)}"
         )
+
         data = res.json()
 
-        total_found = data.get("paging", {}).get("total")
+        new_elements = []
+        for i in range(len(data["data"]["elements"])):
+            new_elements.extend(data["data"]["elements"][i]["elements"])
 
         # recursive base case
         if (
-            len(data["elements"]) == 0
-            or (max_results is not None and len(results) >= max_results)
-            or total_found is None
-            or len(results) >= total_found
-            or (
-                max_results is not None
-                and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS
-            )
+            (
+                limit is not None
+                and (
+                    len(results) >= limit
+                    or len(results) / limit >= Linkedin._MAX_REPEATED_REQUESTS
+                )
+            )  # if we've hit some limit (user-specified or maximum repeated requests)
+            or len(new_elements) == 0
         ):
             return results
 
-        results.extend(data["elements"][0]["elements"])
-        self.logger.debug(f"results grew: {len(results)}")
+        results.extend(new_elements)
 
-        return self.search(params, results=results, max_results=max_results)
+        self.logger.debug(f"results grew to {len(results)}")
+
+        return self.search(params, results=results, limit=limit)
 
     def search_people(
         self,
         keywords=None,
         connection_of=None,
         network_depth=None,
+        current_company=None,
+        past_companies=None,
+        nonprofit_interests=None,
+        profile_languages=None,
         regions=None,
         industries=None,
+        include_private_profiles=False,  # profiles without a public id, "Linkedin Member"
     ):
         """
         Do a people search.
         """
-        guides = ["v->PEOPLE"]
+        filters = ["resultType->PEOPLE"]
         if connection_of:
-            guides.append(f"facetConnectionOf->{connection_of}")
+            filters.append(f"connectionOf->{connection_of}")
         if network_depth:
-            guides.append(f"facetNetwork->{network_depth}")
+            filters.append(f"network->{network_depth}")
         if regions:
-            guides.append(f'facetGeoRegion->{"|".join(regions)}')
+            filters.append(f'geoRegion->{"|".join(regions)}')
         if industries:
-            guides.append(f'facetIndustry->{"|".join(industries)}')
+            filters.append(f'industry->{"|".join(industries)}')
+        if current_company:
+            filters.append(f'currentCompany->{"|".join(current_company)}')
+        if past_companies:
+            filters.append(f'pastCompany->{"|".join(past_companies)}')
+        if profile_languages:
+            filters.append(f'profileLanguage->{"|".join(profile_languages)}')
+        if nonprofit_interests:
+            filters.append(f'nonprofitInterest->{"|".join(nonprofit_interests)}')
 
-        params = {"guides": "List({})".format(",".join(guides))}
+        params = {
+            "filters": "List({})".format(",".join(filters)),
+            "queryContext": "List(spellCorrectionEnabled->true,relatedSearchesEnabled->true,kcardTypes->PROFILE|COMPANY)",
+            "origin": "GLOBAL_SEARCH_HEADER",
+        }
 
         if keywords:
             params["keywords"] = keywords
@@ -114,17 +143,14 @@ class Linkedin(object):
 
         results = []
         for item in data:
-            search_profile = item["hitInfo"][
-                "com.linkedin.voyager.search.SearchProfile"
-            ]
-            profile_id = search_profile["id"]
-            distance = search_profile["distance"]["value"]
+            if "publicIdentifier" not in item:
+                continue
 
             results.append(
                 {
-                    "urn_id": profile_id,
-                    "distance": distance,
-                    "public_id": search_profile["miniProfile"]["publicIdentifier"],
+                    "urn_id": item.get("targetUrn"),
+                    "distance": item.get("memberDistance", {}).get("value"),
+                    "public_id": item.get("publicIdentifier"),
                 }
             )
 

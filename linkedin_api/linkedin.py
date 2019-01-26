@@ -68,7 +68,8 @@ class Linkedin(object):
         default_params.update(params)
 
         res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/search/blended?{toqs(default_params)}"
+            f"{self.client.API_BASE_URL}/search/blended?{toqs(default_params)}",
+            headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
         )
 
         data = res.json()
@@ -108,6 +109,7 @@ class Linkedin(object):
         regions=None,
         industries=None,
         include_private_profiles=False,  # profiles without a public id, "Linkedin Member"
+        limit=None,
     ):
         """
         Do a people search.
@@ -139,7 +141,7 @@ class Linkedin(object):
         if keywords:
             params["keywords"] = keywords
 
-        data = self.search(params)
+        data = self.search(params, limit=limit)
 
         results = []
         for item in data:
@@ -403,13 +405,12 @@ class Linkedin(object):
         }
 
         res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/organization/companies", params=params
+            f"{self.client.API_BASE_URL}/organization/companies?{toqs(params)}"
         )
 
         data = res.json()
 
         if data and "status" in data and data["status"] != 200:
-            print(data)
             self.logger.info("request failed: {}".format(data))
             return {}
 

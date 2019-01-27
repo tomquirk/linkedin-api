@@ -63,6 +63,7 @@ class Linkedin(object):
             "origin": "GLOBAL_SEARCH_HEADER",
             "q": "all",
             "start": len(results),
+            "queryContext": "List(spellCorrectionEnabled->true,relatedSearchesEnabled->true,kcardTypes->PROFILE|COMPANY)",
         }
 
         default_params.update(params)
@@ -73,10 +74,11 @@ class Linkedin(object):
         )
 
         data = res.json()
-
         new_elements = []
         for i in range(len(data["data"]["elements"])):
             new_elements.extend(data["data"]["elements"][i]["elements"])
+            # not entirely sure what extendedElements generally refers to - keyword search gives back a single job?
+            # new_elements.extend(data["data"]["elements"][i]["extendedElements"])
 
         # recursive base case
         if (
@@ -132,11 +134,7 @@ class Linkedin(object):
         if nonprofit_interests:
             filters.append(f'nonprofitInterest->{"|".join(nonprofit_interests)}')
 
-        params = {
-            "filters": "List({})".format(",".join(filters)),
-            "queryContext": "List(spellCorrectionEnabled->true,relatedSearchesEnabled->true,kcardTypes->PROFILE|COMPANY)",
-            "origin": "GLOBAL_SEARCH_HEADER",
-        }
+        params = {"filters": "List({})".format(",".join(filters))}
 
         if keywords:
             params["keywords"] = keywords

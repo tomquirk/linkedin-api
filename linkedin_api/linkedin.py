@@ -20,7 +20,7 @@ def toqs(params):
     return "&".join([f"{key}={params[key]}" for key in params.keys()])
 
 
-def evade():
+def default_evade():
     """
     A catch-all method to try and evade suspension from Linkedin.
     Currenly, just delays the request by a random (bounded) time
@@ -46,13 +46,23 @@ class Linkedin(object):
 
         self.logger = logger
 
-    def _fetch(self, uri, _evade=True, **kwargs):
+    def _fetch(self, uri, evade=default_evade, **kwargs):
         """
         GET request to Linkedin API
         """
-        if _evade:
-            evade()
-        return self.client.session.get(f"{self.client.API_BASE_URL}{uri}", **kwargs)
+        evade()
+
+        url = f"{self.client.API_BASE_URL}{uri}"
+        return self.client.session.get(url, **kwargs)
+
+    def _post(self, uri, evade=default_evade, **kwargs):
+        """
+        POST request to Linkedin API
+        """
+        evade()
+
+        url = f"{self.client.API_BASE_URL}{uri}"
+        return self.client.session.post(url, **kwargs)
 
     def search(self, params, limit=None, results=[]):
         """
@@ -227,7 +237,6 @@ class Linkedin(object):
         [public_id] - public identifier i.e. tom-quirk-1928345
         [urn_id] - id provided by the related URN
         """
-        evade()
         res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")
 
         data = res.json()
@@ -301,8 +310,6 @@ class Linkedin(object):
         [public_id] - public identifier ie - microsoft
         [urn_id] - id provided by the related URN
         """
-        evade()
-
         params = {
             "companyUniversalName": {public_id or urn_id},
             "q": "companyFeedByUniversalName",
@@ -341,8 +348,6 @@ class Linkedin(object):
         [public_id] - public identifier i.e. tom-quirk-1928345
         [urn_id] - id provided by the related URN
         """
-        evade()
-
         params = {
             "profileId": {public_id or urn_id},
             "q": "memberShareFeed",
@@ -394,8 +399,6 @@ class Linkedin(object):
 
         [public_id] - public identifier i.e. uq
         """
-        evade()
-
         params = {
             "decorationId": "com.linkedin.voyager.deco.organization.web.WebFullCompanyMain-12",
             "q": "universalName",
@@ -420,8 +423,6 @@ class Linkedin(object):
 
         [public_id] - public identifier i.e. univeristy-of-queensland
         """
-        evade()
-
         params = {
             "decorationId": "com.linkedin.voyager.deco.organization.web.WebFullCompanyMain-12",
             "q": "universalName",
@@ -497,7 +498,7 @@ class Linkedin(object):
             }
         )
 
-        res = self.client.session.post(
+        res = self._post(
             f"/messaging/conversations/{conversation_urn_id}/events",
             params=params,
             data=payload,
@@ -511,7 +512,7 @@ class Linkedin(object):
         """
         payload = json.dumps({"patch": {"$set": {"read": True}}})
 
-        res = self.client.session.post(
+        res = self._post(
             f"/messaging/conversations/{conversation_urn_id}", data=payload
         )
 

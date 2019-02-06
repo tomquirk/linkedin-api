@@ -46,11 +46,12 @@ class Linkedin(object):
 
         self.logger = logger
 
-    def _get(self, uri, **kwargs):
+    def _fetch(self, uri, _evade=True, **kwargs):
         """
         GET request to Linkedin API
         """
-        evade()
+        if _evade:
+            evade()
         return self.client.session.get(f"{self.client.API_BASE_URL}{uri}", **kwargs)
 
     def search(self, params, limit=None, results=[]):
@@ -73,7 +74,7 @@ class Linkedin(object):
 
         default_params.update(params)
 
-        res = self._get(
+        res = self._fetch(
             f"/search/blended?{toqs(default_params)}",
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
         )
@@ -169,8 +170,8 @@ class Linkedin(object):
         [public_id] - public identifier i.e. tom-quirk-1928345
         [urn_id] - id provided by the related URN
         """
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/identity/profiles/{public_id or urn_id}/profileContactInfo"
+        res = self._fetch(
+            f"/identity/profiles/{public_id or urn_id}/profileContactInfo"
         )
         data = res.json()
 
@@ -208,9 +209,8 @@ class Linkedin(object):
         [urn_id] - id provided by the related URN
         """
         params = {"count": 100, "start": 0}
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/identity/profiles/{public_id or urn_id}/skills",
-            params=params,
+        res = self._fetch(
+            f"/identity/profiles/{public_id or urn_id}/skills", params=params
         )
         data = res.json()
 
@@ -228,9 +228,7 @@ class Linkedin(object):
         [urn_id] - id provided by the related URN
         """
         evade()
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/identity/profiles/{public_id or urn_id}/profileView"
-        )
+        res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")
 
         data = res.json()
 
@@ -313,9 +311,7 @@ class Linkedin(object):
             "start": len(results),
         }
 
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/feed/updates", params=params
-        )
+        res = self._fetch(f"/feed/updates", params=params)
 
         data = res.json()
 
@@ -355,9 +351,7 @@ class Linkedin(object):
             "start": len(results),
         }
 
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/feed/updates", params=params
-        )
+        res = self._fetch(f"/feed/updates", params=params)
 
         data = res.json()
 
@@ -382,7 +376,7 @@ class Linkedin(object):
         """
         Get profile view statistics, including chart data.
         """
-        res = self.client.session.get(f"{self.client.API_BASE_URL}/identity/wvmpCards")
+        res = self._fetch(f"/identity/wvmpCards")
 
         data = res.json()
 
@@ -408,9 +402,7 @@ class Linkedin(object):
             "universalName": public_id,
         }
 
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/organization/companies?{toqs(params)}"
-        )
+        res = self._fetch(f"/organization/companies?{toqs(params)}")
 
         data = res.json()
 
@@ -436,9 +428,7 @@ class Linkedin(object):
             "universalName": public_id,
         }
 
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/organization/companies", params=params
-        )
+        res = self._fetch(f"/organization/companies", params=params)
 
         data = res.json()
 
@@ -456,8 +446,8 @@ class Linkedin(object):
         """
         # passing `params` doesn't work properly, think it's to do with List().
         # Might be a bug in `requests`?
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/messaging/conversations?\
+        res = self._fetch(
+            f"/messaging/conversations?\
             keyVersion=LEGACY_INBOX&q=participants&recipients=List({profile_urn_id})"
         )
 
@@ -474,9 +464,7 @@ class Linkedin(object):
         """
         params = {"keyVersion": "LEGACY_INBOX"}
 
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/messaging/conversations", params=params
-        )
+        res = self._fetch(f"/messaging/conversations", params=params)
 
         return res.json()
 
@@ -484,9 +472,7 @@ class Linkedin(object):
         """
         Return the full conversation at a given [conversation_urn_id]
         """
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/messaging/conversations/{conversation_urn_id}/events"
-        )
+        res = self._fetch(f"/messaging/conversations/{conversation_urn_id}/events")
 
         return res.json()
 
@@ -512,7 +498,7 @@ class Linkedin(object):
         )
 
         res = self.client.session.post(
-            f"{self.client.API_BASE_URL}/messaging/conversations/{conversation_urn_id}/events",
+            f"/messaging/conversations/{conversation_urn_id}/events",
             params=params,
             data=payload,
         )
@@ -526,8 +512,7 @@ class Linkedin(object):
         payload = json.dumps({"patch": {"$set": {"read": True}}})
 
         res = self.client.session.post(
-            f"{self.client.API_BASE_URL}/messaging/conversations/{conversation_urn_id}",
-            data=payload,
+            f"/messaging/conversations/{conversation_urn_id}", data=payload
         )
 
         return res.status_code != 200
@@ -540,7 +525,7 @@ class Linkedin(object):
             random.randint(0, 1)
         )  # sleep a random duration to try and evade suspention
 
-        res = self.client.session.get(f"{self.client.API_BASE_URL}/me")
+        res = self._fetch(f"/me")
 
         data = res.json()
 

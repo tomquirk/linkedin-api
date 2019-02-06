@@ -3,8 +3,8 @@ import json
 import os
 from linkedin_api import Linkedin
 
-TEST_PROFILE_ID = "ACoAABQ11fIBQLGQbB1V1XPBZJsRwfK5r1U2Rzw"
-TEST_CONVERSATION_ID = "6419123050314375168"
+TEST_PROFILE_ID = os.environ["TEST_PROFILE_ID"]
+TEST_CONVERSATION_ID = os.environ["TEST_CONVERSATION_ID"]
 
 
 @pytest.fixture
@@ -91,7 +91,7 @@ def test_search_people(linkedin):
 
 
 def test_search_people_with_limit(linkedin):
-    results = linkedin.search_people(keywords="software")
+    results = linkedin.search_people(keywords="software", limit=1)
     assert results
     assert len(results) == 1
 

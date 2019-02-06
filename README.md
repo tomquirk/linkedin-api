@@ -6,7 +6,7 @@
 
 > No "official" API access required - just use a valid Linkedin account!
 
-Programmatically send messages, perform searchs, get profile data and more, all with only your Linkedin account!
+Programmatically send messages, perform searches, get profile data and more, all with a standard Linkedin account!
 
 ##### USE AT YOUR OWN RISK 😉
 This project should only be used as a learning project. Using it would violate Linkedin's Terms of Use. I am not responsible for your account being blocked (which they will definitely do. Hint: **don't use your personal Linkedin account**)
@@ -17,7 +17,7 @@ This project attempts to provide a simple Python interface for the Linkedin API.
 
 > Do you mean the [legit Linkedin API](https://developer.linkedin.com/)?
 
-NO! To retrieve structured data, the [Linkedin Website](https://linkedin.com) uses a service they call **Voyager**. Voyager endpoints give us access to pretty much everything we could want from Linkedin: profiles, companies, connections, messages, etc.
+NO! To retrieve structured data, the [Linkedin Website](https://linkedin.com) uses a service they call **Voyager**. Voyager endpoints give us access to pretty much everything we could want from Linkedin: profiles, companies, connections, messages, etc. - anything that you can see on linkedin.com, we can get from Voyager.
 
 So specifically, this project aims to provide complete coverage for Voyager.
 
@@ -52,20 +52,29 @@ connections = api.get_profile_connections('1234asc12304', max_connections=200)
 ## Documentation
 For a complete reference documentation, see the [DOCS.md](https://github.com/tomquirk/linkedin-api/blob/master/DOCS.md)
 
-## Setup
+## Development Setup
 
 ### Dependencies
 
-* Python 3
+* Python 3.7
 * A valid Linkedin user account (don't use your personal account, if possible)
 * Pipenv (optional)
 
-1. Using pipenv...
+### Installation
+
+1. Create a `.env` config file. An example is provided in `.env.example` - you include at least all of the settings set there.
+2. Using pipenv...
 
     ```
     $ pipenv install
     $ pipenv shell
     ```
+
+### Running tests
+
+```
+$ python -m pytest tests
+```
 
 ### Troubleshooting
 

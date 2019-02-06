@@ -46,19 +46,24 @@ class Linkedin(object):
 
         self.logger = logger
 
+    def _get(self, uri, **kwargs):
+        """
+        GET request to Linkedin API
+        """
+        evade()
+        return self.client.session.get(f"{self.client.API_BASE_URL}{uri}", **kwargs)
+
     def search(self, params, limit=None, results=[]):
         """
         Do a search.
         """
-        evade()
-
         count = (
             limit
             if limit and limit <= Linkedin._MAX_SEARCH_COUNT
             else Linkedin._MAX_SEARCH_COUNT
         )
         default_params = {
-            "count": count,
+            "count": str(count),
             "filters": "List()",
             "origin": "GLOBAL_SEARCH_HEADER",
             "q": "all",
@@ -68,32 +73,33 @@ class Linkedin(object):
 
         default_params.update(params)
 
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/search/blended?{toqs(default_params)}",
+        res = self._get(
+            f"/search/blended?{toqs(default_params)}",
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
         )
 
         data = res.json()
+
         new_elements = []
         for i in range(len(data["data"]["elements"])):
             new_elements.extend(data["data"]["elements"][i]["elements"])
             # not entirely sure what extendedElements generally refers to - keyword search gives back a single job?
             # new_elements.extend(data["data"]["elements"][i]["extendedElements"])
 
+        results.extend(new_elements)
+        results = results[
+            :limit
+        ]  # always trim results, no matter what the request returns
+
         # recursive base case
         if (
-            (
-                limit is not None
-                and (
-                    len(results) >= limit
-                    or len(results) / limit >= Linkedin._MAX_REPEATED_REQUESTS
-                )
-            )  # if we've hit some limit (user-specified or maximum repeated requests)
-            or len(new_elements) == 0
-        ):
+            limit is not None
+            and (
+                len(results) >= limit  # if our results exceed set limit
+                or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS
+            )
+        ) or len(new_elements) == 0:
             return results
-
-        results.extend(new_elements)
 
         self.logger.debug(f"results grew to {len(results)}")
 

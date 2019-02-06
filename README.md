@@ -73,6 +73,9 @@ For a complete reference documentation, see the [DOCS.md](https://github.com/tom
 
 Linkedin will throw you a curve ball in the form of a challenge URL. We currently don't handle this, and so you're kinda screwed. We think it could be only IP-based (i.e. logging in from different location). Your best chance at resolution is to log out and log back in on your browser.
 
+#### Search woes
+- Mileage may vary when searching general keywords like "software" using the standard `search` method. They've recently added some smarts around search whereby they group results by people, company, jobs etc. if the query is general enough. Try to use an entity-specific search method (i.e. search_people) where possible.
+
 ## In-depth overview
 
 Voyager endpoints look like this:

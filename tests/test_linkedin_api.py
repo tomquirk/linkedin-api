@@ -80,7 +80,7 @@ def test_search(linkedin):
 
 
 def test_search_with_limit(linkedin):
-    results = linkedin.search({"keywords": "software"}, limit=1)
+    results = linkedin.search({"keywords": "tom"}, limit=1)
     assert len(results) == 1
 
 

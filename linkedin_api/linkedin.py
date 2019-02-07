@@ -162,10 +162,9 @@ class Linkedin(object):
         for item in data:
             if "publicIdentifier" not in item:
                 continue
-
             results.append(
                 {
-                    "urn_id": item.get("targetUrn"),
+                    "urn_id": get_id_from_urn(item.get("targetUrn")),
                     "distance": item.get("memberDistance", {}).get("value"),
                     "public_id": item.get("publicIdentifier"),
                 }
@@ -240,7 +239,6 @@ class Linkedin(object):
         res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")
 
         data = res.json()
-
         if data and "status" in data and data["status"] != 200:
             self.logger.info("request failed: {}".format(data["message"]))
             return {}

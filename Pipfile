@@ -11,6 +11,7 @@ pylint = "*"
 [packages]
 requests = "*"
 pytest = "*"
+tqdm = "*"
 
 [requires]
 python_version = "3.7"

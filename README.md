@@ -9,7 +9,7 @@
 Programmatically send messages, perform searches, get profile data and more, all with a standard Linkedin account!
 
 ##### USE AT YOUR OWN RISK 😉
-This project should only be used as a learning project. Using it would violate Linkedin's Terms of Use. I am not responsible for your account being blocked (which they will definitely do. Hint: **don't use your personal Linkedin account**)
+This project should only be used as a learning project. Using it would violate Linkedin's User Agreement. I am not responsible for your account being blocked (which they will definitely do - see User Agreement section 8.2). Hint: **don't use a Linkedin account that you care about**)
 
 ## Overview
 
@@ -78,9 +78,15 @@ $ python -m pytest tests
 
 ### Troubleshooting
 
-#### > I can't authenticate - I keep getting a CHALLENGE!?!
+#### > I keep getting a CHALLENGE!?!
 
-Linkedin will throw you a curve ball in the form of a challenge URL. We currently don't handle this, and so you're kinda screwed. We think it could be only IP-based (i.e. logging in from different location). Your best chance at resolution is to log out and log back in on your browser.
+Linkedin will throw you a curve ball in the form of a Challenge URL. We currently don't handle this, and so you're kinda screwed. We think it could be only IP-based (i.e. logging in from different location). Your best chance at resolution is to log out and log back in on your browser.
+
+##### Known reasons for Challenge:
+- 2FA
+- Rate-limit - "It looks like you’re visiting a very high number of pages on LinkedIn.". Note - n=1 experiment where this page was hit after ~900 contiguous requests in a single session (within the hour) (these included random delays between each request), as well as a bunch of testing, so who knows the actual limit.
+
+Please add more as you come across them.
 
 #### Search woes
 - Mileage may vary when searching general keywords like "software" using the standard `search` method. They've recently added some smarts around search whereby they group results by people, company, jobs etc. if the query is general enough. Try to use an entity-specific search method (i.e. search_people) where possible.

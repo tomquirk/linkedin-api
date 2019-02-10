@@ -13,7 +13,14 @@ from linkedin_api.client import Client
 logger = logging.getLogger(__name__)
 
 
-def evade():
+def toqs(params):
+    """
+    Takes a dictionary of params and returns a query string
+    """
+    return "&".join([f"{key}={params[key]}" for key in params.keys()])
+
+
+def default_evade():
     """
     A catch-all method to try and evade suspension from Linkedin.
     Currenly, just delays the request by a random (bounded) time
@@ -32,99 +39,134 @@ class Linkedin(object):
         200
     )  # VERY conservative max requests count to avoid rate-limit
 
-    def __init__(self, username, password, refresh_cookies=False):
-        self.client = Client(refresh_cookies=False)
+    def __init__(self, username, password, refresh_cookies=False, debug=False):
+        self.client = Client(refresh_cookies=refresh_cookies, debug=debug)
         self.client.authenticate(username, password)
+        logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
 
         self.logger = logger
 
-    def search(self, params, max_results=None, results=[]):
+    def _fetch(self, uri, evade=default_evade, **kwargs):
         """
-        Do a search.
+        GET request to Linkedin API
         """
         evade()
 
+        url = f"{self.client.API_BASE_URL}{uri}"
+        return self.client.session.get(url, **kwargs)
+
+    def _post(self, uri, evade=default_evade, **kwargs):
+        """
+        POST request to Linkedin API
+        """
+        evade()
+
+        url = f"{self.client.API_BASE_URL}{uri}"
+        return self.client.session.post(url, **kwargs)
+
+    def search(self, params, limit=None, results=[]):
+        """
+        Do a search.
+        """
         count = (
-            max_results
-            if max_results and max_results <= Linkedin._MAX_SEARCH_COUNT
+            limit
+            if limit and limit <= Linkedin._MAX_SEARCH_COUNT
             else Linkedin._MAX_SEARCH_COUNT
         )
         default_params = {
-            "count": count,
-            "guides": "List()",
+            "count": str(count),
+            "filters": "List()",
             "origin": "GLOBAL_SEARCH_HEADER",
-            "q": "guided",
+            "q": "all",
             "start": len(results),
+            "queryContext": "List(spellCorrectionEnabled->true,relatedSearchesEnabled->true,kcardTypes->PROFILE|COMPANY)",
         }
 
         default_params.update(params)
 
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/search/cluster", params=default_params
+        res = self._fetch(
+            f"/search/blended?{toqs(default_params)}",
+            headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
         )
+
         data = res.json()
 
-        total_found = data.get("paging", {}).get("total")
+        new_elements = []
+        for i in range(len(data["data"]["elements"])):
+            new_elements.extend(data["data"]["elements"][i]["elements"])
+            # not entirely sure what extendedElements generally refers to - keyword search gives back a single job?
+            # new_elements.extend(data["data"]["elements"][i]["extendedElements"])
+
+        results.extend(new_elements)
+        results = results[
+            :limit
+        ]  # always trim results, no matter what the request returns
 
         # recursive base case
         if (
-            len(data["elements"]) == 0
-            or (max_results is not None and len(results) >= max_results)
-            or total_found is None
-            or len(results) >= total_found
-            or (
-                max_results is not None
-                and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS
+            limit is not None
+            and (
+                len(results) >= limit  # if our results exceed set limit
+                or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS
             )
-        ):
+        ) or len(new_elements) == 0:
             return results
 
-        results.extend(data["elements"][0]["elements"])
-        self.logger.debug(f"results grew: {len(results)}")
+        self.logger.debug(f"results grew to {len(results)}")
 
-        return self.search(params, results=results, max_results=max_results)
+        return self.search(params, results=results, limit=limit)
 
     def search_people(
         self,
         keywords=None,
         connection_of=None,
         network_depth=None,
+        current_company=None,
+        past_companies=None,
+        nonprofit_interests=None,
+        profile_languages=None,
         regions=None,
         industries=None,
+        include_private_profiles=False,  # profiles without a public id, "Linkedin Member"
+        limit=None,
     ):
         """
         Do a people search.
         """
-        guides = ["v->PEOPLE"]
+        filters = ["resultType->PEOPLE"]
         if connection_of:
-            guides.append(f"facetConnectionOf->{connection_of}")
+            filters.append(f"connectionOf->{connection_of}")
         if network_depth:
-            guides.append(f"facetNetwork->{network_depth}")
+            filters.append(f"network->{network_depth}")
         if regions:
-            guides.append(f'facetGeoRegion->{"|".join(regions)}')
+            filters.append(f'geoRegion->{"|".join(regions)}')
         if industries:
-            guides.append(f'facetIndustry->{"|".join(industries)}')
+            filters.append(f'industry->{"|".join(industries)}')
+        if current_company:
+            filters.append(f'currentCompany->{"|".join(current_company)}')
+        if past_companies:
+            filters.append(f'pastCompany->{"|".join(past_companies)}')
+        if profile_languages:
+            filters.append(f'profileLanguage->{"|".join(profile_languages)}')
+        if nonprofit_interests:
+            filters.append(f'nonprofitInterest->{"|".join(nonprofit_interests)}')
 
-        params = {"guides": "List({})".format(",".join(guides))}
+        params = {"filters": "List({})".format(",".join(filters))}
 
         if keywords:
             params["keywords"] = keywords
 
-        data = self.search(params)
+        data = self.search(params, limit=limit)
 
         results = []
         for item in data:
-            search_profile = item["hitInfo"][
-                "com.linkedin.voyager.search.SearchProfile"
-            ]
-            profile_id = search_profile["id"]
-            distance = search_profile["distance"]["value"]
-
+            if "publicIdentifier" not in item:
+                continue
             results.append(
                 {
-                    "urn_id": profile_id,
-                    "distance": distance,
-                    "public_id": search_profile["miniProfile"]["publicIdentifier"],
+                    "urn_id": get_id_from_urn(item.get("targetUrn")),
+                    "distance": item.get("memberDistance", {}).get("value"),
+                    "public_id": item.get("publicIdentifier"),
                 }
             )
 
@@ -137,8 +179,8 @@ class Linkedin(object):
         [public_id] - public identifier i.e. tom-quirk-1928345
         [urn_id] - id provided by the related URN
         """
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/identity/profiles/{public_id or urn_id}/profileContactInfo"
+        res = self._fetch(
+            f"/identity/profiles/{public_id or urn_id}/profileContactInfo"
         )
         data = res.json()
 
@@ -176,9 +218,8 @@ class Linkedin(object):
         [urn_id] - id provided by the related URN
         """
         params = {"count": 100, "start": 0}
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/identity/profiles/{public_id or urn_id}/skills",
-            params=params,
+        res = self._fetch(
+            f"/identity/profiles/{public_id or urn_id}/skills", params=params
         )
         data = res.json()
 
@@ -195,13 +236,9 @@ class Linkedin(object):
         [public_id] - public identifier i.e. tom-quirk-1928345
         [urn_id] - id provided by the related URN
         """
-        evade()
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/identity/profiles/{public_id or urn_id}/profileView"
-        )
+        res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")
 
         data = res.json()
-
         if data and "status" in data and data["status"] != 200:
             self.logger.info("request failed: {}".format(data["message"]))
             return {}
@@ -271,8 +308,6 @@ class Linkedin(object):
         [public_id] - public identifier ie - microsoft
         [urn_id] - id provided by the related URN
         """
-        evade()
-
         params = {
             "companyUniversalName": {public_id or urn_id},
             "q": "companyFeedByUniversalName",
@@ -281,9 +316,7 @@ class Linkedin(object):
             "start": len(results),
         }
 
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/feed/updates", params=params
-        )
+        res = self._fetch(f"/feed/updates", params=params)
 
         data = res.json()
 
@@ -313,8 +346,6 @@ class Linkedin(object):
         [public_id] - public identifier i.e. tom-quirk-1928345
         [urn_id] - id provided by the related URN
         """
-        evade()
-
         params = {
             "profileId": {public_id or urn_id},
             "q": "memberShareFeed",
@@ -323,9 +354,7 @@ class Linkedin(object):
             "start": len(results),
         }
 
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/feed/updates", params=params
-        )
+        res = self._fetch(f"/feed/updates", params=params)
 
         data = res.json()
 
@@ -350,7 +379,7 @@ class Linkedin(object):
         """
         Get profile view statistics, including chart data.
         """
-        res = self.client.session.get(f"{self.client.API_BASE_URL}/identity/wvmpCards")
+        res = self._fetch(f"/identity/wvmpCards")
 
         data = res.json()
 
@@ -368,22 +397,17 @@ class Linkedin(object):
 
         [public_id] - public identifier i.e. uq
         """
-        evade()
-
         params = {
             "decorationId": "com.linkedin.voyager.deco.organization.web.WebFullCompanyMain-12",
             "q": "universalName",
             "universalName": public_id,
         }
 
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/organization/companies", params=params
-        )
+        res = self._fetch(f"/organization/companies?{toqs(params)}")
 
         data = res.json()
 
         if data and "status" in data and data["status"] != 200:
-            print(data)
             self.logger.info("request failed: {}".format(data))
             return {}
 
@@ -397,17 +421,13 @@ class Linkedin(object):
 
         [public_id] - public identifier i.e. univeristy-of-queensland
         """
-        evade()
-
         params = {
             "decorationId": "com.linkedin.voyager.deco.organization.web.WebFullCompanyMain-12",
             "q": "universalName",
             "universalName": public_id,
         }
 
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/organization/companies", params=params
-        )
+        res = self._fetch(f"/organization/companies", params=params)
 
         data = res.json()
 
@@ -425,8 +445,8 @@ class Linkedin(object):
         """
         # passing `params` doesn't work properly, think it's to do with List().
         # Might be a bug in `requests`?
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/messaging/conversations?\
+        res = self._fetch(
+            f"/messaging/conversations?\
             keyVersion=LEGACY_INBOX&q=participants&recipients=List({profile_urn_id})"
         )
 
@@ -443,9 +463,7 @@ class Linkedin(object):
         """
         params = {"keyVersion": "LEGACY_INBOX"}
 
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/messaging/conversations", params=params
-        )
+        res = self._fetch(f"/messaging/conversations", params=params)
 
         return res.json()
 
@@ -453,9 +471,7 @@ class Linkedin(object):
         """
         Return the full conversation at a given [conversation_urn_id]
         """
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/messaging/conversations/{conversation_urn_id}/events"
-        )
+        res = self._fetch(f"/messaging/conversations/{conversation_urn_id}/events")
 
         return res.json()
 
@@ -480,8 +496,8 @@ class Linkedin(object):
             }
         )
 
-        res = self.client.session.post(
-            f"{self.client.API_BASE_URL}/messaging/conversations/{conversation_urn_id}/events",
+        res = self._post(
+            f"/messaging/conversations/{conversation_urn_id}/events",
             params=params,
             data=payload,
         )
@@ -494,9 +510,8 @@ class Linkedin(object):
         """
         payload = json.dumps({"patch": {"$set": {"read": True}}})
 
-        res = self.client.session.post(
-            f"{self.client.API_BASE_URL}/messaging/conversations/{conversation_urn_id}",
-            data=payload,
+        res = self._post(
+            f"/messaging/conversations/{conversation_urn_id}", data=payload
         )
 
         return res.status_code != 200
@@ -509,7 +524,7 @@ class Linkedin(object):
             random.randint(0, 1)
         )  # sleep a random duration to try and evade suspention
 
-        res = self.client.session.get(f"{self.client.API_BASE_URL}/me")
+        res = self._fetch(f"/me")
 
         data = res.json()
 

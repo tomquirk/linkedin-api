@@ -6,15 +6,11 @@ verify_ssl = true
 [dev-packages]
 ipdb = "*"
 black = "*"
+pytest = "*"
 pylint = "*"
 
 [packages]
 requests = "*"
-pytest = "*"
-tqdm = "*"
-
-[requires]
-python_version = "3.7"
 
 [pipenv]
 allow_prereleases = true

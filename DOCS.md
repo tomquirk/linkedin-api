@@ -366,6 +366,7 @@ Perform a Linkedin search and return the results.
 - `network_depth <str>` - the network depth to search within. One of {`F`, `S`, or `O`} (first, second and third+ respectively)
 - `regions <list>` - list of Linkedin region ids
 - `industries <list>` - list of Linkedin industry ids
+- ... more (see code)
 
 **Return**
 

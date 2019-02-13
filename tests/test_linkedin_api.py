@@ -47,8 +47,18 @@ def test_get_conversation(linkedin):
     assert conversation
 
 
-def test_send_message(linkedin):
-    err = linkedin.send_message(TEST_CONVERSATION_ID, "test message from pytest")
+def test_send_message_to_conversation(linkedin):
+    err = linkedin.send_message(
+        conversation_urn_id=TEST_CONVERSATION_ID,
+        message_body="test message from pytest",
+    )
+    assert not err
+
+
+def test_send_message_to_recipients(linkedin):
+    err = linkedin.send_message(
+        recipients=[TEST_PROFILE_ID], message_body="test message from pytest"
+    )
     assert not err
 
 

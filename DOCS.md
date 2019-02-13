@@ -272,13 +272,14 @@ conversation_id = conversation_details['id']
 
 <a name="send_message"></a>
 
-### linkedin.send_message(conversation_urn_id, message_body)
+### linkedin.send_message(conversation_urn_id=None, recipients=None, message_body=None)
 
-Sends a message to the given [conversation_urn_id]
+Sends a message to the given [conversation_urn_id] OR list of recipients
 
 **Arguments**
 
 - `conversation_urn_id <str>` - the urn id of the conversation
+- `recipients <list(str)>` - a list of profile urn id's
 - `message_body <str>` - the message to send
 
 **Return**
@@ -296,7 +297,7 @@ profile_urn_id = profile['profile_id']
 conversation = linkedin.get_conversation_details(profile_urn_id)
 conversation_id = conversation['id']
 
-err = linkedin.send_message(conversation_id, "No I will not be your technical cofounder")
+err = linkedin.send_message(conversation_urn_id=conversation_id, message_body="No I will not be your technical cofounder")
 if err:
     # handle error
     return

@@ -515,7 +515,7 @@ class Linkedin(object):
             res = self._post(
                 f"/messaging/conversations", params=params, data=json.dumps(payload)
             )
-            print(res)
+
         return res.status_code != 201
 
     def mark_conversation_as_seen(self, conversation_urn_id):
@@ -543,3 +543,32 @@ class Linkedin(object):
         data = res.json()
 
         return data
+
+    # def add_connection(self, profile_urn_id):
+    #     payload = {
+    #         "emberEntityName": "growth/invitation/norm-invitation",
+    #         "invitee": {
+    #             "com.linkedin.voyager.growth.invitation.InviteeProfile": {
+    #                 "profileId": profile_urn_id
+    #             }
+    #         },
+    #     }
+
+    #     print(payload)
+
+    #     res = self._post(
+    #         "/growth/normInvitations",
+    #         data=payload,
+    #         headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+    #     )
+
+    #     return res.status_code != 201
+
+    def remove_connection(self, public_profile_id):
+        res = self._post(
+            f"/identity/profiles/{public_profile_id}/profileActions?action=disconnect",
+            headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+        )
+
+        return res.status_code != 200
+

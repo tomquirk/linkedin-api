@@ -4,6 +4,7 @@
 - [`linkedin.get_profile_connections`](#get_profile_connections)
 - [`linkedin.get_profile_contact_info`](#get_profile_contact_info)
 - [`linkedin.get_profile_skills`](#get_profile_skills)
+- [`linkedin.remove_connection`](#remove_connection)
 
 - [`linkedin.get_conversations`](#get_conversations)
 - [`linkedin.get_conversation_details`](#get_conversation_details)
@@ -119,6 +120,30 @@ One of:
 linkedin = Linkedin(credentials['username'], credentials['password'])
 
 profile_info = linkedin.get_profile_skills('AC000102305')
+```
+
+---
+
+<a name="remove_connection"></a>
+
+### linkedin.remove_connection(public_id)
+
+Removes a connection on Linkedin
+
+**Arguments**
+
+- `public_id <str>` - public identifier i.e. tom-quirk-1928345
+
+**Return**
+
+- `<bool>` - True if err
+
+**Example**
+
+```python
+linkedin = Linkedin(credentials['username'], credentials['password'])
+
+err = linkedin.remove_connection('tom-tom-quirk-1928345')
 ```
 
 ---

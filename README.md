@@ -11,6 +11,9 @@ Programmatically send messages, perform searches, get profile data and more, all
 ##### USE AT YOUR OWN RISK 😉
 This project should only be used as a learning project. Using it would violate Linkedin's User Agreement. I am not responsible for your account being blocked (which they will definitely do - see User Agreement section 8.2). Hint: **don't use a Linkedin account that you care about**)
 
+##### Development Notice
+This project is NOT STABLE by any stretch of the imagination. The API is subject to change at a moment's notice. @tomquirk will be amending the PyPI releases to reflect this fact soon.
+
 ## Overview
 
 This project attempts to provide a simple Python interface for the Linkedin API.

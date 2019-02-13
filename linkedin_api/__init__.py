@@ -4,7 +4,7 @@
 from .linkedin import Linkedin
 
 __title__ = "linkedin_api"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __description__ = "Python Wrapper for the Linkedin API"
 
 __license__ = "MIT"

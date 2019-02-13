@@ -475,32 +475,46 @@ class Linkedin(object):
 
         return res.json()
 
-    def send_message(self, conversation_urn_id, message_body):
+    def send_message(self, conversation_urn_id=None, recipients=[], message_body=None):
         """
         Send a message to a given conversation. If error, return true.
+
+        Recipients: List of profile urn id's
         """
         params = {"action": "create"}
 
-        payload = json.dumps(
-            {
-                "eventCreate": {
-                    "value": {
-                        "com.linkedin.voyager.messaging.create.MessageCreate": {
-                            "body": message_body,
-                            "attachments": [],
-                            "attributedBody": {"text": message_body, "attributes": []},
-                            "mediaAttachments": [],
-                        }
+        if not (conversation_urn_id or recipients) and not message_body:
+            return True
+
+        message_event = {
+            "eventCreate": {
+                "value": {
+                    "com.linkedin.voyager.messaging.create.MessageCreate": {
+                        "body": message_body,
+                        "attachments": [],
+                        "attributedBody": {"text": message_body, "attributes": []},
+                        "mediaAttachments": [],
                     }
                 }
             }
-        )
+        }
 
-        res = self._post(
-            f"/messaging/conversations/{conversation_urn_id}/events",
-            params=params,
-            data=payload,
-        )
+        if conversation_urn_id and not recipients:
+            res = self._post(
+                f"/messaging/conversations/{conversation_urn_id}/events",
+                params=params,
+                data=json.dumps(message_event),
+            )
+        elif recipients and not conversation_urn_id:
+            message_event["recipients"] = recipients
+            message_event["subtype"] = "MEMBER_TO_MEMBER"
+            payload = {
+                "keyVersion": "LEGACY_INBOX",
+                "conversationCreate": message_event,
+            }
+            res = self._post(
+                f"/messaging/conversations", params=params, data=json.dumps(payload)
+            )
 
         return res.status_code != 201
 
@@ -529,3 +543,32 @@ class Linkedin(object):
         data = res.json()
 
         return data
+
+    # def add_connection(self, profile_urn_id):
+    #     payload = {
+    #         "emberEntityName": "growth/invitation/norm-invitation",
+    #         "invitee": {
+    #             "com.linkedin.voyager.growth.invitation.InviteeProfile": {
+    #                 "profileId": profile_urn_id
+    #             }
+    #         },
+    #     }
+
+    #     print(payload)
+
+    #     res = self._post(
+    #         "/growth/normInvitations",
+    #         data=payload,
+    #         headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+    #     )
+
+    #     return res.status_code != 201
+
+    def remove_connection(self, public_profile_id):
+        res = self._post(
+            f"/identity/profiles/{public_profile_id}/profileActions?action=disconnect",
+            headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+        )
+
+        return res.status_code != 200
+

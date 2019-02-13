@@ -2,7 +2,7 @@
 
 👨‍💼 Python Wrapper for the Linkedin API
 
-![v1.0.0](https://img.shields.io/badge/PyPI-v0.2.0-blue.svg)
+![v1.0.1](https://img.shields.io/badge/PyPI-v1.0.1-blue.svg)
 
 > No "official" API access required - just use a valid Linkedin account!
 

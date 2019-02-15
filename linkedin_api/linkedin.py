@@ -558,3 +558,29 @@ class Linkedin(object):
         response_payload = res.json()
         return [element["invitation"] for element in response_payload["elements"]]
 
+    def reply_invitation(self, invitation_entity_urn, invitation_shared_secret, action="accept"):
+        """
+        Reply to an invite, the default is to accept the invitation.
+        @Param: invitation_entity_urn: str
+        @Param: invitation_shared_secret: str
+        @Param: action: "accept" or "ignore"
+        Returns True if sucess, False otherwise
+        """
+        invitation_id = invitation_entity_urn.split(':')[len(invitation_entity_urn.split(':')) - 1]
+        params = {
+            'action': action
+        }
+        payload = json.dumps({
+            "invitationId": invitation_id,
+            "invitationSharedSecret": invitation_shared_secret,
+            "isGenericInvitation": False
+        })
+
+        res = self.client.session.post(
+            f"{self.client.API_BASE_URL}/relationships/invitations/{invitation_id}",
+            params=params,
+            data=payload
+        )
+
+        return res.status_code == 200
+

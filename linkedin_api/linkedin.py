@@ -535,3 +535,26 @@ class Linkedin(object):
         data = res.json()
 
         return data
+
+    def get_invitations(self):
+        """
+        Return list of new invites
+        """
+        params = {
+            "start": 0,
+            "count": 3,
+            "includeInsights": True,
+            "q": "receivedInvitation"
+        }
+
+        res = self.client.session.get(
+            f"{self.client.API_BASE_URL}/relationships/invitationViews",
+            params=params
+        )
+
+        if (res.status_code != 200):
+            return []
+        
+        response_payload = res.json()
+        return [element["invitation"] for element in response_payload["elements"]]
+

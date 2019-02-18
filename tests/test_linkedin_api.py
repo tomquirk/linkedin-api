@@ -3,8 +3,8 @@ import json
 import os
 from linkedin_api import Linkedin
 
-TEST_PROFILE_ID = "ACoAABQ11fIBQLGQbB1V1XPBZJsRwfK5r1U2Rzw"
-TEST_CONVERSATION_ID = "6419123050314375168"
+TEST_PROFILE_ID = os.environ["TEST_PROFILE_ID"]
+TEST_CONVERSATION_ID = os.environ["TEST_CONVERSATION_ID"]
 
 
 @pytest.fixture
@@ -47,8 +47,18 @@ def test_get_conversation(linkedin):
     assert conversation
 
 
-def test_send_message(linkedin):
-    err = linkedin.send_message(TEST_CONVERSATION_ID, "test message from pytest")
+def test_send_message_to_conversation(linkedin):
+    err = linkedin.send_message(
+        conversation_urn_id=TEST_CONVERSATION_ID,
+        message_body="test message from pytest",
+    )
+    assert not err
+
+
+def test_send_message_to_recipients(linkedin):
+    err = linkedin.send_message(
+        recipients=[TEST_PROFILE_ID], message_body="test message from pytest"
+    )
     assert not err
 
 
@@ -65,27 +75,35 @@ def test_get_current_profile_views(linkedin):
 def test_get_school(linkedin):
     school = linkedin.get_school("university-of-queensland")
     assert school
+    assert school["name"] == "The University of Queensland"
 
 
 def test_get_company(linkedin):
     company = linkedin.get_company("linkedin")
     assert company
+    assert company["name"] == "LinkedIn"
 
 
 def test_search(linkedin):
-    results = linkedin.search({"keywords": "software"}, 200)
+    results = linkedin.search({"keywords": "software"})
     assert results
+
+
+def test_search_with_limit(linkedin):
+    results = linkedin.search({"keywords": "tom"}, limit=1)
+    assert len(results) == 1
 
 
 def test_search_people(linkedin):
-    results = linkedin.search_people(
-        keywords="software,lol",
-        connection_of="AC000120303",
-        network_depth="F",
-        regions=["4909"],
-        industries=["29", "1"],
-    )
+    results = linkedin.search_people(keywords="software")
     assert results
+    assert results[0]["public_id"]
+
+
+def test_search_people_with_limit(linkedin):
+    results = linkedin.search_people(keywords="software", limit=1)
+    assert results
+    assert len(results) == 1
 
 
 def test_get_profile_skills(linkedin):

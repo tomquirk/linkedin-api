@@ -5,15 +5,16 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="linkedin_api",
-    version="0.2.0",
+    version="1.0.1",
     author="Tom Quirk",
     author_email="tomquirkacc@gmail.com",
     description="Python wrapper for the Linkedin API",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/tomquirk/linkedin-api",
-    license='MIT',
+    license="MIT",
     packages=setuptools.find_packages(),
+    install_requires=["requests"],
     classifiers=(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

@@ -30,7 +30,11 @@ class Client(object):
                 "Chrome/66.0.3359.181 Safari/537.36",
             ]
         ),
+        # "accept": "application/vnd.linkedin.normalized+json+2.1",
+        "accept-language": "en-AU,en-GB;q=0.9,en-US;q=0.8,en;q=0.7",
+        "x-li-lang": "en_US",
         "x-restli-protocol-version": "2.0.0",
+        # "x-li-track": '{"clientVersion":"1.2.6216","osName":"web","timezoneOffset":10,"deviceFormFactor":"DESKTOP","mpName":"voyager-web"}',
     }
 
     # Settings for authenticating with Linkedin

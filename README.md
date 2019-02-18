@@ -2,14 +2,17 @@
 
 👨‍💼 Python Wrapper for the Linkedin API
 
-![v0.2.0](https://img.shields.io/badge/PyPI-v0.2.0-blue.svg)
+![v1.0.1](https://img.shields.io/badge/PyPI-v1.0.1-blue.svg)
 
 > No "official" API access required - just use a valid Linkedin account!
 
-Programmatically send messages, perform searchs, get profile data and more, all with only your Linkedin account!
+Programmatically send messages, perform searches, get profile data and more, all with a standard Linkedin account!
 
 ##### USE AT YOUR OWN RISK 😉
-This project should only be used as a learning project. Using it would violate Linkedin's Terms of Use. I am not responsible for your account being blocked (which they will definitely do. Hint: **don't use your personal Linkedin account**)
+This project should only be used as a learning project. Using it would violate Linkedin's User Agreement. I am not responsible for your account being blocked (which they will definitely do - see User Agreement section 8.2). Hint: **don't use a Linkedin account that you care about**)
+
+##### Development Notice
+This project is NOT STABLE by any stretch of the imagination. The API is subject to change at a moment's notice. @tomquirk will be amending the PyPI releases to reflect this fact soon.
 
 ## Overview
 
@@ -17,7 +20,7 @@ This project attempts to provide a simple Python interface for the Linkedin API.
 
 > Do you mean the [legit Linkedin API](https://developer.linkedin.com/)?
 
-NO! To retrieve structured data, the [Linkedin Website](https://linkedin.com) uses a service they call **Voyager**. Voyager endpoints give us access to pretty much everything we could want from Linkedin: profiles, companies, connections, messages, etc.
+NO! To retrieve structured data, the [Linkedin Website](https://linkedin.com) uses a service they call **Voyager**. Voyager endpoints give us access to pretty much everything we could want from Linkedin: profiles, companies, connections, messages, etc. - anything that you can see on linkedin.com, we can get from Voyager.
 
 So specifically, this project aims to provide complete coverage for Voyager.
 
@@ -52,26 +55,44 @@ connections = api.get_profile_connections('1234asc12304', max_connections=200)
 ## Documentation
 For a complete reference documentation, see the [DOCS.md](https://github.com/tomquirk/linkedin-api/blob/master/DOCS.md)
 
-## Setup
+## Development Setup
 
 ### Dependencies
 
-* Python 3
+* Python 3.7
 * A valid Linkedin user account (don't use your personal account, if possible)
 * Pipenv (optional)
 
-1. Using pipenv...
+### Installation
+
+1. Create a `.env` config file. An example is provided in `.env.example` - you include at least all of the settings set there.
+2. Using pipenv...
 
     ```
     $ pipenv install
     $ pipenv shell
     ```
 
+### Running tests
+
+```
+$ python -m pytest tests
+```
+
 ### Troubleshooting
 
-#### > I can't authenticate - I keep getting a CHALLENGE!?!
+#### > I keep getting a CHALLENGE!?!
 
-Linkedin will throw you a curve ball in the form of a challenge URL. We currently don't handle this, and so you're kinda screwed. We think it could be only IP-based (i.e. logging in from different location). Your best chance at resolution is to log out and log back in on your browser.
+Linkedin will throw you a curve ball in the form of a Challenge URL. We currently don't handle this, and so you're kinda screwed. We think it could be only IP-based (i.e. logging in from different location). Your best chance at resolution is to log out and log back in on your browser.
+
+##### Known reasons for Challenge:
+- 2FA
+- Rate-limit - "It looks like you’re visiting a very high number of pages on LinkedIn.". Note - n=1 experiment where this page was hit after ~900 contiguous requests in a single session (within the hour) (these included random delays between each request), as well as a bunch of testing, so who knows the actual limit.
+
+Please add more as you come across them.
+
+#### Search woes
+- Mileage may vary when searching general keywords like "software" using the standard `search` method. They've recently added some smarts around search whereby they group results by people, company, jobs etc. if the query is general enough. Try to use an entity-specific search method (i.e. search_people) where possible.
 
 ## In-depth overview
 

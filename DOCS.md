@@ -4,6 +4,7 @@
 - [`linkedin.get_profile_connections`](#get_profile_connections)
 - [`linkedin.get_profile_contact_info`](#get_profile_contact_info)
 - [`linkedin.get_profile_skills`](#get_profile_skills)
+- [`linkedin.remove_connection`](#remove_connection)
 
 - [`linkedin.get_conversations`](#get_conversations)
 - [`linkedin.get_conversation_details`](#get_conversation_details)
@@ -122,6 +123,30 @@ One of:
 linkedin = Linkedin(credentials['username'], credentials['password'])
 
 profile_info = linkedin.get_profile_skills('AC000102305')
+```
+
+---
+
+<a name="remove_connection"></a>
+
+### linkedin.remove_connection(public_id)
+
+Removes a connection on Linkedin
+
+**Arguments**
+
+- `public_id <str>` - public identifier i.e. tom-quirk-1928345
+
+**Return**
+
+- `<bool>` - True if err
+
+**Example**
+
+```python
+linkedin = Linkedin(credentials['username'], credentials['password'])
+
+err = linkedin.remove_connection('tom-tom-quirk-1928345')
 ```
 
 ---
@@ -275,13 +300,14 @@ conversation_id = conversation_details['id']
 
 <a name="send_message"></a>
 
-### linkedin.send_message(conversation_urn_id, message_body)
+### linkedin.send_message(conversation_urn_id=None, recipients=None, message_body=None)
 
-Sends a message to the given [conversation_urn_id]
+Sends a message to the given [conversation_urn_id] OR list of recipients
 
 **Arguments**
 
 - `conversation_urn_id <str>` - the urn id of the conversation
+- `recipients <list(str)>` - a list of profile urn id's
 - `message_body <str>` - the message to send
 
 **Return**
@@ -299,7 +325,7 @@ profile_urn_id = profile['profile_id']
 conversation = linkedin.get_conversation_details(profile_urn_id)
 conversation_id = conversation['id']
 
-err = linkedin.send_message(conversation_id, "No I will not be your technical cofounder")
+err = linkedin.send_message(conversation_urn_id=conversation_id, message_body="No I will not be your technical cofounder")
 if err:
     # handle error
     return
@@ -369,6 +395,7 @@ Perform a Linkedin search and return the results.
 - `network_depth <str>` - the network depth to search within. One of {`F`, `S`, or `O`} (first, second and third+ respectively)
 - `regions <list>` - list of Linkedin region ids
 - `industries <list>` - list of Linkedin industry ids
+- ... more (see code)
 
 **Return**
 

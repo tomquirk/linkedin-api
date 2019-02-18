@@ -19,6 +19,9 @@
 - [`linkedin.search`](#search)
 - [`linkedin.search_people`](#search_people)
 
+- [`linkedin.get_invitations`](#get_invitations)
+- [`linkedin.reply_invitation`](#reply_invitation)
+
 ---
 
 <a name="get_profile"></a>
@@ -383,4 +386,41 @@ results = linkedin.search_people(
   regions=[4909],
   industries=[29, 1]
 )
+```
+
+---
+
+<a name="get_invitations"></a>
+
+### linkedin.get_invitations()
+
+Get all the invitations for the current authenticated profile.
+
+**Example**
+
+```python
+linkedin = Linkedin(credentials['username'], credentials['password'])
+
+invitations = linkedin.get_invitations()
+```
+
+---
+
+<a name="reply_invitation"></a>
+
+### linkedin.reply_invitation(invitation_entity_urn, invitation_shared_secret, action="accept")
+
+Reply to the given invite (invitation_entity_urn) with one of the possible actions action=["accept"|"ignore"].
+The default is to accept the given invitation.
+
+**Example**
+
+```python
+linkedin = Linkedin(credentials['username'], credentials['password'])
+
+invite_to_accept = linkedin.get_invitations()[0]
+invite_to_ignore = linkedin.get_invitations()[1]
+
+linkedin.reply_invitation(invitation_entity_urn=invite_to_accept['entityUrn'], invitation_shared_secret=invite_to_accept['sharedSecret'])
+linkedin.reply_invitation(invitation_entity_urn=invite_to_ignore['entityUrn'], invitation_shared_secret=invite_to_ignore['sharedSecret'], action="ignore")
 ```

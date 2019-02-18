@@ -518,27 +518,6 @@ class Linkedin(object):
 
         return res.status_code != 201
 
-    def upload_photo_attachment(self, file_size, file_name):
-        """
-        Upload photo attachment
-        """
-
-        params = {"action": "upload"}
-
-        payload = json.dumps({
-            "fileSize": file_size,
-            "filename": file_name,
-            "mediaUploadType": "MESSAGING_PHOTO_ATTACHMENT"
-        })
-
-        res = self.client.session.post(
-            f"{self.client.API_BASE_URL}/voyagerMediaUploadMetadata",
-            params=params,
-            data=payload
-        )
-
-        return res.json()
-
     def mark_conversation_as_seen(self, conversation_urn_id):
         """
         Send seen to a given conversation. If error, return True.

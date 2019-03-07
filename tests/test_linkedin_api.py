@@ -105,6 +105,11 @@ def test_search_people_with_limit(linkedin):
     assert results
     assert len(results) == 1
 
+def test_search_people_by_region(linkedin):
+    results = linkedin.search_people(keywords="software", regions=["au:4910"])
+    assert results
+    assert results[0]["public_id"]
+
 
 def test_get_profile_skills(linkedin):
     skills = linkedin.get_profile_skills(TEST_PROFILE_ID)

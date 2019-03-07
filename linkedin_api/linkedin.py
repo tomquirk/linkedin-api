@@ -4,6 +4,7 @@ Provides linkedin api-related code
 import random
 import logging
 from time import sleep
+from urllib.parse import urlencode
 import json
 
 from linkedin_api.utils.helpers import get_id_from_urn
@@ -11,14 +12,6 @@ from linkedin_api.utils.helpers import get_id_from_urn
 from linkedin_api.client import Client
 
 logger = logging.getLogger(__name__)
-
-
-def toqs(params):
-    """
-    Takes a dictionary of params and returns a query string
-    """
-    return "&".join([f"{key}={params[key]}" for key in params.keys()])
-
 
 def default_evade():
     """
@@ -85,7 +78,7 @@ class Linkedin(object):
         default_params.update(params)
 
         res = self._fetch(
-            f"/search/blended?{toqs(default_params)}",
+            f"/search/blended?{urlencode(default_params)}",
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
         )
 
@@ -127,6 +120,7 @@ class Linkedin(object):
         profile_languages=None,
         regions=None,
         industries=None,
+        schools=None,
         include_private_profiles=False,  # profiles without a public id, "Linkedin Member"
         limit=None,
     ):
@@ -150,6 +144,8 @@ class Linkedin(object):
             filters.append(f'profileLanguage->{"|".join(profile_languages)}')
         if nonprofit_interests:
             filters.append(f'nonprofitInterest->{"|".join(nonprofit_interests)}')
+        if schools:
+            filters.append(f'schools->{"|".join(schools)}')
 
         params = {"filters": "List({})".format(",".join(filters))}
 
@@ -403,7 +399,7 @@ class Linkedin(object):
             "universalName": public_id,
         }
 
-        res = self._fetch(f"/organization/companies?{toqs(params)}")
+        res = self._fetch(f"/organization/companies?{urlencode(params)}")
 
         data = res.json()
 

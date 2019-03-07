@@ -560,9 +560,9 @@ class Linkedin(object):
             params=params
         )
 
-        if (res.status_code != 200):
+        if res.status_code != 200:
             return []
-        
+
         response_payload = res.json()
         return [element["invitation"] for element in response_payload["elements"]]
 

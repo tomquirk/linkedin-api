@@ -5,7 +5,8 @@ from linkedin_api import Linkedin
 
 TEST_PROFILE_ID = os.environ["TEST_PROFILE_ID"]
 TEST_CONVERSATION_ID = os.environ["TEST_CONVERSATION_ID"]
-
+TEST_INVITATION_ID = os.environ["TEST_INVITATION_ID"]
+TEST_INVITATION_SHARED_SECRET = os.environ["TEST_INVITATION_SHARED_SECRET"]
 
 @pytest.fixture
 def linkedin():
@@ -110,3 +111,14 @@ def test_get_profile_skills(linkedin):
     skills = linkedin.get_profile_skills(TEST_PROFILE_ID)
     assert skills
 
+def test_get_invitations(linkedin):
+    invitations = linkedin.get_invitations()
+    assert len(invitations) >= 0
+
+def test_reply_invitation(linkedin):
+    accept_response = linkedin.reply_invitation(
+        TEST_INVITATION_ID,
+        TEST_INVITATION_SHARED_SECRET,
+        "accept"
+    )
+    assert accept_response

@@ -1,6 +1,7 @@
-import pytest
-import json
 import os
+
+import pytest
+
 from linkedin_api import Linkedin
 
 TEST_PROFILE_ID = os.environ["TEST_PROFILE_ID"]
@@ -106,6 +107,7 @@ def test_search_people_with_limit(linkedin):
     assert results
     assert len(results) == 1
 
+
 def test_search_people_by_region(linkedin):
     results = linkedin.search_people(keywords="software", regions=["au:4910"])
     assert results
@@ -116,14 +118,16 @@ def test_get_profile_skills(linkedin):
     skills = linkedin.get_profile_skills(TEST_PROFILE_ID)
     assert skills
 
+
 def test_get_invitations(linkedin):
     invitations = linkedin.get_invitations()
     assert len(invitations) >= 0
+
 
 def test_reply_invitation(linkedin):
     accept_response = linkedin.reply_invitation(
         TEST_INVITATION_ID,
         TEST_INVITATION_SHARED_SECRET,
-        "accept"
+        "ignore"
     )
     assert accept_response

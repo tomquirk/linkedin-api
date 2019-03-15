@@ -6,8 +6,7 @@ from linkedin_api import Linkedin
 
 TEST_PROFILE_ID = os.environ["TEST_PROFILE_ID"]
 TEST_CONVERSATION_ID = os.environ["TEST_CONVERSATION_ID"]
-TEST_INVITATION_ID = os.environ["TEST_INVITATION_ID"]
-TEST_INVITATION_SHARED_SECRET = os.environ["TEST_INVITATION_SHARED_SECRET"]
+
 
 @pytest.fixture
 def linkedin():

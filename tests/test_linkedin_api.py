@@ -119,15 +119,13 @@ def test_get_profile_skills(linkedin):
     assert skills
 
 
-def test_get_invitations(linkedin):
+def test_invitation_complete(linkedin):
     invitations = linkedin.get_invitations()
     assert len(invitations) >= 0
 
-
-def test_reply_invitation(linkedin):
-    accept_response = linkedin.reply_invitation(
-        TEST_INVITATION_ID,
-        TEST_INVITATION_SHARED_SECRET,
-        "ignore"
-    )
-    assert accept_response
+    if len(invitations) > 0:
+        invite = linkedin.get_invitations()[0]
+        invitation_response = linkedin.reply_invitation(invitation_entity_urn=invite['entityUrn'],
+                                                        invitation_shared_secret=invite['sharedSecret'],
+                                                        action="accept")
+        assert invitation_response

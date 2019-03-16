@@ -540,6 +540,54 @@ class Linkedin(object):
 
         return data
 
+    def get_invitations(self, start=0, limit=3):
+        """
+        Return list of new invites
+        """
+        params = {
+            "start": start,
+            "count": limit,
+            "includeInsights": True,
+            "q": "receivedInvitation"
+        }
+
+        res = self.client.session.get(
+            f"{self.client.API_BASE_URL}/relationships/invitationViews",
+            params=params
+        )
+
+        if res.status_code != 200:
+            return []
+
+        response_payload = res.json()
+        return [element["invitation"] for element in response_payload["elements"]]
+
+    def reply_invitation(self, invitation_entity_urn, invitation_shared_secret, action="accept"):
+        """
+        Reply to an invite, the default is to accept the invitation.
+        @Param: invitation_entity_urn: str
+        @Param: invitation_shared_secret: str
+        @Param: action: "accept" or "ignore"
+        Returns True if sucess, False otherwise
+        """
+        invitation_id = get_id_from_urn(invitation_entity_urn)
+        params = {
+            'action': action
+        }
+        payload = json.dumps({
+            "invitationId": invitation_id,
+            "invitationSharedSecret": invitation_shared_secret,
+            "isGenericInvitation": False
+        })
+
+        res = self.client.session.post(
+            f"{self.client.API_BASE_URL}/relationships/invitations/{invitation_id}",
+            params=params,
+            data=payload
+        )
+
+        return res.status_code == 200
+
     # def add_connection(self, profile_urn_id):
     #     payload = {
     #         "emberEntityName": "growth/invitation/norm-invitation",

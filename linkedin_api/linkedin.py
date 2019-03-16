@@ -540,13 +540,13 @@ class Linkedin(object):
 
         return data
 
-    def get_invitations(self):
+    def get_invitations(self, start=0, limit=3):
         """
         Return list of new invites
         """
         params = {
-            "start": 0,
-            "count": 3,
+            "start": start,
+            "count": limit,
             "includeInsights": True,
             "q": "receivedInvitation"
         }
@@ -570,7 +570,7 @@ class Linkedin(object):
         @Param: action: "accept" or "ignore"
         Returns True if sucess, False otherwise
         """
-        invitation_id = invitation_entity_urn.split(':')[len(invitation_entity_urn.split(':')) - 1]
+        invitation_id = get_id_from_urn(invitation_entity_urn)
         params = {
             'action': action
         }

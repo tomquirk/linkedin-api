@@ -115,10 +115,12 @@ def test_search_people_by_region(linkedin):
 def test_get_profile_skills(linkedin):
     skills = linkedin.get_profile_skills(TEST_PROFILE_ID)
     assert skills
-    
+
+
 def test_get_invitiations(linkedin):
     invitations = linkedin.get_invitations()
     assert len(invitations) >= 0
+
 
 def test_accept_invitation(linkedin):
     """
@@ -126,17 +128,43 @@ def test_accept_invitation(linkedin):
     functionality, make sure the test account has at least 1 invitation.
     """
     invitations = linkedin.get_invitations()
-    num_invitations = len(invitations)
     if not invitations:
-        # If we've got no invitations, just push the test through
-        return assert(True)
+        # If we've got no invitations, just force test to pass
+        assert True
+        return
 
-    invite = invitiations[0]
-    invitation_response = linkedin.reply_invitation(invitation_entity_urn=invite['entityUrn'],
-                                                    invitation_shared_secret=invite['sharedSecret'],
-                                                    action="accept")
-    assert(invitation_response)
-    
+    num_invitations = len(invitations)
+    invite = invitations[0]
+    invitation_response = linkedin.reply_invitation(
+        invitation_entity_urn=invite["entityUrn"],
+        invitation_shared_secret=invite["sharedSecret"],
+        action="accept",
+    )
+    assert invitation_response
+
     invitations = linkedin.get_invitations()
     assert len(invitations) == num_invitations - 1
-    
+
+
+def test_reject_invitation(linkedin):
+    """
+    NOTE: this test relies on the existence of invitations. If you'd like to test this
+    functionality, make sure the test account has at least 1 invitation.
+    """
+    invitations = linkedin.get_invitations()
+    if not invitations:
+        # If we've got no invitations, just force test to pass
+        assert True
+        return
+
+    num_invitations = len(invitations)
+    invite = invitations[0]
+    invitation_response = linkedin.reply_invitation(
+        invitation_entity_urn=invite["entityUrn"],
+        invitation_shared_secret=invite["sharedSecret"],
+        action="reject",
+    )
+    assert invitation_response
+
+    invitations = linkedin.get_invitations()
+    assert len(invitations) == num_invitations - 1

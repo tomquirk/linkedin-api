@@ -1,18 +1,28 @@
 import os
+import sys
 import pytest
 
 from linkedin_api import Linkedin
 
-TEST_PROFILE_ID = os.environ["TEST_PROFILE_ID"]
-TEST_CONVERSATION_ID = os.environ["TEST_CONVERSATION_ID"]
+TEST_LINKEDIN_USERNAME = os.getenv("LINKEDIN_USERNAME")
+TEST_LINKEDIN_PASSWORD = os.getenv("LINKEDIN_PASSWORD")
+TEST_PROFILE_ID = os.getenv("TEST_PROFILE_ID")
+TEST_CONVERSATION_ID = os.getenv("TEST_CONVERSATION_ID")
+
+if not (
+    TEST_LINKEDIN_USERNAME
+    and TEST_LINKEDIN_PASSWORD
+    and TEST_PROFILE_ID
+    and TEST_CONVERSATION_ID
+):
+    print("Test config incomplete. Exiting...")
+    sys.exit()
 
 
 @pytest.fixture
 def linkedin():
     return Linkedin(
-        os.environ["LINKEDIN_USERNAME"],
-        os.environ["LINKEDIN_PASSWORD"],
-        refresh_cookies=True,
+        TEST_LINKEDIN_USERNAME, TEST_LINKEDIN_PASSWORD, refresh_cookies=True
     )
 
 

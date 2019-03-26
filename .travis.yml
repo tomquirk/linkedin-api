@@ -9,12 +9,13 @@ install:
   - pipenv --python 3
   - pipenv install --pre
 
-script:
-  - pipenv run python -m pytest tests -s
+# reminder: we can't run tests because Linkedin always throws challenges (likely because of IP)
 
 deploy:
   provider: pypi
-  user: "Your username"
-  password: "Your password"
+  user:
+    secure: "OIlyR8F/jKJbU5CQmUmbek/ZomLvQCdxeiITv14XEG1/gbDlS3DcesCZhPDhvXmuOtke+Q0Thd98PpOrs7VNGT5YVWSTlZGKxmUnOJoMzkFltSWO4GFnwfXKWT5Euu1pbkTNgQxUmPgucGZdHWo96pr+Bjp5QV45GuiDIfFKT/jkjgr5mriVvpbvKvaXqw6TgeQulLlKE86O4rRQAHz5txspJtl3CF4nQao79ZKUyyZwnpBbjvsKehuq2jXGuDB8UTCSJkH0wtzRFqXQnJdv5Ghm84YPlaqk50zbgMg0yz4Ylehi1CSud4zcegc94FSAbv4yB18T4BvrZcdIckufbw24QgqFSU3atSzTZ7zCQ4JFBa+SQn1ppy+s8c8XXHshF+sxfMJb8/wKzXurvhDkiiBgiin+0Qgju1z/1QxZ4J+898/5Eq1qxlAoeNbkOz4RvF+5mja2w8wySDQASGznlksOP7ARGc/aQpz6S+Cv3rTmhcO+JaDxz/Qomq82LoIY2h0WHLWv9iUWQrNuMZPkEcQptQ5XZQsuJDkRQThF+kGriiV0hZqfoeqHZC9coCCUYGszEI733+M5wK9GRHOZwEKwYAbiM4MU6ItKtZs+/oynlQWQAFe55hdQZUgDvhB9lR3FxJih9z7KXVIot27B1h2ls5WYZ1hXfNO3/Vv3h3Y="
+  password:
+    secure: "FgZ9Z6ufPC++HAhVLffqhw+5PLpRvN4OXNRs3ghNn8IjXouVKBf6enOb0TjYp2N2oDH/++xscmswhQuYA0TiuaX7Wbd7oHZtt/xCDYNiy5A9nNwmmiHzMlwqwkc7URMj+AF6ksuro/rCgfC/SBrKGQQDW905I2b96ly3fblZMBh3iIRFBtxhbpVw7UFOxxPtiUiHJWj/YmwwNJ5fYTgDBnjpy7xuKPa8Ms6HYlU2hypp65Jq0EhfPKdDYQyh5VWnnqCAnNn1nfjHzpl/rckcS1j4mx3VRsIbuSRt/73Gid4Be1/wgXHnuJAuvj4Ew08JryNk0nVW5je93LuGidtAcUtt5nzCIfRwdDFpSez395qP6nUCwFOeNEnH9P2YD9diHJbOr5oSc3sBQLTBX6aauXw54h0CMHHYZKOhrvC9cn223RPnl0Pxsk/6PAcb0yb1v7Yv4COmg4B1dS9bfZM6u+4VByrQQeEqL854bIznDFWzOCJ1FPUhwN7sY48cfUxsgNeJyerESNcW2F/UpHJP+42PhCSlGlRD0eiIoOr51IawSXGb588C+DCQqzEh7nhMkdUFPtFdh/QD7ogw7S/y7k3TCVH1EHkY1QoZ3DFIRowOcpltyOIZSD3DyzdTOX+luaMn4w7+fyWd+zSQiiPSAeHsw2Us0AKTrIMphtAcLaQ="
   on:
-    branch: master
+    branch: travis

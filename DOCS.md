@@ -337,7 +337,7 @@ if err:
 
 ### linkedin.mark_conversation_as_seen(conversation_urn_id)
 
-Mark a given conversation as seen. 
+Mark a given conversation as seen.
 
 **Arguments**
 
@@ -410,8 +410,8 @@ results = linkedin.search_people(
   keywords='software,lol',
   connection_of='AC000120303',
   network_depth='F',
-  regions=[4909],
-  industries=[29, 1]
+  regions=['au:4909'],
+  industries=['29', '1']
 )
 ```
 

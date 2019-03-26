@@ -11,3 +11,10 @@ install:
 
 script:
   - pipenv run python -m pytest tests -s
+
+deploy:
+  provider: pypi
+  user: "Your username"
+  password: "Your password"
+  on:
+    branch: master

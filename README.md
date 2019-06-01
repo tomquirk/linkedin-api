@@ -8,9 +8,7 @@
 
 Programmatically send messages, perform searches, get profile data and more, all with a regular Linkedin user account!
 
-##### USE AT YOUR OWN RISK 😉
-
-This project should only be used as a learning project. Using it would violate Linkedin's User Agreement. I am not responsible for your account being blocked (which they will definitely do - see User Agreement section 8.2). Hint: **don't use a Linkedin account that you care about**)
+Before using this project, please consult the [Terms and Conditions](#t-c) and [Legal Notice](#legal).
 
 ## Overview
 
@@ -70,7 +68,7 @@ For a complete reference documentation, see the [DOCS.md](https://github.com/tom
 2. Using pipenv...
 
    ```
-   $ pipenv install
+   $ pipenv install --dev
    $ pipenv shell
    ```
 
@@ -169,3 +167,26 @@ List(v->PEOPLE)
 ```
 
 It could be possible to document (and implement a nice interface for) this query language - as we add more endpoints to this project, I'm sure it will become more clear if such a thing would be possible (and if it's worth it).
+
+<a name="t-c"></a>
+
+## Terms and Conditions
+
+By using this project, you agree to the following Terms and Conditions. We reserve the right to block any user of this repository that does not meet these conditions.
+
+### Usage
+
+This project may not be used for any of the following:
+
+* Commercial use
+* Spam
+* Storage of any Personally Identifiable Information
+* Personal abuse (i.e. verbal abuse)
+
+<a name="legal"></a>
+
+## Legal
+
+This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by Linkedin or any of its affiliates or subsidiaries. This is an independent and unofficial API. Use at your own risk.
+
+This project violates Linkedin's User Agreement Section 8.2, and because of this, Linkedin may (and will) temporarily or permantly ban your account. We are not responsible for your account being banned.

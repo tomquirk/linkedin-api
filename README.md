@@ -4,11 +4,16 @@
 
 [![PyPI version](https://badge.fury.io/py/linkedin-api.svg)](https://badge.fury.io/py/linkedin-api)
 
+[![Build](https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png)](https://www.buymeacoffee.com/tomquirk)
+
+
 > No "official" API access required - just use a valid Linkedin account!
 
 Programmatically send messages, perform searches, get profile data and more, all with a regular Linkedin user account!
 
 Before using this project, please consult the [Terms and Conditions](#t-c) and [Legal Notice](#legal).
+
+
 
 ## Overview
 

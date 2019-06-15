@@ -19,7 +19,7 @@ setuptools.setup(
     author="Tom Quirk",
     author_email="tomquirkacc@gmail.com",
     description="Python wrapper for the Linkedin API",
-    long_description=get_long_description(),
+    long_description="sdf",
     long_description_content_type="text/markdown",
     url="https://github.com/tomquirk/linkedin-api",
     license="MIT",

@@ -45,7 +45,7 @@ class Linkedin(object):
         """
         evade()
 
-        url = f"{self.client.API_BASE_URL}{uri}"
+        url = "{}{}".format(self.client.API_BASE_URL,uri)
         return self.client.session.get(url, **kwargs)
 
     def _post(self, uri, evade=default_evade, **kwargs):
@@ -54,7 +54,7 @@ class Linkedin(object):
         """
         evade()
 
-        url = f"{self.client.API_BASE_URL}{uri}"
+        url = "{}{}".format(self.client.API_BASE_URL,uri)
         return self.client.session.post(url, **kwargs)
 
     def search(self, params, limit=None, results=[]):
@@ -78,7 +78,7 @@ class Linkedin(object):
         default_params.update(params)
 
         res = self._fetch(
-            f"/search/blended?{urlencode(default_params)}",
+            "/search/blended?{}".format(urlencode(default_params)),
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
         )
 
@@ -105,7 +105,7 @@ class Linkedin(object):
         ) or len(new_elements) == 0:
             return results
 
-        self.logger.debug(f"results grew to {len(results)}")
+        self.logger.debug("results grew to {}".format(len(results)))
 
         return self.search(params, results=results, limit=limit)
 
@@ -129,23 +129,23 @@ class Linkedin(object):
         """
         filters = ["resultType->PEOPLE"]
         if connection_of:
-            filters.append(f"connectionOf->{connection_of}")
+            filters.append("connectionOf->{}".format(connection_of))
         if network_depth:
-            filters.append(f"network->{network_depth}")
+            filters.append("network->{}".format(network_depth))
         if regions:
-            filters.append(f'geoRegion->{"|".join(regions)}')
+            filters.append('geoRegion->{}'.format("|".join(regions)))
         if industries:
-            filters.append(f'industry->{"|".join(industries)}')
+            filters.append('industry->{}'.format("|".join(industries)))
         if current_company:
-            filters.append(f'currentCompany->{"|".join(current_company)}')
+            filters.append('currentCompany->{}'.format("|".join(current_company)))
         if past_companies:
-            filters.append(f'pastCompany->{"|".join(past_companies)}')
+            filters.append('pastCompany->{}'.format("|".join(past_companies)))
         if profile_languages:
-            filters.append(f'profileLanguage->{"|".join(profile_languages)}')
+            filters.append('profileLanguage->{}'.format("|".join(profile_languages)))
         if nonprofit_interests:
-            filters.append(f'nonprofitInterest->{"|".join(nonprofit_interests)}')
+            filters.append('nonprofitInterest->{}'.format("|".join(nonprofit_interests)))
         if schools:
-            filters.append(f'schools->{"|".join(schools)}')
+            filters.append('schools->{}'.format("|".join(schools)))
 
         params = {"filters": "List({})".format(",".join(filters))}
 
@@ -176,7 +176,7 @@ class Linkedin(object):
         [urn_id] - id provided by the related URN
         """
         res = self._fetch(
-            f"/identity/profiles/{public_id or urn_id}/profileContactInfo"
+            "/identity/profiles/{}/profileContactInfo".format(public_id or urn_id)
         )
         data = res.json()
 
@@ -215,7 +215,7 @@ class Linkedin(object):
         """
         params = {"count": 100, "start": 0}
         res = self._fetch(
-            f"/identity/profiles/{public_id or urn_id}/skills", params=params
+            "/identity/profiles/{}/skills".format(public_id or urn_id), params=params
         )
         data = res.json()
 
@@ -232,7 +232,7 @@ class Linkedin(object):
         [public_id] - public identifier i.e. tom-quirk-1928345
         [urn_id] - id provided by the related URN
         """
-        res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")
+        res = self._fetch("/identity/profiles/{}/profileView".format(public_id or urn_id))
 
         data = res.json()
         if data and "status" in data and data["status"] != 200:
@@ -312,7 +312,7 @@ class Linkedin(object):
             "start": len(results),
         }
 
-        res = self._fetch(f"/feed/updates", params=params)
+        res = self._fetch("/feed/updates", params=params)
 
         data = res.json()
 
@@ -327,7 +327,7 @@ class Linkedin(object):
             return results
 
         results.extend(data["elements"])
-        self.logger.debug(f"results grew: {len(results)}")
+        self.logger.debug("results grew: {}".format(len(results)))
 
         return self.get_company_updates(
             public_id=public_id, urn_id=urn_id, results=results, max_results=max_results
@@ -350,7 +350,7 @@ class Linkedin(object):
             "start": len(results),
         }
 
-        res = self._fetch(f"/feed/updates", params=params)
+        res = self._fetch("/feed/updates", params=params)
 
         data = res.json()
 
@@ -365,7 +365,7 @@ class Linkedin(object):
             return results
 
         results.extend(data["elements"])
-        self.logger.debug(f"results grew: {len(results)}")
+        self.logger.debug("results grew: {}".format(len(results)))
 
         return self.get_profile_updates(
             public_id=public_id, urn_id=urn_id, results=results, max_results=max_results
@@ -375,7 +375,7 @@ class Linkedin(object):
         """
         Get profile view statistics, including chart data.
         """
-        res = self._fetch(f"/identity/wvmpCards")
+        res = self._fetch("/identity/wvmpCards")
 
         data = res.json()
 
@@ -399,7 +399,7 @@ class Linkedin(object):
             "universalName": public_id,
         }
 
-        res = self._fetch(f"/organization/companies?{urlencode(params)}")
+        res = self._fetch("/organization/companies?{}".format(urlencode(params)))
 
         data = res.json()
 
@@ -423,7 +423,7 @@ class Linkedin(object):
             "universalName": public_id,
         }
 
-        res = self._fetch(f"/organization/companies", params=params)
+        res = self._fetch("/organization/companies", params=params)
 
         data = res.json()
 
@@ -442,8 +442,8 @@ class Linkedin(object):
         # passing `params` doesn't work properly, think it's to do with List().
         # Might be a bug in `requests`?
         res = self._fetch(
-            f"/messaging/conversations?\
-            keyVersion=LEGACY_INBOX&q=participants&recipients=List({profile_urn_id})"
+            "/messaging/conversations?\
+            keyVersion=LEGACY_INBOX&q=participants&recipients=List({})".format(profile_urn_id)
         )
 
         data = res.json()
@@ -459,7 +459,7 @@ class Linkedin(object):
         """
         params = {"keyVersion": "LEGACY_INBOX"}
 
-        res = self._fetch(f"/messaging/conversations", params=params)
+        res = self._fetch("/messaging/conversations", params=params)
 
         return res.json()
 
@@ -467,7 +467,7 @@ class Linkedin(object):
         """
         Return the full conversation at a given [conversation_urn_id]
         """
-        res = self._fetch(f"/messaging/conversations/{conversation_urn_id}/events")
+        res = self._fetch("/messaging/conversations/{}/events".format(conversation_urn_id))
 
         return res.json()
 
@@ -497,7 +497,7 @@ class Linkedin(object):
 
         if conversation_urn_id and not recipients:
             res = self._post(
-                f"/messaging/conversations/{conversation_urn_id}/events",
+                "/messaging/conversations/{}/events".format(conversation_urn_id),
                 params=params,
                 data=json.dumps(message_event),
             )
@@ -509,7 +509,7 @@ class Linkedin(object):
                 "conversationCreate": message_event,
             }
             res = self._post(
-                f"/messaging/conversations", params=params, data=json.dumps(payload)
+                "/messaging/conversations", params=params, data=json.dumps(payload)
             )
 
         return res.status_code != 201
@@ -521,7 +521,7 @@ class Linkedin(object):
         payload = json.dumps({"patch": {"$set": {"read": True}}})
 
         res = self._post(
-            f"/messaging/conversations/{conversation_urn_id}", data=payload
+            "/messaging/conversations/{}".format(conversation_urn_id), data=payload
         )
 
         return res.status_code != 200
@@ -534,7 +534,7 @@ class Linkedin(object):
             random.randint(0, 1)
         )  # sleep a random duration to try and evade suspention
 
-        res = self._fetch(f"/me")
+        res = self._fetch("/me")
 
         data = res.json()
 
@@ -552,7 +552,7 @@ class Linkedin(object):
         }
 
         res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/relationships/invitationViews",
+            "{}/relationships/invitationViews".format(self.client.API_BASE_URL),
             params=params
         )
 
@@ -581,7 +581,7 @@ class Linkedin(object):
         })
 
         res = self.client.session.post(
-            f"{self.client.API_BASE_URL}/relationships/invitations/{invitation_id}",
+            "{}/relationships/invitations/{invitation_id}".format(self.client.API_BASE_URL),
             params=params,
             data=payload
         )
@@ -610,7 +610,7 @@ class Linkedin(object):
 
     def remove_connection(self, public_profile_id):
         res = self._post(
-            f"/identity/profiles/{public_profile_id}/profileActions?action=disconnect",
+            "/identity/profiles/{}/profileActions?action=disconnect".format(public_profile_id),
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
         )
 

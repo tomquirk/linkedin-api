@@ -72,7 +72,7 @@ class Client(object):
                 self.logger.debug("Cookie file not found. Requesting new cookies.")
 
         res = requests.get(
-            f"{Client.AUTH_BASE_URL}/uas/authenticate",
+            "{}/uas/authenticate".format(Client.AUTH_BASE_URL),
             headers=Client.AUTH_REQUEST_HEADERS,
         )
 
@@ -104,7 +104,7 @@ class Client(object):
         }
 
         res = requests.post(
-            f"{Client.AUTH_BASE_URL}/uas/authenticate",
+            "{}/uas/authenticate".format(Client.AUTH_BASE_URL),
             data=payload,
             cookies=self.session.cookies,
             headers=Client.AUTH_REQUEST_HEADERS,

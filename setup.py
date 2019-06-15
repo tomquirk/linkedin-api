@@ -12,18 +12,10 @@ def get_long_description() -> str:
         return ld_file.read()
 
 
-def get_version() -> str:
-    black_py = CURRENT_DIR / "linkedin_api/__init__.py"
-    _version_re = re.compile(r"__version__\s+=\s+(?P<version>.*)")
-    with open(black_py, "r", encoding="utf8") as f:
-        match = _version_re.search(f.read())
-        version = match.group("version") if match is not None else '"unknown"'
-    return str(ast.literal_eval(version))
-
 
 setuptools.setup(
     name="linkedin_api",
-    version=get_version(),
+    version="1.1.1.1",
     author="Tom Quirk",
     author_email="tomquirkacc@gmail.com",
     description="Python wrapper for the Linkedin API",

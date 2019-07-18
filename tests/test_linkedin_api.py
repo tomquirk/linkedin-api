@@ -7,13 +7,14 @@ from linkedin_api import Linkedin
 TEST_LINKEDIN_USERNAME = os.getenv("LINKEDIN_USERNAME")
 TEST_LINKEDIN_PASSWORD = os.getenv("LINKEDIN_PASSWORD")
 TEST_PROFILE_ID = os.getenv("TEST_PROFILE_ID")
+TEST_PUBLIC_PROFILE_ID = os.getenv("TEST_PUBLIC_PROFILE_ID")
 TEST_CONVERSATION_ID = os.getenv("TEST_CONVERSATION_ID")
 
-print(TEST_LINKEDIN_USERNAME, TEST_LINKEDIN_PASSWORD)
 if not (
     TEST_LINKEDIN_USERNAME
     and TEST_LINKEDIN_PASSWORD
     and TEST_PROFILE_ID
+    and TEST_PUBLIC_PROFILE_ID
     and TEST_CONVERSATION_ID
 ):
     print("Test config incomplete. Exiting...")
@@ -31,6 +32,12 @@ def test_get_profile(linkedin):
     profile = linkedin.get_profile(TEST_PROFILE_ID)
 
     assert profile["summary"] and profile["summary"][0] == "👋"
+
+
+def test_view_profile(linkedin):
+    err = linkedin.view_profile(TEST_PUBLIC_PROFILE_ID)
+
+    assert not err
 
 
 def test_get_profile_contact_info(linkedin):

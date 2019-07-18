@@ -204,6 +204,7 @@ company = linkedin.get_company('linkedin')
 ### linkedin.search(params, max_results=None, results=[])
 
 Perform a Linkedin search and return the results.
+A reference of country and industry codes can be found [here](https://developer.linkedin.com/docs/reference).
 
 **Arguments**
 
@@ -387,6 +388,7 @@ views = linkedin.get_current_profile_views()
 ### linkedin.search_people(keywords=None, connection_of=None, network_depth=None, regions=None, industries=None)
 
 Perform a Linkedin search and return the results.
+A reference of country and industry codes can be found [here](https://developer.linkedin.com/docs/reference).
 
 **Arguments**
 
@@ -450,4 +452,28 @@ invite_to_ignore = linkedin.get_invitations()[1]
 
 linkedin.reply_invitation(invitation_entity_urn=invite_to_accept['entityUrn'], invitation_shared_secret=invite_to_accept['sharedSecret'])
 linkedin.reply_invitation(invitation_entity_urn=invite_to_ignore['entityUrn'], invitation_shared_secret=invite_to_ignore['sharedSecret'], action="ignore")
+```
+
+---
+
+<a name="view_profile"></a>
+
+### linkedin.view_profile(public_id=None)
+
+Send a profile view (i.e. "<your_name> viewed your profile")
+
+**Arguments**
+
+- `public_id <str>` - public identifier i.e. tom-quirk-1928345
+
+**Return**
+
+- `<boolean>`
+
+**Example**
+
+```python
+linkedin = Linkedin(credentials['username'], credentials['password'])
+
+profile = linkedin.view_profile('tom-quirk')
 ```

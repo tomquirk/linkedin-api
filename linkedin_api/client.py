@@ -49,9 +49,10 @@ class Client(object):
         "Accept-Language": "en-us",
     }
 
-    def __init__(self, debug=False, refresh_cookies=False):
+    def __init__(self, *, debug=False, refresh_cookies=False, proxies={}):
         self.session = requests.session()
-        self.session.headers = Client.REQUEST_HEADERS
+        self.session.proxies.update(proxies)
+        self.session.headers.update(Client.REQUEST_HEADERS)
 
         self.logger = logger
         self._use_cookie_cache = not refresh_cookies
@@ -88,6 +89,10 @@ class Client(object):
         )
         with open(settings.COOKIE_FILE_PATH, "wb") as f:
             pickle.dump(cookiejar, f)
+
+    @property
+    def cookies(self):
+        return self.session.cookies
 
     def authenticate(self, username, password):
         """

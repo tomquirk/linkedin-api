@@ -7,20 +7,21 @@ from linkedin_api import Linkedin
 TEST_LINKEDIN_USERNAME = os.getenv("LINKEDIN_USERNAME")
 TEST_LINKEDIN_PASSWORD = os.getenv("LINKEDIN_PASSWORD")
 TEST_PROFILE_ID = os.getenv("TEST_PROFILE_ID")
+TEST_PUBLIC_PROFILE_ID = os.getenv("TEST_PUBLIC_PROFILE_ID")
 TEST_CONVERSATION_ID = os.getenv("TEST_CONVERSATION_ID")
 
-print(TEST_LINKEDIN_USERNAME, TEST_LINKEDIN_PASSWORD)
 if not (
     TEST_LINKEDIN_USERNAME
     and TEST_LINKEDIN_PASSWORD
     and TEST_PROFILE_ID
+    and TEST_PUBLIC_PROFILE_ID
     and TEST_CONVERSATION_ID
 ):
     print("Test config incomplete. Exiting...")
     sys.exit()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def linkedin():
     return Linkedin(
         TEST_LINKEDIN_USERNAME, TEST_LINKEDIN_PASSWORD, refresh_cookies=True
@@ -32,6 +33,26 @@ def test_get_profile(linkedin):
 
     assert profile["summary"] and profile["summary"][0] == "👋"
 
+
+# def test_view_profile(linkedin):
+#     err = linkedin.view_profile(TEST_PUBLIC_PROFILE_ID)
+
+#     assert not err
+
+def test_get_profile_privacy_settings(linkedin):
+    data = linkedin.get_profile_privacy_settings(TEST_PUBLIC_PROFILE_ID)
+
+    assert data
+
+def test_get_profile_member_badges(linkedin):
+    data = linkedin.get_profile_member_badges(TEST_PUBLIC_PROFILE_ID)
+
+    assert data
+
+def test_get_profile_network_info(linkedin):
+    data = linkedin.get_profile_network_info(TEST_PUBLIC_PROFILE_ID)
+
+    assert data
 
 def test_get_profile_contact_info(linkedin):
     contact_info = linkedin.get_profile_contact_info(TEST_PROFILE_ID)

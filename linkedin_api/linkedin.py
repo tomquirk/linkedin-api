@@ -13,6 +13,7 @@ from linkedin_api.client import Client
 
 logger = logging.getLogger(__name__)
 
+
 def default_evade():
     """
     A catch-all method to try and evade suspension from Linkedin.
@@ -32,8 +33,8 @@ class Linkedin(object):
         200
     )  # VERY conservative max requests count to avoid rate-limit
 
-    def __init__(self, username, password, refresh_cookies=False, debug=False):
-        self.client = Client(refresh_cookies=refresh_cookies, debug=debug)
+    def __init__(self, username, password, *, refresh_cookies=False, debug=False, proxies=proxies):
+        self.client = Client(refresh_cookies=refresh_cookies, debug=debug, proxies=proxies)
         self.client.authenticate(username, password)
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
 
@@ -232,6 +233,8 @@ class Linkedin(object):
         [public_id] - public identifier i.e. tom-quirk-1928345
         [urn_id] - id provided by the related URN
         """
+        # NOTE this still works for now, but will probably eventually have to be converted to
+        # https://www.linkedin.com/voyager/api/identity/profiles/ACoAAAKT9JQBsH7LwKaE9Myay9WcX8OVGuDq9Uw
         res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")
 
         data = res.json()
@@ -548,12 +551,11 @@ class Linkedin(object):
             "start": start,
             "count": limit,
             "includeInsights": True,
-            "q": "receivedInvitation"
+            "q": "receivedInvitation",
         }
 
-        res = self.client.session.get(
-            f"{self.client.API_BASE_URL}/relationships/invitationViews",
-            params=params
+        res = self._fetch(
+            f"{self.client.API_BASE_URL}/relationships/invitationViews", params=params
         )
 
         if res.status_code != 200:
@@ -562,7 +564,9 @@ class Linkedin(object):
         response_payload = res.json()
         return [element["invitation"] for element in response_payload["elements"]]
 
-    def reply_invitation(self, invitation_entity_urn, invitation_shared_secret, action="accept"):
+    def reply_invitation(
+        self, invitation_entity_urn, invitation_shared_secret, action="accept"
+    ):
         """
         Reply to an invite, the default is to accept the invitation.
         @Param: invitation_entity_urn: str
@@ -571,19 +575,19 @@ class Linkedin(object):
         Returns True if sucess, False otherwise
         """
         invitation_id = get_id_from_urn(invitation_entity_urn)
-        params = {
-            'action': action
-        }
-        payload = json.dumps({
-            "invitationId": invitation_id,
-            "invitationSharedSecret": invitation_shared_secret,
-            "isGenericInvitation": False
-        })
+        params = {"action": action}
+        payload = json.dumps(
+            {
+                "invitationId": invitation_id,
+                "invitationSharedSecret": invitation_shared_secret,
+                "isGenericInvitation": False,
+            }
+        )
 
-        res = self.client.session.post(
+        res = self._post(
             f"{self.client.API_BASE_URL}/relationships/invitations/{invitation_id}",
             params=params,
-            data=payload
+            data=payload,
         )
 
         return res.status_code == 200
@@ -615,4 +619,46 @@ class Linkedin(object):
         )
 
         return res.status_code != 200
+
+    # TODO doesn't work
+    # def view_profile(self, public_profile_id):
+    #     res = self._fetch(
+    #         f"/identity/profiles/{public_profile_id}/profileView",
+    #         headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+    #     )
+
+    #     return res.status_code != 200
+
+    def get_profile_privacy_settings(self, public_profile_id):
+        res = self._fetch(
+            f"/identity/profiles/{public_profile_id}/privacySettings",
+            headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+        )
+        if res.status_code != 200:
+            return {}
+
+        data = res.json()
+        return data.get("data", {})
+
+    def get_profile_member_badges(self, public_profile_id):
+        res = self._fetch(
+            f"/identity/profiles/{public_profile_id}/memberBadges",
+            headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+        )
+        if res.status_code != 200:
+            return {}
+
+        data = res.json()
+        return data.get("data", {})
+
+    def get_profile_network_info(self, public_profile_id):
+        res = self._fetch(
+            f"/identity/profiles/{public_profile_id}/networkinfo",
+            headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+        )
+        if res.status_code != 200:
+            return {}
+
+        data = res.json()
+        return data.get("data", {})
 

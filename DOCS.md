@@ -1,9 +1,28 @@
 # Documentation
 
+## The `Linkedin` instance
+
+### Linkedin(username, password, refresh_cookies=False, debug=False, proxies=proxies)
+
+Where it all begins. Create an instance of `Linkedin` to get started. You'll automatically get authenticated.
+
+**Arguments**
+
+- `username <str>` - Linkedin username
+- `password <str>` - Linkedin password
+- `refresh_cookies <boolean>: kwarg` - Whether to refresh any cached cookies
+- `debug <boolean>: kwarg` - Enable debug logging
+- `proxies <dict>: kwarg` - Proxies to use, of [Python Requests](https://python-requests.org/en/master/user/advanced/#proxies) format
+
+## API Reference
+
 - [`linkedin.get_profile`](#get_profile)
 - [`linkedin.get_profile_connections`](#get_profile_connections)
 - [`linkedin.get_profile_contact_info`](#get_profile_contact_info)
 - [`linkedin.get_profile_skills`](#get_profile_skills)
+- [`linkedin.get_profile_privacy_settings`](#get_profile_privacy_settings)
+- [`linkedin.get_profile_member_badges`](#get_profile_member_badges)
+- [`linkedin.get_profile_network_info`](#get_profile_network_info)
 - [`linkedin.remove_connection`](#remove_connection)
 
 - [`linkedin.get_conversations`](#get_conversations)
@@ -204,6 +223,7 @@ company = linkedin.get_company('linkedin')
 ### linkedin.search(params, max_results=None, results=[])
 
 Perform a Linkedin search and return the results.
+A reference of country and industry codes can be found [here](https://developer.linkedin.com/docs/reference).
 
 **Arguments**
 
@@ -387,6 +407,7 @@ views = linkedin.get_current_profile_views()
 ### linkedin.search_people(keywords=None, connection_of=None, network_depth=None, regions=None, industries=None)
 
 Perform a Linkedin search and return the results.
+A reference of country and industry codes can be found [here](https://developer.linkedin.com/docs/reference).
 
 **Arguments**
 
@@ -450,4 +471,107 @@ invite_to_ignore = linkedin.get_invitations()[1]
 
 linkedin.reply_invitation(invitation_entity_urn=invite_to_accept['entityUrn'], invitation_shared_secret=invite_to_accept['sharedSecret'])
 linkedin.reply_invitation(invitation_entity_urn=invite_to_ignore['entityUrn'], invitation_shared_secret=invite_to_ignore['sharedSecret'], action="ignore")
+```
+
+---
+
+<a name="view_profile"></a>
+
+### linkedin.view_profile(public_id)
+
+Send a profile view (i.e. "<your_name> viewed your profile")
+
+#### NOTE: method does not work
+
+**Arguments**
+
+- `public_id <str>` - public identifier i.e. tom-quirk-1928345
+
+**Return**
+
+- `<boolean>`
+
+**Example**
+
+```python
+linkedin = Linkedin(credentials['username'], credentials['password'])
+
+profile = linkedin.view_profile('tom-quirk')
+```
+
+---
+
+<a name="get_profile_privacy_settings"></a>
+
+### linkedin.get_profile_privacy_settings(public_id)
+
+Get the privacy settings for a given profile. Useful to determine whether the profile is publicly accessible.
+
+**Arguments**
+
+- `public_id <str>` - public identifier i.e. tom-quirk-1928345
+
+**Return**
+
+- `<boolean>`
+
+**Example**
+
+```python
+linkedin = Linkedin(credentials['username'], credentials['password'])
+
+profile = linkedin.get_profile_privacy_settings('tom-quirk')
+```
+
+---
+
+<a name="get_profile_member_badges"></a>
+
+### linkedin.get_profile_member_badges(public_id)
+
+Get member badges for a given profile. As of writing this, badges may include:
+
+- `influencer <boolean>`
+- `jobSeeker <boolean>`
+- `openLink <boolean>`
+- `premium <boolean>`
+
+**Arguments**
+
+- `public_id <str>` - public identifier i.e. tom-quirk-1928345
+
+**Return**
+
+- `<boolean>`
+
+**Example**
+
+```python
+linkedin = Linkedin(credentials['username'], credentials['password'])
+
+profile = linkedin.get_profile_member_badges('tom-quirk')
+```
+
+---
+
+<a name="get_profile_network_info"></a>
+
+### linkedin.get_profile_network_info(public_id)
+
+Get high level information about a given profile's network. Useful for follower counts followability, distance from the authed user, etc.
+
+**Arguments**
+
+- `public_id <str>` - public identifier i.e. tom-quirk-1928345
+
+**Return**
+
+- `<boolean>`
+
+**Example**
+
+```python
+linkedin = Linkedin(credentials['username'], credentials['password'])
+
+profile = linkedin.get_profile_network_info('tom-quirk')
 ```

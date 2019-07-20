@@ -33,8 +33,8 @@ class Linkedin(object):
         200
     )  # VERY conservative max requests count to avoid rate-limit
 
-    def __init__(self, username, password, refresh_cookies=False, debug=False):
-        self.client = Client(refresh_cookies=refresh_cookies, debug=debug)
+    def __init__(self, username, password, *, refresh_cookies=False, debug=False, proxies=proxies):
+        self.client = Client(refresh_cookies=refresh_cookies, debug=debug, proxies=proxies)
         self.client.authenticate(username, password)
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
 
@@ -620,13 +620,14 @@ class Linkedin(object):
 
         return res.status_code != 200
 
-    def view_profile(self, public_profile_id):
-        res = self._fetch(
-            f"/identity/profiles/{public_profile_id}/profileView",
-            headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
-        )
+    # TODO doesn't work
+    # def view_profile(self, public_profile_id):
+    #     res = self._fetch(
+    #         f"/identity/profiles/{public_profile_id}/profileView",
+    #         headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+    #     )
 
-        return res.status_code != 200
+    #     return res.status_code != 200
 
     def get_profile_privacy_settings(self, public_profile_id):
         res = self._fetch(

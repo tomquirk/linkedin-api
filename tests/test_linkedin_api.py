@@ -21,7 +21,7 @@ if not (
     sys.exit()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def linkedin():
     return Linkedin(
         TEST_LINKEDIN_USERNAME, TEST_LINKEDIN_PASSWORD, refresh_cookies=True
@@ -34,11 +34,25 @@ def test_get_profile(linkedin):
     assert profile["summary"] and profile["summary"][0] == "👋"
 
 
-def test_view_profile(linkedin):
-    err = linkedin.view_profile(TEST_PUBLIC_PROFILE_ID)
+# def test_view_profile(linkedin):
+#     err = linkedin.view_profile(TEST_PUBLIC_PROFILE_ID)
 
-    assert not err
+#     assert not err
 
+def test_get_profile_privacy_settings(linkedin):
+    data = linkedin.get_profile_privacy_settings(TEST_PUBLIC_PROFILE_ID)
+
+    assert data
+
+def test_get_profile_member_badges(linkedin):
+    data = linkedin.get_profile_member_badges(TEST_PUBLIC_PROFILE_ID)
+
+    assert data
+
+def test_get_profile_network_info(linkedin):
+    data = linkedin.get_profile_network_info(TEST_PUBLIC_PROFILE_ID)
+
+    assert data
 
 def test_get_profile_contact_info(linkedin):
     contact_info = linkedin.get_profile_contact_info(TEST_PROFILE_ID)

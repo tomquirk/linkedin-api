@@ -53,7 +53,7 @@ class Client(object):
         self.session = requests.session()
         self.session.proxies.update(proxies)
         self.session.headers.update(Client.REQUEST_HEADERS)
-
+        self.proxies = proxies
         self.logger = logger
         self._use_cookie_cache = not refresh_cookies
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
@@ -75,6 +75,7 @@ class Client(object):
         res = requests.get(
             f"{Client.AUTH_BASE_URL}/uas/authenticate",
             headers=Client.AUTH_REQUEST_HEADERS,
+            proxies=self.proxies
         )
 
         return res.cookies
@@ -113,6 +114,7 @@ class Client(object):
             data=payload,
             cookies=self.session.cookies,
             headers=Client.AUTH_REQUEST_HEADERS,
+            proxies=self.proxies
         )
 
         data = res.json()

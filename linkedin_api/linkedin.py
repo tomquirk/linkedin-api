@@ -79,7 +79,7 @@ class Linkedin(object):
         default_params.update(params)
 
         res = self._fetch(
-            f"/search/blended?{urlencode(default_params)}",
+            f"/search/blended?{urlencode(default_params, safe='(),')}",
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
         )
 
@@ -122,6 +122,7 @@ class Linkedin(object):
         regions=None,
         industries=None,
         schools=None,
+        title=None,
         include_private_profiles=False,  # profiles without a public id, "Linkedin Member"
         limit=None,
     ):
@@ -147,6 +148,8 @@ class Linkedin(object):
             filters.append(f'nonprofitInterest->{"|".join(nonprofit_interests)}')
         if schools:
             filters.append(f'schools->{"|".join(schools)}')
+        if title:
+            filters.append(f'title->{title}')
 
         params = {"filters": "List({})".format(",".join(filters))}
 
@@ -661,4 +664,3 @@ class Linkedin(object):
 
         data = res.json()
         return data.get("data", {})
-

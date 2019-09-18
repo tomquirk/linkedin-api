@@ -33,6 +33,8 @@ So specifically, this project aims to provide complete coverage for Voyager.
 
 ## Installation
 
+Using **Python >= 3.6**:
+
 ```
 $ pip install linkedin-api
 ```

@@ -1,6 +1,7 @@
 import requests
 import pickle
 import logging
+import time
 
 import linkedin_api.settings as settings
 
@@ -62,16 +63,6 @@ class Client(object):
         """
         Return a new set of session cookies as given by Linkedin.
         """
-        if self._use_cookie_cache:
-            self.logger.debug("Attempting to use cached cookies")
-            try:
-                with open(settings.COOKIE_FILE_PATH, "rb") as f:
-                    cookies = pickle.load(f)
-                    if cookies:
-                        return cookies
-            except FileNotFoundError:
-                self.logger.debug("Cookie file not found. Requesting new cookies.")
-
         res = requests.get(
             f"{Client.AUTH_BASE_URL}/uas/authenticate",
             headers=Client.AUTH_REQUEST_HEADERS,
@@ -79,6 +70,18 @@ class Client(object):
         )
 
         return res.cookies
+
+    def _load_cookies_from_cache(self):
+        try:
+            with open(settings.COOKIE_FILE_PATH, "rb") as f:
+                cookies = pickle.load(f)
+                if cookies:
+                    return True, cookies
+
+        except FileNotFoundError:
+            self.logger.debug("Cookie file not found. Requesting new cookies.")
+
+        return False, None
 
     def _set_session_cookies(self, cookiejar):
         """
@@ -95,7 +98,28 @@ class Client(object):
     def cookies(self):
         return self.session.cookies
 
+    def _is_token_still_valid(self, cookies):
+
+        _now = time.time()
+        for cookie in cookies:
+            if cookie.name == "JSESSIONID" and cookie.value:
+                if cookie.expires and cookie.expires > _now:
+                    return True
+                break
+
+        return False
+
     def authenticate(self, username, password):
+
+        if self._use_cookie_cache:
+            self.logger.debug("Attempting to use cached cookies")
+            found, cookies = self._load_cookies_from_cache()
+            if found and self._is_token_still_valid(cookies):
+                return
+
+        return self._do_authentication_request(username, password)
+
+    def _do_authentication_request(self, username, password):
         """
         Authenticate with Linkedin.
 

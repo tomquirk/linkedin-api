@@ -2,6 +2,7 @@ import requests
 import pickle
 import logging
 import time
+import os
 
 import linkedin_api.settings as settings
 
@@ -58,6 +59,8 @@ class Client(object):
         self.logger = logger
         self._use_cookie_cache = not refresh_cookies
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
+        if not os.path.exists(settings.COOKIE_PATH):
+            os.makedirs(settings.COOKIE_PATH)
 
     def _request_session_cookies(self):
         """
@@ -71,9 +74,10 @@ class Client(object):
 
         return res.cookies
 
-    def _load_cookies_from_cache(self):
+    def _load_cookies_from_cache(self, username):
         try:
-            with open(settings.COOKIE_FILE_PATH, "rb") as f:
+            cookiejar_file = self._get_cookiejar_file(username)
+            with open(cookiejar_file, "rb") as f:
                 cookies = pickle.load(f)
                 if cookies:
                     return True, cookies
@@ -83,15 +87,22 @@ class Client(object):
 
         return False, None
 
-    def _set_session_cookies(self, cookiejar):
+    def _get_cookiejar_file(self, username):
         """
-        Set cookies of the current session and save them to a file.
+        Return the absolute path of the cookiejar for a given username
+        """
+        return "{}{}.jr".format(settings.COOKIE_PATH, username)
+
+    def _set_session_cookies(self, cookiejar, username):
+        """
+        Set cookies of the current session and save them to a file named as the username.
         """
         self.session.cookies = cookiejar
         self.session.headers["csrf-token"] = self.session.cookies["JSESSIONID"].strip(
             '"'
         )
-        with open(settings.COOKIE_FILE_PATH, "wb") as f:
+        cookiejar_file = self._get_cookiejar_file(username)
+        with open(cookiejar_file, "wb") as f:
             pickle.dump(cookiejar, f)
 
     @property
@@ -113,7 +124,7 @@ class Client(object):
 
         if self._use_cookie_cache:
             self.logger.debug("Attempting to use cached cookies")
-            found, cookies = self._load_cookies_from_cache()
+            found, cookies = self._load_cookies_from_cache(username)
             if found and self._is_token_still_valid(cookies):
                 return
 
@@ -125,7 +136,7 @@ class Client(object):
 
         Return a session object that is authenticated.
         """
-        self._set_session_cookies(self._request_session_cookies())
+        self._set_session_cookies(self._request_session_cookies(), username)
 
         payload = {
             "session_key": username,
@@ -152,4 +163,4 @@ class Client(object):
         if res.status_code != 200:
             raise Exception()
 
-        self._set_session_cookies(res.cookies)
+        self._set_session_cookies(res.cookies, username)

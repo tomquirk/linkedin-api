@@ -14,13 +14,16 @@ class CookieRepository(object):
             os.makedirs(settings.COOKIE_PATH)
 
     def save(self, cookies, username):
-        cookiejar_file = self._get_cookiejar_file(username)
-        with open(cookiejar_file, "wb") as f:
-            pickle.dump(cookies, f)
+        try:
+            cookiejar_file = self._get_cookiejar_file(username)
+            with open(cookiejar_file, "wb") as f:
+                pickle.dump(cookies, f)
+        except Exception:
+            self.logger.debug("Cookie file could not be saved.")
 
     def get(self, username):
-        found, cookies = self._load_cookies_from_cache(username)
-        if found and self._is_token_still_valid(cookies):
+        cookies = self._load_cookies_from_cache(username)
+        if cookies and self._is_token_still_valid(cookies):
             return cookies
         else:
             return None
@@ -36,13 +39,11 @@ class CookieRepository(object):
             cookiejar_file = self._get_cookiejar_file(username)
             with open(cookiejar_file, "rb") as f:
                 cookies = pickle.load(f)
-                if cookies:
-                    return True, cookies
+                return cookies
 
-        except FileNotFoundError:
-            self.logger.debug("Cookie file not found. Requesting new cookies.")
-
-        return False, None
+        except Exception:
+            self.logger.debug("Cookie file could not be retrieved.")
+            return None
 
     def _is_token_still_valid(self, cookies):
         _now = time.time()

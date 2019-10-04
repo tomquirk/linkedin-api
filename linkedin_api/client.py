@@ -61,6 +61,8 @@ class Client(object):
         """
         Return a new set of session cookies as given by Linkedin.
         """
+        self.logger.debug("Requesting new cookies.")
+
         res = requests.get(
             f"{Client.AUTH_BASE_URL}/uas/authenticate",
             headers=Client.AUTH_REQUEST_HEADERS,

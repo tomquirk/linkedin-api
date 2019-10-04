@@ -1,10 +1,6 @@
 import requests
-import pickle
 import logging
-import time
-import os
-
-import linkedin_api.settings as settings
+from linkedin_api.cookie_repository import CookieRepository
 
 logger = logging.getLogger(__name__)
 
@@ -59,8 +55,7 @@ class Client(object):
         self.logger = logger
         self._use_cookie_cache = not refresh_cookies
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
-        if not os.path.exists(settings.COOKIE_PATH):
-            os.makedirs(settings.COOKIE_PATH)
+        self._cookie_repository = CookieRepository()
 
     def _request_session_cookies(self):
         """
@@ -71,61 +66,27 @@ class Client(object):
             headers=Client.AUTH_REQUEST_HEADERS,
             proxies=self.proxies
         )
-
         return res.cookies
 
-    def _load_cookies_from_cache(self, username):
-        try:
-            cookiejar_file = self._get_cookiejar_file(username)
-            with open(cookiejar_file, "rb") as f:
-                cookies = pickle.load(f)
-                if cookies:
-                    return True, cookies
-
-        except FileNotFoundError:
-            self.logger.debug("Cookie file not found. Requesting new cookies.")
-
-        return False, None
-
-    def _get_cookiejar_file(self, username):
-        """
-        Return the absolute path of the cookiejar for a given username
-        """
-        return "{}{}.jr".format(settings.COOKIE_PATH, username)
-
-    def _set_session_cookies(self, cookiejar, username):
+    def _set_session_cookies(self, cookies):
         """
         Set cookies of the current session and save them to a file named as the username.
         """
-        self.session.cookies = cookiejar
+        self.session.cookies = cookies
         self.session.headers["csrf-token"] = self.session.cookies["JSESSIONID"].strip(
             '"'
         )
-        cookiejar_file = self._get_cookiejar_file(username)
-        with open(cookiejar_file, "wb") as f:
-            pickle.dump(cookiejar, f)
 
     @property
     def cookies(self):
         return self.session.cookies
 
-    def _is_token_still_valid(self, cookies):
-
-        _now = time.time()
-        for cookie in cookies:
-            if cookie.name == "JSESSIONID" and cookie.value:
-                if cookie.expires and cookie.expires > _now:
-                    return True
-                break
-
-        return False
-
     def authenticate(self, username, password):
-
         if self._use_cookie_cache:
             self.logger.debug("Attempting to use cached cookies")
-            found, cookies = self._load_cookies_from_cache(username)
-            if found and self._is_token_still_valid(cookies):
+            cookies = self._cookie_repository.get(username)
+            if cookies:
+                self._set_session_cookies(cookies)
                 return
 
         return self._do_authentication_request(username, password)
@@ -136,7 +97,7 @@ class Client(object):
 
         Return a session object that is authenticated.
         """
-        self._set_session_cookies(self._request_session_cookies(), username)
+        self._set_session_cookies(self._request_session_cookies())
 
         payload = {
             "session_key": username,
@@ -163,4 +124,5 @@ class Client(object):
         if res.status_code != 200:
             raise Exception()
 
-        self._set_session_cookies(res.cookies, username)
+        self._set_session_cookies(res.cookies)
+        self._cookie_repository.save(res.cookies, username)

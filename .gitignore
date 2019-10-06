@@ -7,8 +7,10 @@
 .vscode
 /playground.py
 cookies/
+
 .pytest_cache
 **__pycache__/
+credentials.json
 
 # PyPI
 dist

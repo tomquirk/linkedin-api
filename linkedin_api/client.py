@@ -66,7 +66,7 @@ class Client(object):
         res = requests.get(
             f"{Client.AUTH_BASE_URL}/uas/authenticate",
             headers=Client.AUTH_REQUEST_HEADERS,
-            proxies=self.proxies
+            proxies=self.proxies,
         )
         return res.cookies
 
@@ -112,7 +112,7 @@ class Client(object):
             data=payload,
             cookies=self.session.cookies,
             headers=Client.AUTH_REQUEST_HEADERS,
-            proxies=self.proxies
+            proxies=self.proxies,
         )
 
         data = res.json()

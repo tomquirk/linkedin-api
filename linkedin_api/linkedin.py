@@ -33,8 +33,12 @@ class Linkedin(object):
         200
     )  # VERY conservative max requests count to avoid rate-limit
 
-    def __init__(self, username, password, *, refresh_cookies=False, debug=False, proxies={}):
-        self.client = Client(refresh_cookies=refresh_cookies, debug=debug, proxies=proxies)
+    def __init__(
+        self, username, password, *, refresh_cookies=False, debug=False, proxies={}
+    ):
+        self.client = Client(
+            refresh_cookies=refresh_cookies, debug=debug, proxies=proxies
+        )
         self.client.authenticate(username, password)
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
 
@@ -149,7 +153,7 @@ class Linkedin(object):
         if schools:
             filters.append(f'schools->{"|".join(schools)}')
         if title:
-            filters.append(f'title->{title}')
+            filters.append(f"title->{title}")
 
         params = {"filters": "List({})".format(",".join(filters))}
 
@@ -167,6 +171,38 @@ class Linkedin(object):
                     "urn_id": get_id_from_urn(item.get("targetUrn")),
                     "distance": item.get("memberDistance", {}).get("value"),
                     "public_id": item.get("publicIdentifier"),
+                }
+            )
+
+        return results
+
+    def search_companies(self, keywords=None, limit=None):
+        """
+        Do a company search.
+        """
+        filters = ["resultType->COMPANIES"]
+
+        params = {
+            "filters": "List({})".format(",".join(filters)),
+            "queryContext": "List(spellCorrectionEnabled->true)",
+        }
+
+        if keywords:
+            params["keywords"] = keywords
+
+        data = self.search(params, limit=limit)
+
+        results = []
+        for item in data:
+            if item.get("type") != "COMPANY":
+                continue
+            results.append(
+                {
+                    "urn": item.get("targetUrn"),
+                    "urn_id": get_id_from_urn(item.get("targetUrn")),
+                    "name": item.get("title", {}).get("text"),
+                    "headline": item.get("headline", {}).get("text"),
+                    "subline": item.get("subline", {}).get("text"),
                 }
             )
 

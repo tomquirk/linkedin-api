@@ -202,6 +202,7 @@ class Linkedin(object):
                     "urn_id": get_id_from_urn(item.get("targetUrn")),
                     "name": item.get("title", {}).get("text"),
                     "headline": item.get("headline", {}).get("text"),
+                    "subline": item.get("subline", {}).get("text"),
                 }
             )
 

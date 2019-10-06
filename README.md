@@ -36,7 +36,7 @@ So specifically, this project aims to provide complete coverage for Voyager.
 Using **Python >= 3.6**:
 
 ```
-$ pip install linkedin-api
+$ pip install -e git+https://github.com/tomquirk/linkedin-api.git
 ```
 
 ### Example usage

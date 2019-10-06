@@ -5,11 +5,12 @@
 # Dev
 *.pyc
 .vscode
-/playground.py
+playground.py
 .cookie.jr
 .cookies
 .pytest_cache
 **__pycache__/
+credentials.json
 
 # PyPI
 dist

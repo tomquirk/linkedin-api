@@ -38,6 +38,7 @@ Where it all begins. Create an instance of `Linkedin` to get started. You'll aut
 
 - [`linkedin.search`](#search)
 - [`linkedin.search_people`](#search_people)
+- [`linkedin.search_companies`](#search_companies)
 
 - [`linkedin.get_invitations`](#get_invitations)
 - [`linkedin.reply_invitation`](#reply_invitation)
@@ -406,7 +407,7 @@ views = linkedin.get_current_profile_views()
 
 ### linkedin.search_people(keywords=None, connection_of=None, network_depth=None, regions=None, industries=None)
 
-Perform a Linkedin search and return the results.
+Perform a Linkedin search for people and return the results.
 A reference of country and industry codes can be found [here](https://developer.linkedin.com/docs/reference).
 
 **Arguments**
@@ -433,6 +434,33 @@ results = linkedin.search_people(
   network_depth='F',
   regions=['au:4909'],
   industries=['29', '1']
+)
+```
+
+---
+
+<a name="search_companies"></a>
+
+### linkedin.search_companies(keywords=None, connection_of=None, network_depth=None, regions=None, industries=None)
+
+Perform a Linkedin search for companies and return the results.
+
+**Arguments**
+
+- `keywords <str>` - keywords, comma seperated
+- `limit <int>` - search limit
+
+**Return**
+
+- `<list>`
+
+**Example**
+
+```python
+linkedin = Linkedin(credentials['username'], credentials['password'])
+
+results = linkedin.search_companies(
+  keywords='linkedin'
 )
 ```
 

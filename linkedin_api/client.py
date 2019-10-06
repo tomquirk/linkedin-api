@@ -1,8 +1,6 @@
 import requests
-import pickle
 import logging
-
-import linkedin_api.settings as settings
+from linkedin_api.cookie_repository import CookieRepository
 
 logger = logging.getLogger(__name__)
 
@@ -57,45 +55,45 @@ class Client(object):
         self.logger = logger
         self._use_cookie_cache = not refresh_cookies
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
+        self._cookie_repository = CookieRepository()
 
     def _request_session_cookies(self):
         """
         Return a new set of session cookies as given by Linkedin.
         """
-        if self._use_cookie_cache:
-            self.logger.debug("Attempting to use cached cookies")
-            try:
-                with open(settings.COOKIE_FILE_PATH, "rb") as f:
-                    cookies = pickle.load(f)
-                    if cookies:
-                        return cookies
-            except FileNotFoundError:
-                self.logger.debug("Cookie file not found. Requesting new cookies.")
+        self.logger.debug("Requesting new cookies.")
 
         res = requests.get(
             f"{Client.AUTH_BASE_URL}/uas/authenticate",
             headers=Client.AUTH_REQUEST_HEADERS,
             proxies=self.proxies,
         )
-
         return res.cookies
 
-    def _set_session_cookies(self, cookiejar):
+    def _set_session_cookies(self, cookies):
         """
-        Set cookies of the current session and save them to a file.
+        Set cookies of the current session and save them to a file named as the username.
         """
-        self.session.cookies = cookiejar
+        self.session.cookies = cookies
         self.session.headers["csrf-token"] = self.session.cookies["JSESSIONID"].strip(
             '"'
         )
-        with open(settings.COOKIE_FILE_PATH, "wb") as f:
-            pickle.dump(cookiejar, f)
 
     @property
     def cookies(self):
         return self.session.cookies
 
     def authenticate(self, username, password):
+        if self._use_cookie_cache:
+            self.logger.debug("Attempting to use cached cookies")
+            cookies = self._cookie_repository.get(username)
+            if cookies:
+                self._set_session_cookies(cookies)
+                return
+
+        return self._do_authentication_request(username, password)
+
+    def _do_authentication_request(self, username, password):
         """
         Authenticate with Linkedin.
 
@@ -129,3 +127,4 @@ class Client(object):
             raise Exception()
 
         self._set_session_cookies(res.cookies)
+        self._cookie_repository.save(res.cookies, username)

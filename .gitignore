@@ -5,9 +5,9 @@
 # Dev
 *.pyc
 .vscode
-playground.py
-.cookie.jr
-.cookies
+/playground.py
+cookies/
+
 .pytest_cache
 **__pycache__/
 credentials.json

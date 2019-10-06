@@ -39,20 +39,24 @@ def test_get_profile(linkedin):
 
 #     assert not err
 
+
 def test_get_profile_privacy_settings(linkedin):
     data = linkedin.get_profile_privacy_settings(TEST_PUBLIC_PROFILE_ID)
 
     assert data
+
 
 def test_get_profile_member_badges(linkedin):
     data = linkedin.get_profile_member_badges(TEST_PUBLIC_PROFILE_ID)
 
     assert data
 
+
 def test_get_profile_network_info(linkedin):
     data = linkedin.get_profile_network_info(TEST_PUBLIC_PROFILE_ID)
 
     assert data
+
 
 def test_get_profile_contact_info(linkedin):
     contact_info = linkedin.get_profile_contact_info(TEST_PROFILE_ID)
@@ -142,6 +146,18 @@ def test_search_people_by_region(linkedin):
     results = linkedin.search_people(keywords="software", regions=["au:4910"])
     assert results
     assert results[0]["public_id"]
+
+
+def test_search_companies(linkedin):
+    results = linkedin.search_companies(keywords="linkedin", limit=1)
+    assert results
+    assert results[0]["urn_id"] == 1337
+
+
+# def test_search_people_distinct(linkedin):
+#     TEST_NAMES = ['Bill Gates', 'Mark Zuckerberg']
+#     results = [linkedin.search_people(name, limit=2)[0] for name in TEST_NAMES]
+#     assert results[0] != results[1]
 
 
 def test_get_profile_skills(linkedin):

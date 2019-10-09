@@ -54,8 +54,9 @@ class Client(object):
         self.proxies = proxies
         self.logger = logger
         self._use_cookie_cache = not refresh_cookies
-        logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
         self._cookie_repository = CookieRepository()
+
+        logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
 
     def _request_session_cookies(self):
         """

@@ -1,58 +1,67 @@
 import os
 import pickle
 import time
-import logging
 import linkedin_api.settings as settings
 
-logger = logging.getLogger(__name__)
+
+class Error(Exception):
+    """Base class for other exceptions"""
+
+    pass
+
+
+class LinkedinSessionExpired(Error):
+    pass
 
 
 class CookieRepository(object):
     """
         Class to act as a repository for the cookies.
+
+        TODO: refactor to use http.cookiejar.FileCookieJar
     """
 
-    def __init__(self, debug=False):
+    @staticmethod
+    def save(cookies, username):
+        CookieRepository._ensure_cookies_dir()
+        cookiejar_filepath = CookieRepository._get_cookies_filepath(username)
+        with open(cookiejar_filepath, "wb") as f:
+            pickle.dump(cookies, f)
+
+    @staticmethod
+    def get(username):
+        cookies = CookieRepository._load_cookies_from_cache(username)
+        if cookies and not CookieRepository._is_token_still_valid(cookies):
+            raise LinkedinSessionExpired
+
+        return cookies
+
+    @staticmethod
+    def _ensure_cookies_dir():
         if not os.path.exists(settings.COOKIE_PATH):
             os.makedirs(settings.COOKIE_PATH)
-        logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
 
-
-    def save(self, cookies, username):
-        try:
-            cookiejar_file = self._get_cookiejar_file(username)
-            with open(cookiejar_file, "wb") as f:
-                pickle.dump(cookies, f)
-        except Exception:
-            self.logger.debug("Cookie file could not be saved.")
-
-    def get(self, username):
-        cookies = self._load_cookies_from_cache(username)
-        if cookies and self._is_token_still_valid(cookies):
-            return cookies
-        else:
-            return None
-
-    def _get_cookiejar_file(self, username):
+    @staticmethod
+    def _get_cookies_filepath(username):
         """
         Return the absolute path of the cookiejar for a given username
         """
         return "{}{}.jr".format(settings.COOKIE_PATH, username)
 
-    def _load_cookies_from_cache(self, username):
+    @staticmethod
+    def _load_cookies_from_cache(username):
+        cookiejar_filepath = CookieRepository._get_cookies_filepath(username)
         try:
-            cookiejar_file = self._get_cookiejar_file(username)
-            with open(cookiejar_file, "rb") as f:
+            with open(cookiejar_filepath, "rb") as f:
                 cookies = pickle.load(f)
                 return cookies
-
-        except Exception:
-            self.logger.debug("Cookie file could not be retrieved.")
+        except FileNotFoundError:
             return None
 
-    def _is_token_still_valid(self, cookies):
+    @staticmethod
+    def _is_token_still_valid(cookiejar):
         _now = time.time()
-        for cookie in cookies:
+        for cookie in cookiejar:
             if cookie.name == "JSESSIONID" and cookie.value:
                 if cookie.expires and cookie.expires > _now:
                     return True

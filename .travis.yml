@@ -1,16 +1,16 @@
 language: python
 python: 3.7
 
-
 before_install:
   - pip install pipenv
 
-
 install:
-  - pipenv install --pre
-
+  - pipenv install
+  - pipenv install black --pre
+  - pipenv install pytest
 
 # reminder: we can't run tests because Linkedin always throws challenges (likely because of IP)
 script:
+  - black --check
   - pipenv run python -m pytest tests/test_cookie_repository.py tests/test_linkedin_api.py
 

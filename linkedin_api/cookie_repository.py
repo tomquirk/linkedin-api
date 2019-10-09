@@ -1,7 +1,10 @@
 import os
 import pickle
-import linkedin_api.settings as settings
 import time
+import logging
+import linkedin_api.settings as settings
+
+logger = logging.getLogger(__name__)
 
 
 class CookieRepository(object):
@@ -9,9 +12,11 @@ class CookieRepository(object):
         Class to act as a repository for the cookies.
     """
 
-    def __init__(self):
+    def __init__(self, debug=False):
         if not os.path.exists(settings.COOKIE_PATH):
             os.makedirs(settings.COOKIE_PATH)
+        logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
+
 
     def save(self, cookies, username):
         try:

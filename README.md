@@ -2,9 +2,9 @@
 
 👨‍💼 Python Wrapper for the Linkedin API
 
-[![PyPI version](https://badge.fury.io/py/linkedin-api.svg)](https://badge.fury.io/py/linkedin-api)
+[![Build Status](https://travis-ci.com/tomquirk/linkedin-api.svg?branch=master)](https://travis-ci.com/tomquirk/linkedin-api)
 
-[![Build](https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png)](https://www.buymeacoffee.com/tomquirk)
+[![buymeacoffee: https://www.buymeacoffee.com/tomquirk](https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png)](https://www.buymeacoffee.com/tomquirk)
 
 
 > No "official" API access required - just use a valid Linkedin account!

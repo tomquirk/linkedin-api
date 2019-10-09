@@ -34,15 +34,23 @@ class Linkedin(object):
     )  # VERY conservative max requests count to avoid rate-limit
 
     def __init__(
-        self, username, password, *, refresh_cookies=False, debug=False, proxies={}
+        self,
+        username,
+        password,
+        *,
+        authenticate=True,
+        refresh_cookies=False,
+        debug=False,
+        proxies={},
     ):
         self.client = Client(
             refresh_cookies=refresh_cookies, debug=debug, proxies=proxies
         )
-        self.client.authenticate(username, password)
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
-
         self.logger = logger
+
+        if authenticate:
+            self.client.authenticate(username, password)
 
     def _fetch(self, uri, evade=default_evade, **kwargs):
         """

@@ -36,7 +36,9 @@ def test_get_nonexistent_file():
 
 
 def test_get_expired():
-    CookieRepository.save(mock_cookies(date=datetime.strptime("2001-05-04", "%Y-%m-%d")), "testuserex")
+    CookieRepository.save(
+        mock_cookies(date=datetime.strptime("2001-05-04", "%Y-%m-%d")), "testuserex"
+    )
     try:
         CookieRepository.get("testuserex")
         assert False

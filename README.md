@@ -13,6 +13,9 @@ Programmatically send messages, perform searches, get profile data and more, all
 
 Before using this project, please consult the [Terms and Conditions](#t-c) and [Legal Notice](#legal).
 
+## Hey!
+
+I'm taking a break from Github for a few weeks and won't be responding to any tickets 😎
 
 
 ## Overview

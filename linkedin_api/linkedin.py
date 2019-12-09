@@ -337,6 +337,13 @@ class Linkedin(object):
 
         profile["education"] = education
 
+        languages = data["languageView"]["elements"]
+        publications = data["publicationView"]["elements"]
+        certifications = data["certificationView"]["elements"]
+        # massage  [volunteer] data
+        volunteer = data["volunteerExperienceView"]["elements"]
+        honors = data["honorView"]["elements"]
+
         return profile
 
     def get_profile_connections(self, urn_id):

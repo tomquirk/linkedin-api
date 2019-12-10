@@ -59,7 +59,7 @@ One of:
 
 **Return**
 
-- `<dict>`
+- `<dict>` - that includes languages, publications, certifications, volunteer, honors
 
 **Example**
 

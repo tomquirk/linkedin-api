@@ -337,12 +337,37 @@ class Linkedin(object):
 
         profile["education"] = education
 
+        # massage [language] data
         languages = data["languageView"]["elements"]
+        for item in languages:
+            del item["entityUrn"]
+        profile["languages"] = languages
+
+        # massage [publications] data
         publications = data["publicationView"]["elements"]
+        for item in publications:
+            del item["entityUrn"]
+            for author in item.get("authors", []):
+                del author["entityUrn"]
+        profile["publications"] = publications
+
+        # massage [certifications] data
         certifications = data["certificationView"]["elements"]
-        # massage  [volunteer] data
+        for item in certifications:
+            del item["entityUrn"]
+        profile["certifications"] = certifications
+
+        # massage [volunteer] data
         volunteer = data["volunteerExperienceView"]["elements"]
+        for item in volunteer:
+            del item["entityUrn"]
+        profile["volunteer"] = volunteer
+
+        # massage [honors] data
         honors = data["honorView"]["elements"]
+        for item in honors:
+            del item["entityUrn"]
+        profile["honors"] = honors
 
         return profile
 

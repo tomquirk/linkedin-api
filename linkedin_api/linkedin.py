@@ -337,7 +337,7 @@ class Linkedin(object):
 
         profile["education"] = education
 
-        # massage [language] data
+        # massage [languages] data
         languages = data["languageView"]["elements"]
         for item in languages:
             del item["entityUrn"]

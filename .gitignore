@@ -20,3 +20,4 @@ build
 # Misc
 .DS_Store
 .idea/
+venv/

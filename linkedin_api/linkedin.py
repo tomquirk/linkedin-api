@@ -528,7 +528,9 @@ class Linkedin(object):
             "topNRequestedFlavors": "List(IN_NETWORK,COMPANY_RECRUIT,SCHOOL_RECRUIT,HIDDEN_GEM)",
         }
 
-        res = self._fetch(f"/jobs/jobPostings/{job_urn_id}", params=params)
+        res = self._fetch(
+            f"/jobs/jobPostings/{job_urn_id}?{urlencode(params, safe='(),')}"
+        )
 
         data = res.json()
 

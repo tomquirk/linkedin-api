@@ -517,15 +517,15 @@ class Linkedin(object):
 
         return company
 
-    def get_job_posting(self, job_id):
+    def get_job_posting(self, job_urn_id):
         """
-        Return job posting details for a given [job_id], e.g: 1677638156
+        Return job posting details for a given [job_urn_id], e.g: 1677638156
         """
 
         params = {'decorationId': 'com.linkedin.voyager.deco.jobs.web.shared.WebFullJobPosting-39', 'topN': '1',
                   'topNRequestedFlavors': 'List(IN_NETWORK,COMPANY_RECRUIT,SCHOOL_RECRUIT,HIDDEN_GEM)'}
 
-        res = self._fetch(f"/jobs/jobPostings/{job_id}", params=params)
+        res = self._fetch(f"/jobs/jobPostings/{job_urn_id}", params=params)
 
         data = res.json()
 

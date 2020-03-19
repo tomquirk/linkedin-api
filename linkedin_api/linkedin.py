@@ -517,6 +517,24 @@ class Linkedin(object):
 
         return company
 
+    def get_job_posting(self, job_id):
+        """
+        Return job posting details for a given [job_id], e.g: 1677638156
+        """
+
+        params = {'decorationId': 'com.linkedin.voyager.deco.jobs.web.shared.WebFullJobPosting-39', 'topN': '1',
+                  'topNRequestedFlavors': 'List(IN_NETWORK,COMPANY_RECRUIT,SCHOOL_RECRUIT,HIDDEN_GEM)'}
+
+        res = self._fetch(f"/jobs/jobPostings/{job_id}", params=params)
+
+        data = res.json()
+
+        if data and "status" in data and data["status"] != 200:
+            self.logger.info("request failed, code {}".format(data["status"]))
+            return {}
+
+        return data
+
     def get_conversation_details(self, profile_urn_id):
         """
         Return the conversation (or "message thread") details for a given [public_profile_id]

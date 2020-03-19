@@ -35,6 +35,7 @@ Where it all begins. Create an instance of `Linkedin` to get started. You'll aut
 
 - [`linkedin.get_school`](#get_school)
 - [`linkedin.get_company`](#get_company)
+- [`linkedin.get_job_posting`](#get_job_posting)
 
 - [`linkedin.search`](#search)
 - [`linkedin.search_people`](#search_people)
@@ -215,6 +216,29 @@ Returns a company's Linkedin profile.
 linkedin = Linkedin(credentials['username'], credentials['password'])
 
 company = linkedin.get_company('linkedin')
+```
+
+---
+<a name="get_job_posting"></a>
+
+### linkedin.get_job_posting(job_urn_id)
+
+Returns job posting details. The job_urn_id can be found in the "jobPosting" fields in the response of a [`linkedin.search`](#search) for job postings, (i.e, with query param decoration_id=com.linkedin.voyager.deco.jobs.web.shared.WebFullJobPosting-39).
+
+**Arguments**
+
+- `job_urn_id <str>` - job id, e.g: '1792209257'
+
+**Return**
+
+- `<dict>`
+
+**Example**
+
+```python
+linkedin = Linkedin(credentials['username'], credentials['password'])
+
+job_posting = linkedin.get_job_posting('1754968923")
 ```
 
 ---

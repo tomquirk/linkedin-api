@@ -122,6 +122,77 @@ class Linkedin(object):
 
         return self.search(params, results=results, limit=limit)
 
+    def search_jobs(self, params, max=25, start=0):
+        """
+        Do a search.
+        """
+
+        jobs = {}
+        companies = {}
+
+        default_params = {
+            "count": "25",
+            "start": str(start),
+            "decorationId": "com.linkedin.voyager.deco.jserp.WebJobSearchHit-22",
+            "facetEnabled": "false",
+            "isRequestPrefetch": "true",
+            "keywords": "",
+            "origin": "SEARCH_ON_JOBS_HOME_PREFETCH",
+            "q": "jserpAll",
+            "query": "search",
+            "topNRequestedFlavors": "List(HIDDEN_GEM,IN_NETWORK,SCHOOL_RECRUIT,COMPANY_RECRUIT,SALARY,"
+            "JOB_SEEKER_QUALIFIED,PREFERRED_COMMUTE)",
+        }
+
+        default_params.update(params)
+        n_attempts = 0
+        while len(jobs) < max:
+            length_before = len(jobs)
+            res = self._fetch(
+                f"/search/hits?{urlencode(default_params, safe='(),')}",
+                headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+            )
+
+            data = res.json()
+            if not data or not data["included"]:
+                break
+            for job in data["included"]:
+                company_details = job.get("companyDetails")
+                if company_details:
+                    company_urn = company_details.get("company")
+                    company_urn_id = get_id_from_urn(company_urn) if company_urn else ""
+                    job_urn_id = get_id_from_urn(job["entityUrn"])
+                    if not jobs.get(job_urn_id):
+                        jobs[job_urn_id] = {
+                            "title": job.get("title"),
+                            "companyId": company_urn_id,
+                            "location": job.get("formattedLocation"),
+                            "listedAt": job.get("listedAt"),
+                            "expireAt": job.get("expireAt"),
+                        }
+                        apply_method = job.get("applyMethod")
+                        if apply_method:
+                            company_apply_url = apply_method.get("companyApplyUrl")
+                            easy_apply_url = apply_method.get("easyApplyUrl")
+                            jobs[job_urn_id]["url"] = (
+                                company_apply_url
+                                if company_apply_url
+                                else easy_apply_url
+                            )
+
+                elif "fs_normalized_company" in job.get("entityUrn"):
+                    company_urn_id = get_id_from_urn(job.get("entityUrn"))
+                    if not companies.get(company_urn_id):
+                        companies[company_urn_id] = {"name": job.get("name")}
+
+            if length_before == len(jobs):
+                n_attempts += 1
+            if n_attempts > 3:
+                break
+            default_params["start"] = str(int(default_params["start"]) + 25)
+
+        return jobs, companies
+
     def search_people(
         self,
         keywords=None,

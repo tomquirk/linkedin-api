@@ -103,7 +103,6 @@ class Linkedin(object):
             new_elements.extend(data["data"]["elements"][i]["elements"])
             # not entirely sure what extendedElements generally refers to - keyword search gives back a single job?
             # new_elements.extend(data["data"]["elements"][i]["extendedElements"])
-
         results.extend(new_elements)
         results = results[
             :limit
@@ -118,7 +117,6 @@ class Linkedin(object):
             )
         ) or len(new_elements) == 0:
             return results
-
         self.logger.debug(f"results grew to {len(results)}")
 
         return self.search(params, results=results, limit=limit)
@@ -163,12 +161,10 @@ class Linkedin(object):
             filters.append(f'schools->{"|".join(schools)}')
         if title:
             filters.append(f"title->{title}")
-
         params = {"filters": "List({})".format(",".join(filters))}
 
         if keywords:
             params["keywords"] = keywords
-
         data = self.search(params, limit=limit)
 
         results = []
@@ -182,7 +178,6 @@ class Linkedin(object):
                     "public_id": item.get("publicIdentifier"),
                 }
             )
-
         return results
 
     def search_companies(self, keywords=None, limit=None):
@@ -198,7 +193,6 @@ class Linkedin(object):
 
         if keywords:
             params["keywords"] = keywords
-
         data = self.search(params, limit=limit)
 
         results = []
@@ -214,10 +208,9 @@ class Linkedin(object):
                     "subline": item.get("subline", {}).get("text"),
                 }
             )
-
         return results
 
-    def search_jobs(self, keywords, location, count = 25, start=0, listedAt = 86400):
+    def search_jobs(self, keywords, location, count=25, start=0, listedAt=86400):
         """
         Do a job search.
 
@@ -231,38 +224,36 @@ class Linkedin(object):
         """
         params = {
             "decorationId": "com.linkedin.voyager.deco.jserp.WebJobSearchHit-22",
-            "location" : location,
+            "location": location,
             "origin": "JOB_SEARCH_RESULTS_PAGE",
             "start": start,
             "q": "jserpAll",
             "query": "search",
-            "sortBy": "List(DD)"
+            "sortBy": "List(DD)",
         }
-        
+
         # count must be below 50
-        if (count > 49):
+        if count > 49:
             count = 49
-        params['count'] = count
-        
+        params["count"] = count
+
         # check if input is int
-        if(isinstance(listedAt, int)):
-            params['f_TPR'] = f"List(r{listedAt})"
+        if isinstance(listedAt, int):
+            params["f_TPR"] = f"List(r{listedAt})"
         else:
-            params['f_TPR'] = "List(r86400)"
-            
-        str_params = urlencode(params, safe='(),')
+            params["f_TPR"] = "List(r86400)"
+        str_params = urlencode(params, safe="(),")
 
         # we need to encode the keywords incase it used brackets, otherwise it will return an error
         if keywords:
-            keywords_encoded=f"&keywords={quote(keywords)}"
+            keywords_encoded = f"&keywords={quote(keywords)}"
             str_params += keywords_encoded
-
         res = self._fetch(
             f"/search/hits?{str_params}",
-            headers={   
-                        "accept": "application/vnd.linkedin.normalized+json+2.1",
-                        "x-li-track": '{"clientVersion":"1.6.*","osName":"web","timezoneOffset":1,"deviceFormFactor":"DESKTOP","mpName":"voyager-web","displayDensity":1.100000023841858}'
-                    },
+            headers={
+                "accept": "application/vnd.linkedin.normalized+json+2.1",
+                "x-li-track": '{"clientVersion":"1.6.*","osName":"web","timezoneOffset":1,"deviceFormFactor":"DESKTOP","mpName":"voyager-web","displayDensity":1.100000023841858}',
+            },
         )
 
         data = res.json()
@@ -299,9 +290,7 @@ class Linkedin(object):
                 item["label"] = item["type"][
                     "com.linkedin.voyager.identity.profile.CustomWebsite"
                 ]["label"]
-
             del item["type"]
-
         contact_info["websites"] = websites
 
         return contact_info
@@ -322,7 +311,6 @@ class Linkedin(object):
         skills = data.get("elements", [])
         for item in skills:
             del item["entityUrn"]
-
         return skills
 
     def get_profile(self, public_id=None, urn_id=None):
@@ -340,7 +328,6 @@ class Linkedin(object):
         if data and "status" in data and data["status"] != 200:
             self.logger.info("request failed: {}".format(data["message"]))
             return {}
-
         # massage [profile] data
         profile = data["profile"]
         if "miniProfile" in profile:
@@ -351,7 +338,6 @@ class Linkedin(object):
             profile["profile_id"] = get_id_from_urn(profile["miniProfile"]["entityUrn"])
 
             del profile["miniProfile"]
-
         del profile["defaultLocale"]
         del profile["supportedLocales"]
         del profile["versionTag"]
@@ -368,7 +354,6 @@ class Linkedin(object):
                     if logo:
                         item["companyLogoUrl"] = logo["rootUrl"]
                 del item["company"]["miniCompany"]
-
         profile["experience"] = experience
 
         # massage [skills] data
@@ -386,7 +371,6 @@ class Linkedin(object):
                         "com.linkedin.common.VectorImage"
                     ]["rootUrl"]
                     del item["school"]["logo"]
-
         profile["education"] = education
 
         # massage [languages] data
@@ -459,7 +443,6 @@ class Linkedin(object):
             )
         ):
             return results
-
         results.extend(data["elements"])
         self.logger.debug(f"results grew: {len(results)}")
 
@@ -497,7 +480,6 @@ class Linkedin(object):
             )
         ):
             return results
-
         results.extend(data["elements"])
         self.logger.debug(f"results grew: {len(results)}")
 
@@ -540,7 +522,6 @@ class Linkedin(object):
         if data and "status" in data and data["status"] != 200:
             self.logger.info("request failed: {}".format(data))
             return {}
-
         school = data["elements"][0]
 
         return school
@@ -564,7 +545,6 @@ class Linkedin(object):
         if data and "status" in data and data["status"] != 200:
             self.logger.info("request failed: {}".format(data["message"]))
             return {}
-
         company = data["elements"][0]
 
         return company
@@ -615,7 +595,6 @@ class Linkedin(object):
 
         if not (conversation_urn_id or recipients) and not message_body:
             return True
-
         message_event = {
             "eventCreate": {
                 "value": {
@@ -645,7 +624,6 @@ class Linkedin(object):
             res = self._post(
                 f"/messaging/conversations", params=params, data=json.dumps(payload)
             )
-
         return res.status_code != 201
 
     def mark_conversation_as_seen(self, conversation_urn_id):
@@ -691,7 +669,6 @@ class Linkedin(object):
 
         if res.status_code != 200:
             return []
-
         response_payload = res.json()
         return [element["invitation"] for element in response_payload["elements"]]
 
@@ -767,7 +744,6 @@ class Linkedin(object):
         )
         if res.status_code != 200:
             return {}
-
         data = res.json()
         return data.get("data", {})
 
@@ -778,7 +754,6 @@ class Linkedin(object):
         )
         if res.status_code != 200:
             return {}
-
         data = res.json()
         return data.get("data", {})
 
@@ -789,6 +764,5 @@ class Linkedin(object):
         )
         if res.status_code != 200:
             return {}
-
         data = res.json()
         return data.get("data", {})

@@ -148,7 +148,11 @@ def test_search_people_by_region(linkedin):
     assert results
     assert results[0]["public_id"]
 
-
+def test_search_jobs(linkedin):
+    jobs = linkedin.search_jobs(keywords="data analyst", location="Germany", count=1)
+    
+    assert jobs
+    
 def test_search_companies(linkedin):
     results = linkedin.search_companies(keywords="linkedin", limit=1)
     assert results

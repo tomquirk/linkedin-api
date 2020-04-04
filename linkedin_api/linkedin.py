@@ -1,10 +1,11 @@
-"""
+"""""
 Provides linkedin api-related code
 """
 import random
 import logging
 from time import sleep
 from urllib.parse import urlencode
+from urllib.parse import quote
 import json
 
 from linkedin_api.utils.helpers import get_id_from_urn
@@ -215,6 +216,57 @@ class Linkedin(object):
             )
 
         return results
+
+    def search_jobs(self, keywords, location, count = 25, start=0, listedAt = 86400):
+        """
+        Do a job search.
+
+        [keywords] - any queries using OR, AND, (), ""
+        [location] - job location
+        [count] - number of jobs returned
+        [start] - for paging to fetch the next set of results
+        [sort_by] - sort by relevance "List(R)" or by most recent "List(DD)"
+        [posted_at] - limits the results based on date posted, in seconds
+
+        """
+        params = {
+            "decorationId": "com.linkedin.voyager.deco.jserp.WebJobSearchHit-22",
+            "location" : location,
+            "origin": "JOB_SEARCH_RESULTS_PAGE",
+            "start": start,
+            "q": "jserpAll",
+            "query": "search",
+            "sortBy": "List(DD)"
+        }
+        
+        # count must be below 50
+        if (count > 49):
+            count = 49
+        params['count'] = count
+        
+        # check if input is int
+        if(isinstance(listedAt, int)):
+            params['f_TPR'] = f"List(r{listedAt})"
+        else:
+            params['f_TPR'] = "List(r86400)"
+            
+        str_params = urlencode(params, safe='(),')
+
+        # we need to encode the keywords incase it used brackets, otherwise it will return an error
+        if keywords:
+            keywords_encoded=f"&keywords={quote(keywords)}"
+            str_params += keywords_encoded
+
+        res = self._fetch(
+            f"/search/hits?{str_params}",
+            headers={   
+                        "accept": "application/vnd.linkedin.normalized+json+2.1",
+                        "x-li-track": '{"clientVersion":"1.6.*","osName":"web","timezoneOffset":1,"deviceFormFactor":"DESKTOP","mpName":"voyager-web","displayDensity":1.100000023841858}'
+                    },
+        )
+
+        data = res.json()
+        return data
 
     def get_profile_contact_info(self, public_id=None, urn_id=None):
         """

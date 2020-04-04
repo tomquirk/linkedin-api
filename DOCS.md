@@ -39,6 +39,7 @@ Where it all begins. Create an instance of `Linkedin` to get started. You'll aut
 - [`linkedin.search`](#search)
 - [`linkedin.search_people`](#search_people)
 - [`linkedin.search_companies`](#search_companies)
+- [`linkedin.search_jobs`](#search_jobs)
 
 - [`linkedin.get_invitations`](#get_invitations)
 - [`linkedin.reply_invitation`](#reply_invitation)
@@ -461,6 +462,37 @@ linkedin = Linkedin(credentials['username'], credentials['password'])
 
 results = linkedin.search_companies(
   keywords='linkedin'
+)
+```
+
+---
+
+<a name="search_jobs"></a>
+
+### linkedin.search_jobs(keywords, location, count=25, start=0, listedAt=86400)
+
+Perform a Linkedin search for jobs and return the results.
+
+**Arguments**
+
+- `keywords <str>` - Search query, accepts brackets, OR, AND, double quotations
+- `location <str>` - A geographical region. This is not necessarily a country. It could be a city or regional area, such as San Francisco Bay Area.
+- `count <int>` - Number of jobs returned, limited at 49
+- `start <int>` - Return results from a different starting point (for pagination)
+- `listedAt <int>` - Returns results based on how long it has been posted, in seconds
+
+
+**Return**
+
+- `<dict>`
+
+**Example**
+
+```python
+linkedin = Linkedin(credentials['username'], credentials['password'])
+
+results = linkedin.search_jobs(
+  keywords='data AND (analyst OR scientist)'
 )
 ```
 

@@ -149,6 +149,12 @@ def test_search_people_by_region(linkedin):
     assert results[0]["public_id"]
 
 
+def test_search_jobs(linkedin):
+    jobs = linkedin.search_jobs(keywords="data analyst", location="Germany", count=1)
+
+    assert jobs
+
+
 def test_search_companies(linkedin):
     results = linkedin.search_companies(keywords="linkedin", limit=1)
     assert results
@@ -181,7 +187,6 @@ def test_accept_invitation(linkedin):
         # If we've got no invitations, just force test to pass
         assert True
         return
-
     num_invitations = len(invitations)
     invite = invitations[0]
     invitation_response = linkedin.reply_invitation(
@@ -205,7 +210,6 @@ def test_reject_invitation(linkedin):
         # If we've got no invitations, just force test to pass
         assert True
         return
-
     num_invitations = len(invitations)
     invite = invitations[0]
     invitation_response = linkedin.reply_invitation(

@@ -422,7 +422,7 @@ class Linkedin(object):
         courses = data["courseView"]["elements"]
         for item in courses:
             del item["entityUrn"]
-        profile["courses"] = course
+        profile["courses"] = courses
 
         return profile
 

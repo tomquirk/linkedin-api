@@ -5,7 +5,7 @@ import json
 import logging
 import random
 from time import sleep
-from urllib.parse import urlencode
+from urllib.parse import urlencode, quote
 
 from linkedin_api.client import Client
 from linkedin_api.utils.helpers import get_id_from_urn
@@ -215,6 +215,55 @@ class Linkedin(object):
 
         return results
 
+    def search_jobs(self, keywords, location, count=25, start=0, listed_at=86400):
+        """
+        Do a job search.
+
+        [keywords] - any queries using OR, AND, (), ""
+        [location] - job location
+        [count] - number of jobs returned
+        [start] - for paging to fetch the next set of results
+        [sort_by] - sort by relevance "List(R)" or by most recent "List(DD)"
+        [posted_at] - limits the results based on date posted, in seconds
+        
+        """
+        params = {
+            "decorationId": "com.linkedin.voyager.deco.jserp.WebJobSearchHit-22",
+            "location": location,
+            "origin": "JOB_SEARCH_RESULTS_PAGE",
+            "start": start,
+            "q": "jserpAll",
+            "query": "search",
+            "sortBy": "List(DD)",
+        }
+
+        # count must be below 50
+        if count > 49:
+            count = 49
+        params["count"] = count
+
+        # check if input is int
+        if isinstance(listed_at, int):
+            params["f_TPR"] = f"List(r{listed_at})"
+        else:
+            params["f_TPR"] = "List(r86400)"
+        str_params = urlencode(params, safe="(),")
+
+        # we need to encode the keywords incase it used brackets, otherwise it will return an error
+        if keywords:
+            keywords_encoded = f"&keywords={quote(keywords)}"
+            str_params += keywords_encoded
+        res = self._fetch(
+            f"/search/hits?{str_params}",
+            headers={
+                "accept": "application/vnd.linkedin.normalized+json+2.1",
+                "x-li-track": '{"clientVersion":"1.6.*","osName":"web","timezoneOffset":1,"deviceFormFactor":"DESKTOP","mpName":"voyager-web","displayDensity":1.100000023841858}',
+            },
+        )
+
+        data = res.json()
+        return data
+
     def get_profile_contact_info(self, public_id=None, urn_id=None):
         """
         Return data for a single profile.
@@ -335,6 +384,38 @@ class Linkedin(object):
                     del item["school"]["logo"]
 
         profile["education"] = education
+
+        # massage [languages] data
+        languages = data["languageView"]["elements"]
+        for item in languages:
+            del item["entityUrn"]
+        profile["languages"] = languages
+
+        # massage [publications] data
+        publications = data["publicationView"]["elements"]
+        for item in publications:
+            del item["entityUrn"]
+            for author in item.get("authors", []):
+                del author["entityUrn"]
+        profile["publications"] = publications
+
+        # massage [certifications] data
+        certifications = data["certificationView"]["elements"]
+        for item in certifications:
+            del item["entityUrn"]
+        profile["certifications"] = certifications
+
+        # massage [volunteer] data
+        volunteer = data["volunteerExperienceView"]["elements"]
+        for item in volunteer:
+            del item["entityUrn"]
+        profile["volunteer"] = volunteer
+
+        # massage [honors] data
+        honors = data["honorView"]["elements"]
+        for item in honors:
+            del item["entityUrn"]
+        profile["honors"] = honors
 
         return profile
 

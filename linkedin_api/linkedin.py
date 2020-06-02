@@ -1,15 +1,14 @@
 """
 Provides linkedin api-related code
 """
-import random
+import json
 import logging
+import random
 from time import sleep
 from urllib.parse import urlencode, quote
-import json
-
-from linkedin_api.utils.helpers import get_id_from_urn
 
 from linkedin_api.client import Client
+from linkedin_api.utils.helpers import get_id_from_urn
 
 logger = logging.getLogger(__name__)
 

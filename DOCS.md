@@ -44,6 +44,8 @@ Where it all begins. Create an instance of `Linkedin` to get started. You'll aut
 - [`linkedin.get_invitations`](#get_invitations)
 - [`linkedin.reply_invitation`](#reply_invitation)
 
+- [`linkedin.unfollow_entity`](#unfollow_entity)
+
 ---
 
 <a name="get_profile"></a>
@@ -481,7 +483,6 @@ Perform a Linkedin search for jobs and return the results.
 - `start <int>` - Return results from a different starting point (for pagination)
 - `listedAt <int>` - Returns results based on how long it has been posted, in seconds
 
-
 **Return**
 
 - `<dict>`
@@ -531,6 +532,26 @@ invite_to_ignore = linkedin.get_invitations()[1]
 
 linkedin.reply_invitation(invitation_entity_urn=invite_to_accept['entityUrn'], invitation_shared_secret=invite_to_accept['sharedSecret'])
 linkedin.reply_invitation(invitation_entity_urn=invite_to_ignore['entityUrn'], invitation_shared_secret=invite_to_ignore['sharedSecret'], action="ignore")
+```
+
+---
+
+<a name="unfollow_entity"></a>
+
+### linkedin.unfollow_entity(urn)
+
+Unfollow any entity (company, member, etc.) to remove them from your feed.
+`urn` is the full urn (e.g. `urn:li:member:AC0blablabla123asdf`)
+
+**Example**
+
+```python
+linkedin = Linkedin(credentials['username'], credentials['password'])
+
+profile = linkedin.get_profile()
+member_urn = f"urn:li:member:{profile['profile_id']}"
+
+linkedin.unfollow_entity(profile)
 ```
 
 ---

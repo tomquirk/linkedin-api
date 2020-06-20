@@ -6,7 +6,6 @@
 
 [![buymeacoffee: https://www.buymeacoffee.com/tomquirk](https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png)](https://www.buymeacoffee.com/tomquirk)
 
-
 > No "official" API access required - just use a valid Linkedin account!
 
 Programmatically send messages, perform searches, get profile data and more, all with a regular Linkedin user account!
@@ -183,10 +182,10 @@ By using this project, you agree to the following Terms and Conditions. We reser
 
 This project may not be used for any of the following:
 
-* Commercial use
-* Spam
-* Storage of any Personally Identifiable Information
-* Personal abuse (i.e. verbal abuse)
+- Commercial use
+- Spam
+- Storage of any Personally Identifiable Information
+- Personal abuse (i.e. verbal abuse)
 
 <a name="legal"></a>
 

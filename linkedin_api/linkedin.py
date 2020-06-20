@@ -791,13 +791,11 @@ class Linkedin(object):
         return data.get("data", {})
 
     def unfollow_entity(self, urn):
-        payload = {
-            "urn": f"urn:li:fs_followingInfo:{urn}"
-        }
+        payload = {"urn": f"urn:li:fs_followingInfo:{urn}"}
         res = self._post(
             "/feed/follows?action=unfollowByEntityUrn",
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
-            data=json.dumps(payload)
+            data=json.dumps(payload),
         )
 
         err = False

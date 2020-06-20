@@ -222,6 +222,7 @@ def test_reject_invitation(linkedin):
     invitations = linkedin.get_invitations()
     assert len(invitations) == num_invitations - 1
 
+
 def test_unfollow_entity(linkedin):
     urn = f"urn:li:member:ACoAACVmHBkBdk3IYY1uodl8Ht4W79rmdVFccOA"
     err = linkedin.unfollow_entity(urn)

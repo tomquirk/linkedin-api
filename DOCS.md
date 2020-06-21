@@ -82,7 +82,8 @@ Returns a Linkedin profile's first degree (direct) connections
 
 **Arguments**
 
-- `urn_id <str>` - id provided by the Linkedin URN
+- `urn_id <str>` - id provided by the Linkedin URN.
+  If `urn_id` is `None`, returns the currently authenticated profile's connections.
 
 **Return**
 

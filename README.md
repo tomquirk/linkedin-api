@@ -20,7 +20,7 @@ Before using this project, please consult the [Terms and Conditions](#terms-and-
 pip3 install linkedin-api~=2.0.0a
 ```
 
-> [Why v2.0.0a?](versioning-note)
+> [Why v2.0.0a?](#versioning-note)
 
 ### Example usage
 

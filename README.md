@@ -17,8 +17,10 @@ Before using this project, please consult the [Terms and Conditions](#terms-and-
 > ⚠️ Python >= 3.6 required
 
 ```bash
-pip install -e git+https://github.com/tomquirk/linkedin-api.git
+pip3 install linkedin-api~=2.0.0a
 ```
+
+> [Why v2.0.0a?](versioning-note)
 
 ### Example usage
 
@@ -188,3 +190,10 @@ This project may not be used for any of the following:
 This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by Linkedin or any of its affiliates or subsidiaries. This is an independent and unofficial API. Use at your own risk.
 
 This project violates Linkedin's User Agreement Section 8.2, and because of this, Linkedin may (and will) temporarily or permanently ban your account. We are not responsible for your account being banned.
+
+## Versioning Note
+
+**Tl;dr:** Don't use anything < v2.0.0a.
+
+Releases/tags for this package have not been kept up to date with changes and thus versions (like v1.0.0) are misleading and do not represent "stability".
+Eventually, v2.0.0 will be the "stable" release.

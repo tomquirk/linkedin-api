@@ -126,6 +126,13 @@ def test_search(linkedin):
     assert results
 
 
+def test_search_pagination(linkedin):
+    linkedin._MAX_SEARCH_COUNT = 2
+    results = linkedin.search({"keywords": "software"}, limit=4)
+    assert results
+    assert len(results) == 4
+
+
 def test_search_with_limit(linkedin):
     results = linkedin.search({"keywords": "tom"}, limit=1)
     assert len(results) == 1

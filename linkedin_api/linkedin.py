@@ -27,7 +27,7 @@ class Linkedin(object):
     """
 
     _MAX_UPDATE_COUNT = 100  # max seems to be 100
-    _MAX_SEARCH_COUNT = 49  # max seems to be 49
+    _MAX_SEARCH_COUNT = 49  # max seems to be 49, and min seems to be 2
     _MAX_REPEATED_REQUESTS = (
         200  # VERY conservative max requests count to avoid rate-limit
     )
@@ -81,6 +81,9 @@ class Linkedin(object):
 
         results = []
         while True:
+            # when we're close to the limit, only fetch what we need to
+            if limit - len(results) < count:
+                count = limit - len(results)
             default_params = {
                 "count": str(count),
                 "filters": "List()",
@@ -105,6 +108,8 @@ class Linkedin(object):
             results.extend(new_elements)
 
             # break the loop if we're done searching
+            # NOTE: we could also check for the `total` returned in the response.
+            # This is in data["data"]["paging"]["total"]
             if (
                 limit is not None
                 and (
@@ -417,9 +422,10 @@ class Linkedin(object):
 
         return profile
 
-    def get_profile_connections(self, urn_id):
+    def get_profile_connections(self, urn_id=None):
         """
-        Return a list of profile ids connected to profile of given [urn_id]
+        Return a list of profile ids connected to profile of given [urn_id].
+        If urn_id is None, then the currently logged in user's connections are returned
         """
         return self.search_people(connection_of=urn_id, network_depth="F")
 

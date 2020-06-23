@@ -156,6 +156,14 @@ def test_search_people_by_region(linkedin):
     assert results[0]["public_id"]
 
 
+def test_search_people_by_keywords_filter(linkedin: Linkedin):
+    results = linkedin.search_people(
+        keyword_first_name="John", keyword_last_name="Smith"
+    )
+    assert results
+    assert results[0]["public_id"]
+
+
 def test_search_jobs(linkedin):
     jobs = linkedin.search_jobs(keywords="data analyst", location="Germany", count=1)
 

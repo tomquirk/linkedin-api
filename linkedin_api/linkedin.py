@@ -138,6 +138,12 @@ class Linkedin(object):
         title=None,
         include_private_profiles=False,  # profiles without a public id, "Linkedin Member"
         limit=None,
+        # Keywords filter
+        keyword_first_name=None,
+        keyword_last_name=None,
+        keyword_title=None,
+        keyword_company=None,
+        keyword_school=None,
     ):
         """
         Do a people search.
@@ -163,6 +169,16 @@ class Linkedin(object):
             filters.append(f'schools->{"|".join(schools)}')
         if title:
             filters.append(f"title->{title}")
+        if keyword_first_name:
+            filters.append(f"firstName->{keyword_first_name}")
+        if keyword_last_name:
+            filters.append(f"lastName->{keyword_last_name}")
+        if keyword_title:
+            filters.append(f"title->{keyword_title}")
+        if keyword_company:
+            filters.append(f"company->{keyword_company}")
+        if keyword_school:
+            filters.append(f"school->{keyword_school}")
 
         params = {"filters": "List({})".format(",".join(filters))}
 

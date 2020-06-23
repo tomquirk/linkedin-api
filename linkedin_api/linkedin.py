@@ -73,11 +73,9 @@ class Linkedin(object):
         """
         Do a search.
         """
-        count = (
-            limit
-            if limit and limit <= Linkedin._MAX_SEARCH_COUNT
-            else Linkedin._MAX_SEARCH_COUNT
-        )
+        if not limit or limit > Linkedin._MAX_SEARCH_COUNT:
+            limit = Linkedin._MAX_SEARCH_COUNT
+        count = limit
 
         results = []
         while True:
@@ -111,11 +109,8 @@ class Linkedin(object):
             # NOTE: we could also check for the `total` returned in the response.
             # This is in data["data"]["paging"]["total"]
             if (
-                limit is not None
-                and (
-                    len(results) >= limit  # if our results exceed set limit
-                    or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS
-                )
+                len(results) >= limit  # if our results exceed set limit
+                or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS
             ) or len(new_elements) == 0:
                 break
 

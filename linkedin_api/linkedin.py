@@ -130,13 +130,13 @@ class Linkedin(object):
         regions=None,
         industries=None,
         schools=None,
-        title=None,
+        title=None,  # `keyword_title` and `title` are the same. We kept `title` for backward compatibility. Please only use one of them.
         include_private_profiles=False,  # profiles without a public id, "Linkedin Member"
         limit=None,
         # Keywords filter
         keyword_first_name=None,
         keyword_last_name=None,
-        keyword_title=None,
+        keyword_title=None,  # `keyword_title` and `title` are the same. We kept `title` for backward compatibility. Please only use one of them.
         keyword_company=None,
         keyword_school=None,
     ):
@@ -162,8 +162,8 @@ class Linkedin(object):
             filters.append(f'nonprofitInterest->{"|".join(nonprofit_interests)}')
         if schools:
             filters.append(f'schools->{"|".join(schools)}')
-        if title:
-            filters.append(f"title->{title}")
+        # `Keywords` filter
+        keyword_title = keyword_title if keyword_title else title
         if keyword_first_name:
             filters.append(f"firstName->{keyword_first_name}")
         if keyword_last_name:

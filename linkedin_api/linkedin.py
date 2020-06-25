@@ -73,11 +73,9 @@ class Linkedin(object):
         """
         Do a search.
         """
-        count = (
-            limit
-            if limit and limit <= Linkedin._MAX_SEARCH_COUNT
-            else Linkedin._MAX_SEARCH_COUNT
-        )
+        if not limit or limit > Linkedin._MAX_SEARCH_COUNT:
+            limit = Linkedin._MAX_SEARCH_COUNT
+        count = limit
 
         results = []
         while True:
@@ -111,11 +109,8 @@ class Linkedin(object):
             # NOTE: we could also check for the `total` returned in the response.
             # This is in data["data"]["paging"]["total"]
             if (
-                limit is not None
-                and (
-                    len(results) >= limit  # if our results exceed set limit
-                    or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS
-                )
+                len(results) >= limit  # if our results exceed set limit
+                or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS
             ) or len(new_elements) == 0:
                 break
 
@@ -135,9 +130,15 @@ class Linkedin(object):
         regions=None,
         industries=None,
         schools=None,
-        title=None,
+        title=None,  # `keyword_title` and `title` are the same. We kept `title` for backward compatibility. Please only use one of them.
         include_private_profiles=False,  # profiles without a public id, "Linkedin Member"
         limit=None,
+        # Keywords filter
+        keyword_first_name=None,
+        keyword_last_name=None,
+        keyword_title=None,  # `keyword_title` and `title` are the same. We kept `title` for backward compatibility. Please only use one of them.
+        keyword_company=None,
+        keyword_school=None,
     ):
         """
         Do a people search.
@@ -161,8 +162,18 @@ class Linkedin(object):
             filters.append(f'nonprofitInterest->{"|".join(nonprofit_interests)}')
         if schools:
             filters.append(f'schools->{"|".join(schools)}')
-        if title:
-            filters.append(f"title->{title}")
+        # `Keywords` filter
+        keyword_title = keyword_title if keyword_title else title
+        if keyword_first_name:
+            filters.append(f"firstName->{keyword_first_name}")
+        if keyword_last_name:
+            filters.append(f"lastName->{keyword_last_name}")
+        if keyword_title:
+            filters.append(f"title->{keyword_title}")
+        if keyword_company:
+            filters.append(f"company->{keyword_company}")
+        if keyword_school:
+            filters.append(f"school->{keyword_school}")
 
         params = {"filters": "List({})".format(",".join(filters))}
 

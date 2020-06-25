@@ -354,9 +354,21 @@ class Linkedin(object):
         profile = data["profile"]
         if "miniProfile" in profile:
             if "picture" in profile["miniProfile"]:
+                # profile picture url prefix (root url)
                 profile["displayPictureUrl"] = profile["miniProfile"]["picture"][
                     "com.linkedin.common.VectorImage"
                 ]["rootUrl"]
+                # profile pictures full urls dict (prefix: root Url + suffix: artifcat)
+                # example : {"100_100": "https://medi...100_100/0?e=15984...", "200_200": ...}
+                profile["displayPictureFullUrls"] = {
+                    f"{suffix['width']}_{suffix['height']}": profile[
+                        "displayPictureUrl"
+                    ]
+                    + suffix["fileIdentifyingUrlPathSegment"]
+                    for suffix in profile["miniProfile"]["picture"][
+                        "com.linkedin.common.VectorImage"
+                    ]["artifacts"]
+                }
             profile["profile_id"] = get_id_from_urn(profile["miniProfile"]["entityUrn"])
             profile["profile_urn"] = profile["miniProfile"]["entityUrn"]
 

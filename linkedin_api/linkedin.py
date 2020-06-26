@@ -53,7 +53,7 @@ class Linkedin(object):
             if cookies:
                 # If the cookies are expired, the API won't work anymore since
                 # `username` and `password` are not used at all in this case.
-                self.client.self._set_session_cookies(cookies)
+                self.client._set_session_cookies(cookies)
             else:
                 self.client.authenticate(username, password)
 

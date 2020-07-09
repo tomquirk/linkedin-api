@@ -77,23 +77,35 @@ class Linkedin(object):
             limit = Linkedin._MAX_SEARCH_COUNT
         count = limit
 
+        # encode the params. We encode filters & keywords separately because '(),' are not safe
+        default_params = {
+            "filters": "List()",
+            "origin": "GLOBAL_SEARCH_HEADER",
+            "q": "all",
+            "queryContext": "List(spellCorrectionEnabled->true,relatedSearchesEnabled->true,kcardTypes->PROFILE|COMPANY)",
+        }
+        unsafe_params = []
+        if "filters" in params:
+            unsafe_params.append(
+                f"&filters=List({','.join([quote(f) for f in params['filters']])})"
+            )
+            del params["filters"]
+            del default_params["filters"]
+        if "keywords" in params:
+            unsafe_params.append("keywords=" + quote(params["keywords"]))
+            del params["keywords"]
+        url_encoded = urlencode(default_params, safe="(),") + "&".join(unsafe_params)
+
         results = []
         while True:
             # when we're close to the limit, only fetch what we need to
             if limit - len(results) < count:
                 count = limit - len(results)
-            default_params = {
-                "count": str(count),
-                "filters": "List()",
-                "origin": "GLOBAL_SEARCH_HEADER",
-                "q": "all",
-                "start": len(results),
-                "queryContext": "List(spellCorrectionEnabled->true,relatedSearchesEnabled->true,kcardTypes->PROFILE|COMPANY)",
-            }
-            default_params.update(params)
+            url_encoded_with_paging = url_encoded + "&count=" + str(count)
+            url_encoded_with_paging += "&start=" + str(len(results))
 
             res = self._fetch(
-                f"/search/blended?{urlencode(default_params, safe='(),')}",
+                "/search/blended?" + url_encoded_with_paging,
                 headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
             )
             data = res.json()
@@ -175,7 +187,7 @@ class Linkedin(object):
         if keyword_school:
             filters.append(f"school->{keyword_school}")
 
-        params = {"filters": "List({})".format(",".join(filters))}
+        params = {"filters": filters}
 
         if keywords:
             params["keywords"] = keywords
@@ -203,7 +215,7 @@ class Linkedin(object):
         filters = ["resultType->COMPANIES"]
 
         params = {
-            "filters": "List({})".format(",".join(filters)),
+            "filters": filters,
             "queryContext": "List(spellCorrectionEnabled->true)",
         }
 

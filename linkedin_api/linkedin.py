@@ -88,6 +88,8 @@ class Linkedin(object):
         if "filters" in params:
             unsafe_params.append(
                 f"&filters=List({','.join([quote(f) for f in params['filters']])})"
+                if type(params["filters"]) is list
+                else "&filters=" + params["filters"]
             )
             del params["filters"]
             del default_params["filters"]

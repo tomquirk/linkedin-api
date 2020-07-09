@@ -100,7 +100,54 @@ class Linkedin(object):
 
             new_elements = []
             for i in range(len(data["data"]["elements"])):
-                new_elements.extend(data["data"]["elements"][i]["elements"])
+                elements = data["data"]["elements"][i]["elements"]
+
+                # Get more information :
+                # For people (firstName, lastName, occupation, picture)
+                # For companies (picture, universalName)
+                for el in elements:
+                    if (
+                        "included" in data
+                        and "targetUrn" in el
+                        and (el["type"] in ["PROFILE", "COMPANY"])
+                    ):
+                        # Find the right item in the `included` list
+                        mini_details = next(
+                            (
+                                item
+                                for item in data["included"]
+                                if item["entityUrn"] == el["targetUrn"]
+                            ),
+                            {},
+                        )
+                        # Edit the picture or logo to output a nice dict
+                        # e.g: {"100_100": "https://medi...100_100/0?e=15984...", "200_200": ...}
+                        picture = mini_details.get("picture") or mini_details.get(
+                            "logo"
+                        )
+                        if picture:
+                            mini_details["picture"] = {
+                                f"{suffix['width']}_{suffix['height']}": picture[
+                                    "rootUrl"
+                                ]
+                                + suffix["fileIdentifyingUrlPathSegment"]
+                                for suffix in picture["artifacts"]
+                            }
+                        # Keep the keys we're interested in (firstName, lastName, occupation, picture, name)
+                        el["mini_details"] = {
+                            k: v
+                            for k, v in mini_details.items()
+                            if k
+                            in [
+                                "firstName",
+                                "lastName",
+                                "occupation",
+                                "picture",
+                                "universalName",
+                            ]
+                        }
+                    new_elements.append(el)
+
                 # not entirely sure what extendedElements generally refers to - keyword search gives back a single job?
                 # new_elements.extend(data["data"]["elements"][i]["extendedElements"])
             results.extend(new_elements)
@@ -191,6 +238,7 @@ class Linkedin(object):
                     "urn_id": get_id_from_urn(item.get("targetUrn")),
                     "distance": item.get("memberDistance", {}).get("value"),
                     "public_id": item.get("publicIdentifier"),
+                    "mini_details": item.get("mini_details", {}),
                 }
             )
 
@@ -223,6 +271,7 @@ class Linkedin(object):
                     "name": item.get("title", {}).get("text"),
                     "headline": item.get("headline", {}).get("text"),
                     "subline": item.get("subline", {}).get("text"),
+                    "mini_details": item.get("mini_details", {}),
                 }
             )
 

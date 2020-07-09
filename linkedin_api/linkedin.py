@@ -409,7 +409,7 @@ class Linkedin(object):
                 ]["rootUrl"]
                 # profile pictures full urls dict (prefix: root Url + suffix: artifcat)
                 # example : {"100_100": "https://medi...100_100/0?e=15984...", "200_200": ...}
-                profile["displayPictureFullUrls"] = {
+                profile["picture"] = {
                     f"{suffix['width']}_{suffix['height']}": profile[
                         "displayPictureUrl"
                     ]

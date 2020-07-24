@@ -24,6 +24,7 @@ Where it all begins. Create an instance of `Linkedin` to get started. You'll aut
 - [`linkedin.get_profile_member_badges`](#get_profile_member_badges)
 - [`linkedin.get_profile_network_info`](#get_profile_network_info)
 - [`linkedin.remove_connection`](#remove_connection)
+- [`linkedin.view_profile`](#view_profile)
 
 - [`linkedin.get_conversations`](#get_conversations)
 - [`linkedin.get_conversation_details`](#get_conversation_details)
@@ -175,6 +176,34 @@ err = linkedin.remove_connection('tom-tom-quirk-1928345')
 
 ---
 
+<a name="view_profile"></a>
+
+### linkedin.view_profile(public_profile_id, network_distance=None, target_member_id=None)
+
+View a profile. The target profile will receive a notification that you "viewed" them.
+
+Providing as many arguments as possible will reduce request duration.
+
+**Arguments**
+
+- `public_profile_id <str>` - public identifier e.g. tom-quirk-1928345
+- `network_distance <int>` - distance from target profile to authenticated user (optional)
+- `target_member_id <int>` - member identifer e.g. 019482 (optional)
+
+**Return**
+
+- `<bool>` - True if err
+
+**Example**
+
+```python
+linkedin = Linkedin(credentials['username'], credentials['password'])
+
+err = linkedin.view_profile('tom-quirk-1928345')
+```
+
+---
+
 <a name="get_school"></a>
 
 ### linkedin.get_school(public_id)
@@ -225,7 +254,7 @@ company = linkedin.get_company('linkedin')
 
 <a name="search"></a>
 
-### linkedin.search(params, max_results=None, results=[])
+### linkedin.search(params, limit=None, results=[])
 
 Perform a Linkedin search and return the results.
 A reference of country and industry codes can be found [here](https://developer.linkedin.com/docs/reference).
@@ -233,7 +262,7 @@ A reference of country and industry codes can be found [here](https://developer.
 **Arguments**
 
 - `params <dict>` - search parameters (see implementation of [search_people](#search_people) for a reference)
-- `max_results <int> - the max number of results to return
+- `limit <int>` - the max number of results to return
 
 **Return**
 
@@ -553,32 +582,6 @@ profile = linkedin.get_profile()
 member_urn = f"urn:li:member:{profile['profile_id']}"
 
 linkedin.unfollow_entity(profile)
-```
-
----
-
-<a name="view_profile"></a>
-
-### linkedin.view_profile(public_id)
-
-Send a profile view (i.e. "<your_name> viewed your profile")
-
-#### NOTE: method does not work
-
-**Arguments**
-
-- `public_id <str>` - public identifier i.e. tom-quirk-1928345
-
-**Return**
-
-- `<boolean>`
-
-**Example**
-
-```python
-linkedin = Linkedin(credentials['username'], credentials['password'])
-
-profile = linkedin.view_profile('tom-quirk')
 ```
 
 ---

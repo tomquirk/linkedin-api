@@ -109,7 +109,9 @@ class Linkedin(object):
             # NOTE: we could also check for the `total` returned in the response.
             # This is in data["data"]["paging"]["total"]
             if (
-                (limit > -1 and len(results) >= limit)  # if our results exceed set limit
+                (
+                    limit > -1 and len(results) >= limit
+                )  # if our results exceed set limit
                 or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS
             ) or len(new_elements) == 0:
                 break
@@ -191,7 +193,7 @@ class Linkedin(object):
                     "urn_id": get_id_from_urn(item.get("targetUrn")),
                     "distance": item.get("memberDistance", {}).get("value"),
                     "public_id": item.get("publicIdentifier"),
-                    "tracking_id": get_id_from_urn(item.get("trackingUrn"))
+                    "tracking_id": get_id_from_urn(item.get("trackingUrn")),
                 }
             )
 

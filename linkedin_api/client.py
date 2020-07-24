@@ -1,6 +1,8 @@
 import requests
 import logging
 from linkedin_api.cookie_repository import CookieRepository
+from bs4 import BeautifulSoup
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +21,8 @@ class Client(object):
     """
 
     # Settings for general Linkedin API calls
-    API_BASE_URL = "https://www.linkedin.com/voyager/api"
+    LINKEDIN_BASE_URL = "https://www.linkedin.com"
+    API_BASE_URL = f"{LINKEDIN_BASE_URL}/voyager/api"
     REQUEST_HEADERS = {
         "user-agent": " ".join(
             [
@@ -36,7 +39,6 @@ class Client(object):
     }
 
     # Settings for authenticating with Linkedin
-    AUTH_BASE_URL = "https://www.linkedin.com"
     AUTH_REQUEST_HEADERS = {
         "X-Li-User-Agent": "LIAuthLibrary:3.2.4 \
                             com.linkedin.LinkedIn:8.8.1 \
@@ -53,6 +55,7 @@ class Client(object):
         self.session.headers.update(Client.REQUEST_HEADERS)
         self.proxies = proxies
         self.logger = logger
+        self.metadata = {}
         self._use_cookie_cache = not refresh_cookies
         self._cookie_repository = CookieRepository()
 
@@ -65,7 +68,7 @@ class Client(object):
         self.logger.debug("Requesting new cookies.")
 
         res = requests.get(
-            f"{Client.AUTH_BASE_URL}/uas/authenticate",
+            f"{Client.LINKEDIN_BASE_URL}/uas/authenticate",
             headers=Client.AUTH_REQUEST_HEADERS,
             proxies=self.proxies,
         )
@@ -89,10 +92,40 @@ class Client(object):
             self.logger.debug("Attempting to use cached cookies")
             cookies = self._cookie_repository.get(username)
             if cookies:
+                self.logger.debug("Using cached cookies")
                 self._set_session_cookies(cookies)
+                self._fetch_metadata()
                 return
 
-        return self._do_authentication_request(username, password)
+        self._do_authentication_request(username, password)
+        self._fetch_metadata()
+
+    def _fetch_metadata(self):
+        """
+        Get metadata about the "instance" of the LinkedIn application for the signed in user.
+
+        Store this data in self.metadata
+        """
+        res = requests.get(
+            f"{Client.LINKEDIN_BASE_URL}",
+            cookies=self.session.cookies,
+            headers=Client.AUTH_REQUEST_HEADERS,
+            proxies=self.proxies,
+        )
+
+        soup = BeautifulSoup(res.text, "lxml")
+
+        clientApplicationInstanceRaw = soup.find(
+            "meta", attrs={"name": "applicationInstance"}
+        ).attrs["content"]
+        clientApplicationInstance = json.loads(clientApplicationInstanceRaw)
+
+        clientPageInstanceId = soup.find(
+            "meta", attrs={"name": "clientPageInstanceId"}
+        ).attrs["content"]
+
+        self.metadata["clientApplicationInstance"] = clientApplicationInstance
+        self.metadata["clientPageInstanceId"] = clientPageInstanceId
 
     def _do_authentication_request(self, username, password):
         """
@@ -109,7 +142,7 @@ class Client(object):
         }
 
         res = requests.post(
-            f"{Client.AUTH_BASE_URL}/uas/authenticate",
+            f"{Client.LINKEDIN_BASE_URL}/uas/authenticate",
             data=payload,
             cookies=self.session.cookies,
             headers=Client.AUTH_REQUEST_HEADERS,

@@ -4,7 +4,7 @@ Provides linkedin api-related code
 import json
 import logging
 import random
-from time import sleep
+from time import sleep, time
 from urllib.parse import urlencode, quote
 
 from linkedin_api.client import Client
@@ -51,36 +51,36 @@ class Linkedin(object):
         if authenticate:
             self.client.authenticate(username, password)
 
-    def _fetch(self, uri, evade=default_evade, **kwargs):
+    def _fetch(self, uri, evade=default_evade, base_request=False, **kwargs):
         """
         GET request to Linkedin API
         """
         evade()
 
-        url = f"{self.client.API_BASE_URL}{uri}"
+        url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
         return self.client.session.get(url, **kwargs)
 
-    def _post(self, uri, evade=default_evade, **kwargs):
+    def _post(self, uri, evade=default_evade, base_request=False, **kwargs):
         """
         POST request to Linkedin API
         """
         evade()
 
-        url = f"{self.client.API_BASE_URL}{uri}"
+        url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
         return self.client.session.post(url, **kwargs)
 
-    def search(self, params, limit=None):
+    def search(self, params, limit=-1):
         """
         Do a search.
         """
-        if not limit or limit > Linkedin._MAX_SEARCH_COUNT:
-            limit = Linkedin._MAX_SEARCH_COUNT
-        count = limit
+        count = Linkedin._MAX_SEARCH_COUNT
+        if limit is None:
+            limit = -1
 
         results = []
         while True:
             # when we're close to the limit, only fetch what we need to
-            if limit - len(results) < count:
+            if limit > -1 and limit - len(results) < count:
                 count = limit - len(results)
             default_params = {
                 "count": str(count),
@@ -109,7 +109,9 @@ class Linkedin(object):
             # NOTE: we could also check for the `total` returned in the response.
             # This is in data["data"]["paging"]["total"]
             if (
-                len(results) >= limit  # if our results exceed set limit
+                (
+                    limit > -1 and len(results) >= limit
+                )  # if our results exceed set limit
                 or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS
             ) or len(new_elements) == 0:
                 break
@@ -191,6 +193,7 @@ class Linkedin(object):
                     "urn_id": get_id_from_urn(item.get("targetUrn")),
                     "distance": item.get("memberDistance", {}).get("value"),
                     "public_id": item.get("publicIdentifier"),
+                    "tracking_id": get_id_from_urn(item.get("trackingUrn")),
                 }
             )
 
@@ -334,7 +337,7 @@ class Linkedin(object):
 
         return skills
 
-    def get_profile(self, public_id=None, urn_id=None):
+    def get_profile(self, public_id=None, urn_id=None, with_skills=True):
         """
         Return data for a single profile.
 
@@ -359,6 +362,7 @@ class Linkedin(object):
                 ]["rootUrl"]
             profile["profile_id"] = get_id_from_urn(profile["miniProfile"]["entityUrn"])
             profile["profile_urn"] = profile["miniProfile"]["entityUrn"]
+            profile["member_urn"] = profile["miniProfile"]["objectUrn"]
 
             del profile["miniProfile"]
 
@@ -385,7 +389,11 @@ class Linkedin(object):
         # skills = [item["name"] for item in data["skillView"]["elements"]]
         # profile["skills"] = skills
 
-        profile["skills"] = self.get_profile_skills(public_id=public_id, urn_id=urn_id)
+        profile["skills"] = (
+            self.get_profile_skills(public_id=public_id, urn_id=urn_id)
+            if with_skills
+            else {}
+        )
 
         # massage [education] data
         education = data["educationView"]["elements"]
@@ -671,19 +679,18 @@ class Linkedin(object):
 
         return res.status_code != 200
 
-    def get_user_profile(self):
+    def get_user_profile(self, use_cache=True):
         """"
         Return current user profile
         """
-        sleep(
-            random.randint(0, 1)
-        )  # sleep a random duration to try and evade suspention
+        me_profile = self.client.metadata.get("me")
+        if not self.client.metadata.get("me") or not use_cache:
+            res = self._fetch(f"/me")
+            me_profile = res.json()
+            # cache profile
+            self.client.metadata["me"] = me_profile
 
-        res = self._fetch(f"/me")
-
-        data = res.json()
-
-        return data
+        return me_profile
 
     def get_invitations(self, start=0, limit=3):
         """
@@ -762,14 +769,76 @@ class Linkedin(object):
 
         return res.status_code != 200
 
-    # TODO doesn't work
-    # def view_profile(self, public_profile_id):
-    #     res = self._fetch(
-    #         f"/identity/profiles/{public_profile_id}/profileView",
-    #         headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
-    #     )
+    def track(self, eventBody, eventInfo):
+        payload = {"eventBody": eventBody, "eventInfo": eventInfo}
+        res = self._post(
+            "/li/track",
+            base_request=True,
+            headers={"accept": "*/*", "content-type": "text/plain;charset=UTF-8"},
+            data=json.dumps(payload),
+        )
 
-    #     return res.status_code != 200
+        return res.status_code != 200
+
+    def view_profile(
+        self, public_profile_id, network_distance=None, target_member_id=None
+    ):
+        me_profile = self.get_user_profile()
+
+        if not target_member_id:
+            profile = self.get_profile(public_id=public_profile_id, with_skills=False)
+            target_member_id = int(get_id_from_urn(profile["member_urn"]))
+
+        if not network_distance:
+            profile_network_info = self.get_profile_network_info(
+                public_profile_id=public_profile_id
+            )
+            network_distance = int(
+                profile_network_info["distance"]
+                .get("value", "DISTANCE_2")
+                .split("_")[1]
+            )
+
+        viewer_privacy_setting = "F"
+        me_member_id = me_profile["plainId"]
+
+        client_application_instance = self.client.metadata["clientApplicationInstance"]
+
+        eventBody = {
+            "viewerPrivacySetting": viewer_privacy_setting,
+            "networkDistance": network_distance,
+            "vieweeMemberUrn": f"urn:li:member:{target_member_id}",
+            "profileTrackingId": self.client.metadata["clientPageInstanceId"],
+            "entityView": {
+                "viewType": "profile-view",
+                "viewerId": me_member_id,
+                "targetId": target_member_id,
+            },
+            "header": {
+                "pageInstance": {
+                    "pageUrn": "urn:li:page:d_flagship3_profile_view_base",
+                    "trackingId": self.client.metadata["clientPageInstanceId"],
+                },
+                "time": int(time()),
+                "version": client_application_instance["version"],
+                "clientApplicationInstance": client_application_instance,
+            },
+            "requestHeader": {
+                "interfaceLocale": "en_US",
+                "pageKey": "d_flagship3_profile_view_base",
+                "path": f"/in/{public_profile_id}/",
+                "referer": "https://www.linkedin.com/feed/",
+            },
+        }
+
+        return self.track(
+            eventBody,
+            {
+                "appId": "com.linkedin.flagship3.d_web",
+                "eventName": "ProfileViewEvent",
+                "topicName": "ProfileViewEvent",
+            },
+        )
 
     def get_profile_privacy_settings(self, public_profile_id):
         res = self._fetch(

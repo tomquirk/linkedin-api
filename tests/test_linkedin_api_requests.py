@@ -35,10 +35,10 @@ def test_get_profile(linkedin):
     assert profile["summary"][0] == "👋"
 
 
-# def test_view_profile(linkedin):
-#     err = linkedin.view_profile(TEST_PUBLIC_PROFILE_ID)
+def test_view_profile(linkedin):
+    err = linkedin.view_profile(TEST_PUBLIC_PROFILE_ID)
 
-#     assert not err
+    assert not err
 
 
 def test_get_profile_privacy_settings(linkedin):

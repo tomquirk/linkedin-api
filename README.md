@@ -4,8 +4,6 @@
 
 [![Build Status](https://travis-ci.com/tomquirk/linkedin-api.svg?branch=master)](https://travis-ci.com/tomquirk/linkedin-api)
 
-[![buymeacoffee: https://www.buymeacoffee.com/tomquirk](https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png)](https://www.buymeacoffee.com/tomquirk)
-
 > No "official" API access required - just use a valid Linkedin account!
 
 Programmatically send messages, perform searches, get profile data and more, all with a regular Linkedin user account!
@@ -28,7 +26,7 @@ pip3 install linkedin-api~=2.0.0a
 from linkedin_api import Linkedin
 
 # Authenticate using any Linkedin account credentials
-api = Linkedin('reedhoffman@linkedin.com', 'iheartmicrosoft')
+api = Linkedin('reedhoffman@linkedin.com', '*******')
 
 # GET a profile
 profile = api.get_profile('billy-g')

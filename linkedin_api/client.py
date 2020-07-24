@@ -119,13 +119,12 @@ class Client(object):
             "meta", attrs={"name": "applicationInstance"}
         ).attrs['content']
         clientApplicationInstance = json.loads(clientApplicationInstanceRaw)
-        clientApplicationInstanceId = clientApplicationInstance['trackingId']
 
         clientPageInstanceId = soup.find(
             "meta", attrs={"name": "clientPageInstanceId"}
         ).attrs['content']
 
-        self.metadata['clientApplicationInstanceId'] = clientApplicationInstanceId
+        self.metadata['clientApplicationInstance'] = clientApplicationInstance
         self.metadata['clientPageInstanceId'] = clientPageInstanceId
 
     def _do_authentication_request(self, username, password):

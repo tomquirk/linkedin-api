@@ -292,6 +292,7 @@ A reference of country and industry codes can be found [here](https://developer.
 
 - `params <dict>` - search parameters (see implementation of [search_people](#search_people) for a reference)
 - `limit <int>` - the max number of results to return
+- `offset <int>` - the offset to start the search from e.g. `offset=50` will start the search from the 50th result
 
 **Return**
 

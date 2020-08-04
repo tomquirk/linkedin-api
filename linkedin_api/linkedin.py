@@ -69,7 +69,7 @@ class Linkedin(object):
         url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
         return self.client.session.post(url, **kwargs)
 
-    def search(self, params, limit=-1):
+    def search(self, params, limit=-1, offset=0):
         """
         Do a search.
         """
@@ -87,7 +87,7 @@ class Linkedin(object):
                 "filters": "List()",
                 "origin": "GLOBAL_SEARCH_HEADER",
                 "q": "all",
-                "start": len(results),
+                "start": len(results) + offset,
                 "queryContext": "List(spellCorrectionEnabled->true,relatedSearchesEnabled->true,kcardTypes->PROFILE|COMPANY)",
             }
             default_params.update(params)
@@ -99,8 +99,9 @@ class Linkedin(object):
             data = res.json()
 
             new_elements = []
-            for i in range(len(data["data"]["elements"])):
-                new_elements.extend(data["data"]["elements"][i]["elements"])
+            elements = data.get("data", {}).get("elements", [])
+            for i in range(len(elements)):
+                new_elements.extend(elements[i]["elements"])
                 # not entirely sure what extendedElements generally refers to - keyword search gives back a single job?
                 # new_elements.extend(data["data"]["elements"][i]["extendedElements"])
             results.extend(new_elements)
@@ -134,13 +135,13 @@ class Linkedin(object):
         schools=None,
         title=None,  # `keyword_title` and `title` are the same. We kept `title` for backward compatibility. Please only use one of them.
         include_private_profiles=False,  # profiles without a public id, "Linkedin Member"
-        limit=None,
         # Keywords filter
         keyword_first_name=None,
         keyword_last_name=None,
         keyword_title=None,  # `keyword_title` and `title` are the same. We kept `title` for backward compatibility. Please only use one of them.
         keyword_company=None,
         keyword_school=None,
+        **kwargs,
     ):
         """
         Do a people search.
@@ -182,7 +183,7 @@ class Linkedin(object):
         if keywords:
             params["keywords"] = keywords
 
-        data = self.search(params, limit=limit)
+        data = self.search(params, **kwargs)
 
         results = []
         for item in data:

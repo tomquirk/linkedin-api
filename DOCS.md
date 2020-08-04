@@ -13,6 +13,7 @@ Where it all begins. Create an instance of `Linkedin` to get started. You'll aut
 - `refresh_cookies <boolean>: kwarg` - Whether to refresh any cached cookies
 - `debug <boolean>: kwarg` - Enable debug logging
 - `proxies <dict>: kwarg` - Proxies to use, of [Python Requests](https://python-requests.org/en/master/user/advanced/#proxies) format
+- `cookies <class 'requests.cookies.RequestsCookieJar'>: kwarg` - LinkedIn cookies to authenticate without using `username` and `password`
 
 ## API Reference
 
@@ -69,6 +70,34 @@ One of:
 
 ```python
 linkedin = Linkedin(credentials['username'], credentials['password'])
+
+profile = linkedin.get_profile('tom-quirk')
+```
+
+**Examples using custom `cookies`**
+
+```python
+import pickle
+
+with open("./my_custom_cookie.jr", "rb") as f:
+  cookies = pickle.load(f)
+
+linkedin = Linkedin("", "", cookies=cookies)
+
+profile = linkedin.get_profile('tom-quirk')
+```
+
+```python
+from requests.cookies import cookiejar_from_dict
+
+cookies = cookiejar_from_dict(
+    {
+        "liap": "true",
+        "li_at": os.environ["LINKEDIN_COOKIE_LI_AT"],
+        "JSESSIONID": os.environ["LINKEDIN_COOKIE_JSESSIONID"],
+    }
+)
+linkedin = Linkedin("", "", cookies=cookies)
 
 profile = linkedin.get_profile('tom-quirk')
 ```

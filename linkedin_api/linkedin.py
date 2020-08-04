@@ -41,6 +41,7 @@ class Linkedin(object):
         refresh_cookies=False,
         debug=False,
         proxies={},
+        cookies=None,
     ):
         self.client = Client(
             refresh_cookies=refresh_cookies, debug=debug, proxies=proxies
@@ -49,7 +50,12 @@ class Linkedin(object):
         self.logger = logger
 
         if authenticate:
-            self.client.authenticate(username, password)
+            if cookies:
+                # If the cookies are expired, the API won't work anymore since
+                # `username` and `password` are not used at all in this case.
+                self.client._set_session_cookies(cookies)
+            else:
+                self.client.authenticate(username, password)
 
     def _fetch(self, uri, evade=default_evade, base_request=False, **kwargs):
         """

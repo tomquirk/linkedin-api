@@ -23,7 +23,12 @@ def default_evade():
 
 class Linkedin(object):
     """
-    Class for accessing Linkedin API.
+    Class for accessing the LinkedIn API.
+
+    :param username: Username of LinkedIn account.
+    :type username: str
+    :param password: Password of LinkedIn account.
+    :type password: str
     """
 
     _MAX_UPDATE_COUNT = 100  # max seems to be 100
@@ -43,6 +48,8 @@ class Linkedin(object):
         proxies={},
         cookies=None,
     ):
+        """Constructor method
+        """
         self.client = Client(
             refresh_cookies=refresh_cookies, debug=debug, proxies=proxies
         )
@@ -58,8 +65,7 @@ class Linkedin(object):
                 self.client.authenticate(username, password)
 
     def _fetch(self, uri, evade=default_evade, base_request=False, **kwargs):
-        """
-        GET request to Linkedin API
+        """GET request to Linkedin API
         """
         evade()
 
@@ -67,8 +73,7 @@ class Linkedin(object):
         return self.client.session.get(url, **kwargs)
 
     def _post(self, uri, evade=default_evade, base_request=False, **kwargs):
-        """
-        POST request to Linkedin API
+        """POST request to Linkedin API
         """
         evade()
 
@@ -76,8 +81,14 @@ class Linkedin(object):
         return self.client.session.post(url, **kwargs)
 
     def search(self, params, limit=-1, offset=0):
-        """
-        Do a search.
+        """Perform a LinkedIn search.
+
+        :param params: Search parameters (see code)
+        :type params: dict
+        :param limit: Maximum length of the returned list, defaults to -1 (no limit)
+        :type limit: int, optional
+        :param offset: Index to start searching from
+        :type offset: int, optional
         """
         count = Linkedin._MAX_SEARCH_COUNT
         if limit is None:
@@ -573,9 +584,11 @@ class Linkedin(object):
 
     def get_company(self, public_id):
         """
-        Return data for a single company.
+        Fetch data for a company.
 
-        [public_id] - public identifier i.e. univeristy-of-queensland
+        :param public_id: LinkedIn public identifier.
+        :type public_id: str.
+        :returns:  object -- LinkedIn company.
         """
         params = {
             "decorationId": "com.linkedin.voyager.deco.organization.web.WebFullCompanyMain-12",

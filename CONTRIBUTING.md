@@ -1,8 +1,12 @@
+# Contribution guide
+
 1. Fork
-2. Write some code
-3. Add stuff to the DOCS.md
-4. Run the tests (with your `pipenv shell` activated)
-```bash
-$ python -m pytest tests -s
-```
-5. Write a good PR
+1. Write some code (with tests if possible)
+1. Write some docs
+1. Run the tests (with your `pipenv shell` activated)
+
+   ```bash
+   python -m pytest tests -s
+   ```
+
+1. Create a pull request on GitHub

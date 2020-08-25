@@ -89,6 +89,10 @@ class Linkedin(object):
         :type limit: int, optional
         :param offset: Index to start searching from
         :type offset: int, optional
+
+
+        :return: List of search results
+        :rtype: list
         """
         count = Linkedin._MAX_SEARCH_COUNT
         if limit is None:
@@ -201,6 +205,9 @@ class Linkedin(object):
         :type keyword_school: str, optional
         :param connection_of: Connection of LinkedIn user, given by profile URN ID
         :type connection_of: str, optional
+
+        :return: List of profiles (minimal data only)
+        :rtype: list
         """
         filters = ["resultType->PEOPLE"]
         if connection_of:
@@ -265,6 +272,9 @@ class Linkedin(object):
 
         :param keywords: A list of search keywords (str)
         :type keywords: list, optional
+
+        :return: List of companies
+        :rtype: list
         """
         filters = ["resultType->COMPANIES"]
 
@@ -327,6 +337,9 @@ class Linkedin(object):
         :type location_name: str, optional
         :param remote: Whether to include remote jobs. Defaults to True
         :type remote: boolean, optional
+
+        :return: Profile data
+        :rtype: dict
         """
         count = Linkedin._MAX_SEARCH_COUNT
         if limit is None:
@@ -396,11 +409,15 @@ class Linkedin(object):
         return results
 
     def get_profile_contact_info(self, public_id=None, urn_id=None):
-        """
-        Return data for a single profile.
+        """Fetch contact information for a given LinkedIn profile. Pass a [public_id] or a [urn_id].
+        
+        :param public_id: LinkedIn public ID for a profile
+        :type public_id: str, optional
+        :param urn_id: LinkedIn URN ID for a profile
+        :type urn_id: str, optional
 
-        [public_id] - public identifier i.e. tom-quirk-1928345
-        [urn_id] - id provided by the related URN
+        :return: Contact data
+        :rtype: dict
         """
         res = self._fetch(
             f"/identity/profiles/{public_id or urn_id}/profileContactInfo"
@@ -434,11 +451,16 @@ class Linkedin(object):
         return contact_info
 
     def get_profile_skills(self, public_id=None, urn_id=None):
-        """
-        Return the skills of a profile.
+        """Fetch the skills listed on a given LinkedIn profile.
+        
+        :param public_id: LinkedIn public ID for a profile
+        :type public_id: str, optional
+        :param urn_id: LinkedIn URN ID for a profile
+        :type urn_id: str, optional
 
-        [public_id] - public identifier i.e. tom-quirk-1928345
-        [urn_id] - id provided by the related URN
+
+        :return: List of skill objects
+        :rtype: list
         """
         params = {"count": 100, "start": 0}
         res = self._fetch(
@@ -452,13 +474,18 @@ class Linkedin(object):
 
         return skills
 
-    def get_profile(self, public_id=None, urn_id=None, with_skills=True):
-        """
-        Return data for a single profile.
+    def get_profile(self, public_id=None, urn_id=None):
+        """Fetch data for a given LinkedIn profile.
+        
+        :param public_id: LinkedIn public ID for a profile
+        :type public_id: str, optional
+        :param urn_id: LinkedIn URN ID for a profile
+        :type urn_id: str, optional
 
-        [public_id] - public identifier i.e. tom-quirk-1928345
-        [urn_id] - id provided by the related URN
+        :return: Profile data
+        :rtype: dict
         """
+
         # NOTE this still works for now, but will probably eventually have to be converted to
         # https://www.linkedin.com/voyager/api/identity/profiles/ACoAAAKT9JQBsH7LwKaE9Myay9WcX8OVGuDq9Uw
         res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")
@@ -499,16 +526,6 @@ class Linkedin(object):
                 del item["company"]["miniCompany"]
 
         profile["experience"] = experience
-
-        # massage [skills] data
-        # skills = [item["name"] for item in data["skillView"]["elements"]]
-        # profile["skills"] = skills
-
-        profile["skills"] = (
-            self.get_profile_skills(public_id=public_id, urn_id=urn_id)
-            if with_skills
-            else {}
-        )
 
         # massage [education] data
         education = data["educationView"]["elements"]
@@ -556,21 +573,29 @@ class Linkedin(object):
 
         return profile
 
-    def get_profile_connections(self, urn_id=None):
-        """
-        Return a list of profile ids connected to profile of given [urn_id].
-        If urn_id is None, then the currently logged in user's connections are returned
+    def get_profile_connections(self, urn_id):
+        """Fetch first-degree connections for a given LinkedIn profile.
+
+        :param urn_id: LinkedIn URN ID for a profile
+        :type urn_id: str
+
+        :return: List of search results
+        :rtype: list
         """
         return self.search_people(connection_of=urn_id, network_depth="F")
 
     def get_company_updates(
         self, public_id=None, urn_id=None, max_results=None, results=[]
     ):
-        """"
-        Return a list of company posts
+        """Fetch company updates (news activity) for a given LinkedIn company.
+        
+        :param public_id: LinkedIn public ID for a company
+        :type public_id: str, optional
+        :param urn_id: LinkedIn URN ID for a company
+        :type urn_id: str, optional
 
-        [public_id] - public identifier ie - microsoft
-        [urn_id] - id provided by the related URN
+        :return: List of company update objects
+        :rtype: list
         """
         params = {
             "companyUniversalName": {public_id or urn_id},
@@ -604,11 +629,15 @@ class Linkedin(object):
     def get_profile_updates(
         self, public_id=None, urn_id=None, max_results=None, results=[]
     ):
-        """"
-        Return a list of profile posts
+        """Fetch profile updates (newsfeed activity) for a given LinkedIn profile.
+        
+        :param public_id: LinkedIn public ID for a profile
+        :type public_id: str, optional
+        :param urn_id: LinkedIn URN ID for a profile
+        :type urn_id: str, optional
 
-        [public_id] - public identifier i.e. tom-quirk-1928345
-        [urn_id] - id provided by the related URN
+        :return: List of profile update objects
+        :rtype: list
         """
         params = {
             "profileId": {public_id or urn_id},
@@ -640,8 +669,10 @@ class Linkedin(object):
         )
 
     def get_current_profile_views(self):
-        """
-        Get profile view statistics, including chart data.
+        """Get profile view statistics, including chart data.
+
+        :return: Profile view data
+        :rtype: dict
         """
         res = self._fetch(f"/identity/wvmpCards")
 
@@ -656,10 +687,13 @@ class Linkedin(object):
         ]
 
     def get_school(self, public_id):
-        """
-        Return data for a single school.
+        """Fetch data about a given LinkedIn school.
+        
+        :param public_id: LinkedIn public ID for a school
+        :type public_id: str
 
-        [public_id] - public identifier i.e. uq
+        :return: School data
+        :rtype: dict
         """
         params = {
             "decorationId": "com.linkedin.voyager.deco.organization.web.WebFullCompanyMain-12",
@@ -680,12 +714,13 @@ class Linkedin(object):
         return school
 
     def get_company(self, public_id):
-        """
-        Fetch data for a company.
+        """Fetch data about a given LinkedIn company.
+        
+        :param public_id: LinkedIn public ID for a company
+        :type public_id: str
 
-        :param public_id: LinkedIn public identifier.
-        :type public_id: str.
-        :returns:  object -- LinkedIn company.
+        :return: Company data
+        :rtype: dict
         """
         params = {
             "decorationId": "com.linkedin.voyager.deco.organization.web.WebFullCompanyMain-12",
@@ -706,8 +741,13 @@ class Linkedin(object):
         return company
 
     def get_conversation_details(self, profile_urn_id):
-        """
-        Return the conversation (or "message thread") details for a given [public_profile_id]
+        """Fetch conversation (message thread) details for a given LinkedIn profile.
+
+        :param profile_urn_id: LinkedIn URN ID for a profile
+        :type profile_urn_id: str
+
+        :return: Conversation data
+        :rtype: dict
         """
         # passing `params` doesn't work properly, think it's to do with List().
         # Might be a bug in `requests`?
@@ -724,8 +764,10 @@ class Linkedin(object):
         return item
 
     def get_conversations(self):
-        """
-        Return list of conversations the user is in.
+        """Fetch list of conversations the user is in.
+
+        :return: List of conversations
+        :rtype: list
         """
         params = {"keyVersion": "LEGACY_INBOX"}
 
@@ -734,22 +776,35 @@ class Linkedin(object):
         return res.json()
 
     def get_conversation(self, conversation_urn_id):
-        """
-        Return the full conversation at a given [conversation_urn_id]
+        """Fetch data about a given conversation.
+
+        :param conversation_urn_id: LinkedIn URN ID for a conversation
+        :type conversation_urn_id: str
+
+        :return: Conversation data
+        :rtype: dict
         """
         res = self._fetch(f"/messaging/conversations/{conversation_urn_id}/events")
 
         return res.json()
 
-    def send_message(self, conversation_urn_id=None, recipients=[], message_body=None):
-        """
-        Send a message to a given conversation. If error, return true.
+    def send_message(self, message_body, conversation_urn_id=None, recipients=None):
+        """Send a message to a given conversation.
 
-        Recipients: List of profile urn id's
+        :param message_body: LinkedIn URN ID for a conversation
+        :type message_body: str
+        :param conversation_urn_id: LinkedIn URN ID for a conversation
+        :type conversation_urn_id: str, optional
+        :param recipients: List of profile urn id's
+        :type recipients: list, optional
+
+        :return: Error state. If True, an error occured.
+        :rtype: boolean
         """
         params = {"action": "create"}
 
-        if not (conversation_urn_id or recipients) and not message_body:
+        if not (conversation_urn_id or recipients):
+            self.logger.debug("Must provide [conversation_urn_id] or [recipients].")
             return True
 
         message_event = {
@@ -785,8 +840,13 @@ class Linkedin(object):
         return res.status_code != 201
 
     def mark_conversation_as_seen(self, conversation_urn_id):
-        """
-        Send seen to a given conversation. If error, return True.
+        """Send 'seen' to a given conversation.
+
+        :param conversation_urn_id: LinkedIn URN ID for a conversation
+        :type conversation_urn_id: str
+
+        :return: Error state. If True, an error occured.
+        :rtype: boolean
         """
         payload = json.dumps({"patch": {"$set": {"read": True}}})
 
@@ -797,8 +857,10 @@ class Linkedin(object):
         return res.status_code != 200
 
     def get_user_profile(self, use_cache=True):
-        """"
-        Return current user profile
+        """Get the current user profile. If not cached, a network request will be fired.
+
+        :return: Profile data for currently logged in user
+        :rtype: dict
         """
         me_profile = self.client.metadata.get("me")
         if not self.client.metadata.get("me") or not use_cache:
@@ -810,8 +872,15 @@ class Linkedin(object):
         return me_profile
 
     def get_invitations(self, start=0, limit=3):
-        """
-        Return list of new invites
+        """Fetch connection invitations for the currently logged in user.
+
+        :param start: How much to offset results by
+        :type start: int
+        :param limit: Maximum amount of invitations to return
+        :type limit: int
+
+        :return: List of invitation objects
+        :rtype: list
         """
         params = {
             "start": start,
@@ -833,12 +902,17 @@ class Linkedin(object):
     def reply_invitation(
         self, invitation_entity_urn, invitation_shared_secret, action="accept"
     ):
-        """
-        Reply to an invite, the default is to accept the invitation.
-        @Param: invitation_entity_urn: str
-        @Param: invitation_shared_secret: str
-        @Param: action: "accept" or "ignore"
-        Returns True if sucess, False otherwise
+        """Respond to a connection invitation. By default, accept the invitation.
+
+        :param invitation_entity_urn: URN ID of the invitation
+        :type invitation_entity_urn: int
+        :param invitation_shared_secret: Shared secret of invitation
+        :type invitation_shared_secret: str
+        :param action: "accept" or "reject". Defaults to "accept"
+        :type action: str, optional
+
+        :return: Success state. True if successful
+        :rtype: boolean
         """
         invitation_id = get_id_from_urn(invitation_entity_urn)
         params = {"action": action}
@@ -858,27 +932,15 @@ class Linkedin(object):
 
         return res.status_code == 200
 
-    # def add_connection(self, profile_urn_id):
-    #     payload = {
-    #         "emberEntityName": "growth/invitation/norm-invitation",
-    #         "invitee": {
-    #             "com.linkedin.voyager.growth.invitation.InviteeProfile": {
-    #                 "profileId": profile_urn_id
-    #             }
-    #         },
-    #     }
-
-    #     print(payload)
-
-    #     res = self._post(
-    #         "/growth/normInvitations",
-    #         data=payload,
-    #         headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
-    #     )
-
-    #     return res.status_code != 201
-
     def remove_connection(self, public_profile_id):
+        """Remove a given profile as a connection.
+
+        :param public_profile_id: public ID of a LinkedIn profile
+        :type public_profile_id: str
+
+        :return: Error state. True if error occurred
+        :rtype: boolean
+        """
         res = self._post(
             f"/identity/profiles/{public_profile_id}/profileActions?action=disconnect",
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
@@ -898,17 +960,35 @@ class Linkedin(object):
         return res.status_code != 200
 
     def view_profile(
-        self, public_profile_id, network_distance=None, target_member_id=None
+        self,
+        target_profile_public_id,
+        target_profile_member_urn_id=None,
+        network_distance=None,
     ):
+        """View a profile, notifying the user that you "viewed" their profile.
+
+        Provide [target_profile_member_urn_id] and [network_distance] to save 2 network requests and
+        speed up the execution of this function.
+
+        :param target_profile_public_id: public ID of a LinkedIn profile
+        :type target_profile_public_id: str
+        :param network_distance: How many degrees of separation exist e.g. 2
+        :type network_distance: int, optional
+        :param target_profile_member_urn_id: member URN id for target profile
+        :type target_profile_member_urn_id: str, optional
+
+        :return: Error state. True if error occurred
+        :rtype: boolean
+        """
         me_profile = self.get_user_profile()
 
-        if not target_member_id:
-            profile = self.get_profile(public_id=public_profile_id, with_skills=False)
-            target_member_id = int(get_id_from_urn(profile["member_urn"]))
+        if not target_profile_member_urn_id:
+            profile = self.get_profile(public_id=target_profile_public_id)
+            target_profile_member_urn_id = int(get_id_from_urn(profile["member_urn"]))
 
         if not network_distance:
             profile_network_info = self.get_profile_network_info(
-                public_profile_id=public_profile_id
+                public_profile_id=target_profile_public_id
             )
             network_distance = int(
                 profile_network_info["distance"]
@@ -924,12 +1004,12 @@ class Linkedin(object):
         eventBody = {
             "viewerPrivacySetting": viewer_privacy_setting,
             "networkDistance": network_distance,
-            "vieweeMemberUrn": f"urn:li:member:{target_member_id}",
+            "vieweeMemberUrn": f"urn:li:member:{target_profile_member_urn_id}",
             "profileTrackingId": self.client.metadata["clientPageInstanceId"],
             "entityView": {
                 "viewType": "profile-view",
                 "viewerId": me_member_id,
-                "targetId": target_member_id,
+                "targetId": target_profile_member_urn_id,
             },
             "header": {
                 "pageInstance": {
@@ -943,7 +1023,7 @@ class Linkedin(object):
             "requestHeader": {
                 "interfaceLocale": "en_US",
                 "pageKey": "d_flagship3_profile_view_base",
-                "path": f"/in/{public_profile_id}/",
+                "path": f"/in/{target_profile_member_urn_id}/",
                 "referer": "https://www.linkedin.com/feed/",
             },
         }
@@ -958,6 +1038,14 @@ class Linkedin(object):
         )
 
     def get_profile_privacy_settings(self, public_profile_id):
+        """Fetch privacy settings for a given LinkedIn profile.
+
+        :param public_profile_id: public ID of a LinkedIn profile
+        :type public_profile_id: str
+
+        :return: Privacy settings data
+        :rtype: dict
+        """
         res = self._fetch(
             f"/identity/profiles/{public_profile_id}/privacySettings",
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
@@ -969,6 +1057,14 @@ class Linkedin(object):
         return data.get("data", {})
 
     def get_profile_member_badges(self, public_profile_id):
+        """Fetch badges for a given LinkedIn profile.
+
+        :param public_profile_id: public ID of a LinkedIn profile
+        :type public_profile_id: str
+
+        :return: Badges data
+        :rtype: dict
+        """
         res = self._fetch(
             f"/identity/profiles/{public_profile_id}/memberBadges",
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
@@ -980,6 +1076,14 @@ class Linkedin(object):
         return data.get("data", {})
 
     def get_profile_network_info(self, public_profile_id):
+        """Fetch network information for a given LinkedIn profile.
+
+        :param public_profile_id: public ID of a LinkedIn profile
+        :type public_profile_id: str
+
+        :return: Network data
+        :rtype: dict
+        """
         res = self._fetch(
             f"/identity/profiles/{public_profile_id}/networkinfo",
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
@@ -990,8 +1094,16 @@ class Linkedin(object):
         data = res.json()
         return data.get("data", {})
 
-    def unfollow_entity(self, urn):
-        payload = {"urn": f"urn:li:fs_followingInfo:{urn}"}
+    def unfollow_entity(self, urn_id):
+        """Unfollow a given entity.
+
+        :param urn_id: URN ID of entity to unfollow
+        :type urn_id: str
+
+        :return: Error state. Returns True if error occurred
+        :rtype: boolean
+        """
+        payload = {"urn": f"urn:li:fs_followingInfo:{urn_id}"}
         res = self._post(
             "/feed/follows?action=unfollowByEntityUrn",
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},

@@ -42,7 +42,7 @@ connections = api.get_profile_connections('1234asc12304')
 
 ## Documentation
 
-For a complete reference documentation, see the [DOCS.md](https://github.com/tomquirk/linkedin-api/blob/master/DOCS.md)
+For a complete reference documentation, see the [documentation website](https://linkedin-api.readthedocs.io/).
 
 ## Overview
 

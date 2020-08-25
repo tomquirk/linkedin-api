@@ -3,6 +3,8 @@
 👨‍💼 Python Wrapper for the Linkedin API
 
 [![Build Status](https://travis-ci.com/tomquirk/linkedin-api.svg?branch=master)](https://travis-ci.com/tomquirk/linkedin-api)
+[![Documentation Status](https://readthedocs.org/projects/linkedin-api/badge/?version=latest)](https://linkedin-api.readthedocs.io/en/latest/?badge=latest)
+
 
 > No "official" API access required - just use a valid Linkedin account!
 

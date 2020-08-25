@@ -8,6 +8,8 @@ ipdb = "*"
 black = "*"
 pytest = "*"
 pylint = "*"
+sphinx = "*"
+sphinx-rtd-theme = "*"
 
 [packages]
 requests = "*"

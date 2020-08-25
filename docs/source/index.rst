@@ -3,20 +3,17 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-instagram_private_api
+linkedin_api
 ======================
 
 A Python wrapper for the Linkedin API.
-
-Features
---------
-- 
 
 .. toctree::
    :maxdepth: 2
    :caption: Usage
 
-   usage
+   key_concepts
+   examples
 
 .. toctree::
    :maxdepth: 2

@@ -142,7 +142,7 @@ class Linkedin(object):
         self,
         keywords=None,
         connection_of=None,
-        network_depth=None,
+        network_depths=None,
         current_company=None,
         past_companies=None,
         nonprofit_interests=None,
@@ -150,7 +150,8 @@ class Linkedin(object):
         regions=None,
         industries=None,
         schools=None,
-        title=None,  # `keyword_title` and `title` are the same. We kept `title` for backward compatibility. Please only use one of them.
+        contact_interests=None,
+        service_categories=None,
         include_private_profiles=False,  # profiles without a public id, "Linkedin Member"
         # Keywords filter
         keyword_first_name=None,
@@ -158,18 +159,58 @@ class Linkedin(object):
         keyword_title=None,  # `keyword_title` and `title` are the same. We kept `title` for backward compatibility. Please only use one of them.
         keyword_company=None,
         keyword_school=None,
+        network_depth=None,  # DEPRECATED - use network_depths
+        title=None,  # DEPRECATED - use keyword_title
         **kwargs,
     ):
-        """
-        Do a people search.
+        """Perform a LinkedIn search for people.
+
+        :param keywords: Keywords to search on
+        :type keywords: str, optional
+        :param current_company: A list of company URN IDs (str)
+        :type current_company: list, optional
+        :param past_companies: A list of company URN IDs (str)
+        :type past_companies: list, optional
+        :param regions: A list of geo URN IDs (str)
+        :type regions: list, optional
+        :param industries: A list of industry URN IDs (str)
+        :type industries: list, optional
+        :param schools: A list of school URN IDs (str)
+        :type schools: list, optional
+        :param profile_languages: A list of 2-letter language codes (str)
+        :type profile_languages: list, optional
+        :param contact_interests: A list containing one or both of "proBono" and "boardMember"
+        :type contact_interests: list, optional
+        :param service_categories: A list of service category URN IDs (str)
+        :type service_categories: list, optional
+        :param network_depth: Deprecated, use `network_depths`. One of "F", "S" and "O" (first, second and third+ respectively) 
+        :type network_depth: str, optional
+        :param network_depths: A list containing one or many of "F", "S" and "O" (first, second and third+ respectively) 
+        :type network_depths: list, optional
+        :param include_private_profiles: Include private profiles in search results. If False, only public profiles are included. Defaults to False
+        :type include_private_profiles: boolean, optional
+        :param keyword_first_name: First name
+        :type keyword_first_name: str, optional
+        :param keyword_last_name: Last name
+        :type keyword_last_name: str, optional
+        :param keyword_title: Job title
+        :type keyword_title: str, optional
+        :param keyword_company: Company name
+        :type keyword_company: str, optional
+        :param keyword_school: School name
+        :type keyword_school: str, optional
+        :param connection_of: Connection of LinkedIn user, given by profile URN ID
+        :type connection_of: str, optional
         """
         filters = ["resultType->PEOPLE"]
         if connection_of:
             filters.append(f"connectionOf->{connection_of}")
-        if network_depth:
+        if network_depths:
+            filters.append(f'network->{"|".join(network_depth)}')
+        elif network_depth:
             filters.append(f"network->{network_depth}")
         if regions:
-            filters.append(f'geoRegion->{"|".join(regions)}')
+            filters.append(f'geoUrn->{"|".join(regions)}')
         if industries:
             filters.append(f'industry->{"|".join(industries)}')
         if current_company:
@@ -182,6 +223,8 @@ class Linkedin(object):
             filters.append(f'nonprofitInterest->{"|".join(nonprofit_interests)}')
         if schools:
             filters.append(f'schools->{"|".join(schools)}')
+        if service_categories:
+            filters.append(f'serviceCategory->{"|".join(service_categories)}')
         # `Keywords` filter
         keyword_title = keyword_title if keyword_title else title
         if keyword_first_name:
@@ -204,7 +247,7 @@ class Linkedin(object):
 
         results = []
         for item in data:
-            if "publicIdentifier" not in item:
+            if not include_private_profiles and "publicIdentifier" not in item:
                 continue
             results.append(
                 {
@@ -217,9 +260,11 @@ class Linkedin(object):
 
         return results
 
-    def search_companies(self, keywords=None, limit=None):
-        """
-        Do a company search.
+    def search_companies(self, keywords=None, **kwargs):
+        """Perform a LinkedIn search for companies.
+
+        :param keywords: A list of search keywords (str)
+        :type keywords: list, optional
         """
         filters = ["resultType->COMPANIES"]
 
@@ -231,7 +276,7 @@ class Linkedin(object):
         if keywords:
             params["keywords"] = keywords
 
-        data = self.search(params, limit=limit)
+        data = self.search(params, **kwargs)
 
         results = []
         for item in data:
@@ -249,54 +294,106 @@ class Linkedin(object):
 
         return results
 
-    def search_jobs(self, keywords, location, count=25, start=0, listed_at=86400):
+    def search_jobs(
+        self,
+        keywords=None,
+        companies=None,
+        experience=None,
+        job_type=None,
+        job_title=None,
+        industries=None,
+        location_name=None,
+        remote=True,
+        listed_at=86400,
+        limit=-1,
+        offset=0,
+        **kwargs,
+    ):
+        """Perform a LinkedIn search for jobs.
+
+        :param keywords: Search keywords (str)
+        :type keywords: str, optional
+        :param companies: A list of company URN IDs (str)
+        :type companies: list, optional
+        :param experience: A list of experience levels, one or many of "1", "2", "3", "4", "5" and "6" (internship, entry level, associate, mid-senior level, director and executive, respectively)
+        :type experience: list, optional
+        :param job_type:  A list of job types , one or many of "F", "C", "P", "T", "I", "V", "O" (full-time, contract, part-time, temporary, internship, volunteer and "other", respectively)
+        :type job_type: list, optional
+        :param job_title: A list of title URN IDs (str)
+        :type job_title: list, optional
+        :param industries: A list of industry URN IDs (str)
+        :type industries: list, optional
+        :param location_name: Name of the location to search within
+        :type location_name: str, optional
+        :param remote: Whether to include remote jobs. Defaults to True
+        :type remote: boolean, optional
         """
-        Do a job search.
+        count = Linkedin._MAX_SEARCH_COUNT
+        if limit is None:
+            limit = -1
 
-        [keywords] - any queries using OR, AND, (), ""
-        [location] - job location
-        [count] - number of jobs returned
-        [start] - for paging to fetch the next set of results
-        [sort_by] - sort by relevance "List(R)" or by most recent "List(DD)"
-        [posted_at] - limits the results based on date posted, in seconds
-        
-        """
-        params = {
-            "decorationId": "com.linkedin.voyager.deco.jserp.WebJobSearchHit-22",
-            "location": location,
-            "origin": "JOB_SEARCH_RESULTS_PAGE",
-            "start": start,
-            "q": "jserpAll",
-            "query": "search",
-            "sortBy": "List(DD)",
-        }
-
-        # count must be below 50
-        if count > 49:
-            count = 49
-        params["count"] = count
-
-        # check if input is int
-        if isinstance(listed_at, int):
-            params["f_TPR"] = f"List(r{listed_at})"
-        else:
-            params["f_TPR"] = "List(r86400)"
-        str_params = urlencode(params, safe="(),")
-
-        # we need to encode the keywords incase it used brackets, otherwise it will return an error
+        params = {}
         if keywords:
-            keywords_encoded = f"&keywords={quote(keywords)}"
-            str_params += keywords_encoded
-        res = self._fetch(
-            f"/search/hits?{str_params}",
-            headers={
-                "accept": "application/vnd.linkedin.normalized+json+2.1",
-                "x-li-track": '{"clientVersion":"1.6.*","osName":"web","timezoneOffset":1,"deviceFormFactor":"DESKTOP","mpName":"voyager-web","displayDensity":1.100000023841858}',
-            },
-        )
+            params["keywords"] = keywords
 
-        data = res.json()
-        return data
+        filters = ["resultType->JOBS"]
+        if companies:
+            filters.append(f'company->{"|".join(companies)}')
+        if experience:
+            filters.append(f'experience->{"|".join(experience)}')
+        if job_type:
+            filters.append(f'jobType->{"|".join(job_type)}')
+        if job_title:
+            filters.append(f'title->{"|".join(job_title)}')
+        if industries:
+            filters.append(f'industry->{"|".join(industries)}')
+        if location_name:
+            filters.append(f'locationFallback->{"|".join(location_name)}')
+        if remote:
+            filters.append(f"commuteFeatures->f_WRA")
+
+        results = []
+        while True:
+            # when we're close to the limit, only fetch what we need to
+            if limit > -1 and limit - len(results) < count:
+                count = limit - len(results)
+            default_params = {
+                "decorationId": "com.linkedin.voyager.deco.jserp.WebJobSearchHitLite-8",
+                "count": str(count),
+                "filters": f"List({filters})",
+                "origin": "JOB_SEARCH_RESULTS_PAGE",
+                "q": "jserpFilters",
+                "start": len(results) + offset,
+                "queryContext": "List(spellCorrectionEnabled->true,relatedSearchesEnabled->true,kcardTypes->PROFILE|COMPANY)",
+            }
+            default_params.update(params)
+
+            res = self._fetch(
+                f"/search/hits?{urlencode(default_params, safe='(),')}",
+                headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+            )
+            data = res.json()
+
+            new_elements = []
+            elements = data.get("data", {}).get("elements", [])
+            for i in range(len(elements)):
+                new_elements.extend(elements[i])
+            results.extend(new_elements)
+
+            # break the loop if we're done searching
+            # NOTE: we could also check for the `total` returned in the response.
+            # This is in data["data"]["paging"]["total"]
+            if (
+                (
+                    limit > -1 and len(results) >= limit
+                )  # if our results exceed set limit
+                or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS
+            ) or len(new_elements) == 0:
+                break
+
+            self.logger.debug(f"results grew to {len(results)}")
+
+        return results
 
     def get_profile_contact_info(self, public_id=None, urn_id=None):
         """

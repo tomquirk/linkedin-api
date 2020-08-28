@@ -1126,8 +1126,6 @@ class Linkedin(object):
         :rtype: dict
         """
         res = self._fetch(
-            # OK
-            #f"/groups/groups/urn%3Ali%3Agroup%3A4783146",
             f"/groups/groups/urn%3Ali%3Agroup%3A{group_id}",
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
         )
@@ -1136,3 +1134,5 @@ class Linkedin(object):
             return {}
         data = res.json()
         return data.get("data", {})
+
+

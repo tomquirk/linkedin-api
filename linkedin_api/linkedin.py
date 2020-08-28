@@ -8,7 +8,8 @@ from time import sleep, time
 from urllib.parse import urlencode, quote
 
 from linkedin_api.client import Client
-from linkedin_api.utils.helpers import get_id_from_urn
+from linkedin_api.utils.helpers import get_id_from_urn, \
+    get_urn_from_raw_group_update
 
 logger = logging.getLogger(__name__)
 
@@ -1135,26 +1136,26 @@ class Linkedin(object):
         data = res.json()
         return data.get("data", {})
 
-    def get_group_update(self, group_id, count = None, start = 0):
+    def get_group_update(self, group_id, limit = None, offset = 0):
         """Fetch posts URLs for a given LinkedIn group ID.
 
         :param group_id: LinkedIn Group ID
         :type group_id: int
 
-        :param count: The number of posts to retrieve
-        :type group_id: int
+        :param limit: Maximum length of the returned list, defaults to -1 (no limit)
+        :type limit: int, optional
 
-        :param start: An integer indicating the starting post, 0 is newest
-        :type group_id: int
+        :param offset: Index to start searching from
+        :type offset: int, optional
 
-        :return: Network data
-        :rtype: dict
+        :return: List of URNs correspoding to the group posts
+        :rtype: list
         """
         params = {
-            "count": count or Linkedin._MAX_UPDATE_COUNT,
+            "count": limit or Linkedin._MAX_UPDATE_COUNT,
             "groupId": group_id,
             "q": "groupsFeed",
-            "start": start
+            "start": offset
         }
         res = self._fetch(
             f"/groups/updatesV2",
@@ -1165,6 +1166,13 @@ class Linkedin(object):
         if res.status_code != 200:
             return {}
         data = res.json()
-        return data.get("data", {})
-
-
+        new_elements = []
+        data = data.get("data", {}).get("*elements", [])
+        results = []
+        for item in data:
+            results.append(
+                {
+                    "urn_id": get_urn_from_raw_group_update(item)
+                }
+            )
+        return results

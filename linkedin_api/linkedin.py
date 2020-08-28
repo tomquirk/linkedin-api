@@ -1176,3 +1176,38 @@ class Linkedin(object):
                 }
             )
         return results
+
+    def get_feed_updates(self, limit = None):
+        """Fetch posts URLs from personal feed sorted by recent
+
+        :param limit: Maximum length of the returned list, defaults to -1 (no limit)
+        :type limit: int, optional
+
+        :return: List of URNs correspoding to posts
+        :rtype: list
+        """
+        params = {
+            "count": limit or Linkedin._MAX_UPDATE_COUNT,
+            "q": "chronFeed",
+        }
+        res = self._fetch(
+            f"/feed/updatesV2",
+            params = params,
+            headers = {"accept": "application/vnd.linkedin.normalized+json+2.1"},
+        )
+        data = res.json()
+        if res.status_code != 200:
+            return {}
+        data = res.json()
+        new_elements = []
+        data = data.get("data", {}).get("*elements", [])
+        results = []
+        for item in data:
+            results.append(
+                {
+                    "urn_id": get_urn_from_raw_group_update(item)
+                }
+            )
+        return results
+
+

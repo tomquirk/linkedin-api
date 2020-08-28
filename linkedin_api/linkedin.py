@@ -1227,7 +1227,7 @@ class Linkedin(object):
         :param offset: Index to start searching from
         :type offset: int, optional
 
-        :return: List of URNs correspoding to posts
+        :return: List of URN IDs correspoding to posts
         :rtype: list
         """
         params = {

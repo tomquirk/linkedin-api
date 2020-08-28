@@ -1179,11 +1179,14 @@ class Linkedin(object):
             )
         return results
 
-    def get_feed_updates(self, limit = None):
+    def get_feed_updates(self, limit = None, offset = None):
         """Fetch posts URLs from personal feed sorted by recent
 
         :param limit: Maximum length of the returned list, defaults to -1 (no limit)
         :type limit: int, optional
+
+        :param offset: Index to start searching from
+        :type offset: int, optional
 
         :return: List of URNs correspoding to posts
         :rtype: list
@@ -1193,6 +1196,7 @@ class Linkedin(object):
             "count": min(value for value in [Linkedin._MAX_UPDATE_COUNT,
                 limit] if limit is not None),
             "q": "chronFeed",
+            "start": offset
         }
         res = self._fetch(
             f"/feed/updatesV2",

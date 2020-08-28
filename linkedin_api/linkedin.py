@@ -1127,7 +1127,39 @@ class Linkedin(object):
         """
         res = self._fetch(
             f"/groups/groups/urn%3Ali%3Agroup%3A{group_id}",
-            headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+            headers = {"accept": "application/vnd.linkedin.normalized+json+2.1"},
+        )
+        data = res.json()
+        if res.status_code != 200:
+            return {}
+        data = res.json()
+        return data.get("data", {})
+
+    def get_group_update(self, group_id, count = None, start = 0):
+        """Fetch group for a given LinkedIn group ID.
+
+        :param group_id: LinkedIn Group ID
+        :type group_id: int
+
+        :param count: The number of posts to retrieve
+        :type group_id: int
+
+        :param start: An integer indicating the starting post, 0 is newest
+        :type group_id: int
+
+        :return: Network data
+        :rtype: dict
+        """
+        params = {
+            "count": count or Linkedin._MAX_UPDATE_COUNT,
+            "groupId": group_id,
+            "q": "groupsFeed",
+            "start": start
+        }
+        res = self._fetch(
+            f"/groups/updatesV2",
+            params = params,
+            headers = {"accept": "application/vnd.linkedin.normalized+json+2.1"},
         )
         data = res.json()
         if res.status_code != 200:

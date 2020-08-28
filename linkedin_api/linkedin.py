@@ -1136,7 +1136,7 @@ class Linkedin(object):
         data = res.json()
         return data.get("data", {})
 
-    def get_group_update(self, group_id, limit = None, offset = 0):
+    def get_group_updates(self, group_id, limit = None, offset = 0):
         """Fetch posts URLs for a given LinkedIn group ID.
 
         :param group_id: LinkedIn Group ID

@@ -1152,7 +1152,9 @@ class Linkedin(object):
         :rtype: list
         """
         params = {
-            "count": limit or Linkedin._MAX_UPDATE_COUNT,
+            # If we try 101+ it will return no elements
+            "count": min(value for value in [Linkedin._MAX_UPDATE_COUNT,
+                limit] if limit is not None),
             "groupId": group_id,
             "q": "groupsFeed",
             "start": offset
@@ -1187,7 +1189,9 @@ class Linkedin(object):
         :rtype: list
         """
         params = {
-            "count": limit or Linkedin._MAX_UPDATE_COUNT,
+            # If we try 101+ it will return no elements
+            "count": min(value for value in [Linkedin._MAX_UPDATE_COUNT,
+                limit] if limit is not None),
             "q": "chronFeed",
         }
         res = self._fetch(
@@ -1209,5 +1213,3 @@ class Linkedin(object):
                 }
             )
         return results
-
-

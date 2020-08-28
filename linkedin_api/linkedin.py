@@ -1115,3 +1115,24 @@ class Linkedin(object):
             err = True
 
         return err
+
+    def get_group(self, group_id):
+        """Fetch group for a given LinkedIn group ID.
+
+        :param group_id: LinkedIn Group ID
+        :type group_id: str
+
+        :return: Network data
+        :rtype: dict
+        """
+        res = self._fetch(
+            # OK
+            #f"/groups/groups/urn%3Ali%3Agroup%3A4783146",
+            f"/groups/groups/urn%3Ali%3Agroup%3A{group_id}",
+            headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+        )
+        data = res.json()
+        if res.status_code != 200:
+            return {}
+        data = res.json()
+        return data.get("data", {})

@@ -1174,7 +1174,7 @@ class Linkedin(object):
         for item in data:
             results.append(
                 {
-                    "urn_id": get_urn_from_raw_group_update(item)
+                    "urn": get_urn_from_raw_group_update(item)
                 }
             )
         return results
@@ -1213,7 +1213,52 @@ class Linkedin(object):
         for item in data:
             results.append(
                 {
-                    "urn_id": get_urn_from_raw_group_update(item)
+                    "urn": get_urn_from_raw_group_update(item)
+                }
+            )
+        return results
+
+    def get_groups(self, limit = None, offset = None):
+        """Fetch groups URLs which the logged in profile belongs to
+
+        :param limit: Maximum length of the returned list, defaults to -1 (no limit)
+        :type limit: int, optional
+
+        :param offset: Index to start searching from
+        :type offset: int, optional
+
+        :return: List of URNs correspoding to posts
+        :rtype: list
+        """
+        params = {
+            # If we try 101+ it will return no elements
+            # Converting to string since as a workaround NOT using params dict
+            "count": str(min(value for value in [Linkedin._MAX_UPDATE_COUNT,
+                limit] if limit is not None)),
+            # Looks like the issue is here. It's mandatory, but looks like not
+            # parsed properly...
+            "membershipStatuses": "List(MANAGER,MEMBER,OWNER)",
+            "q": "member",
+            "start": offset
+        }
+        res = self._fetch(
+            # BUG. If 'params' set, it returns 0 elements
+            #f"/groups/groups",
+            #params = params,
+            f"/groups/groups?count={params['count']}&membershipStatuses=List(MANAGER,MEMBER,OWNER)&q=member&start={params['start']}",
+            headers = {"accept": "application/vnd.linkedin.normalized+json+2.1"},
+        )
+        data = res.json()
+        if res.status_code != 200:
+            return {}
+        data = res.json()
+        new_elements = []
+        data = data.get("data", {}).get("*elements", [])
+        results = []
+        for item in data:
+            results.append(
+                {
+                    "urn_id": get_id_from_urn(item)
                 }
             )
         return results

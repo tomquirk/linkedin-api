@@ -1115,3 +1115,59 @@ class Linkedin(object):
             err = True
 
         return err
+
+    def get_list_urn_feed_updates(self, limit = -1, offset = 0):
+        """Get a list of URNs from feed sorted by 'Recent'
+
+        :param limit: Maximum length of the returned list, defaults to -1 (no limit)
+        :type limit: int, optional
+        :param offset: Index to start searching from
+        :type offset: int, optional
+
+        :return: List of URNs
+        :rtype: list
+        """
+        count = Linkedin._MAX_SEARCH_COUNT
+        if limit is None:
+            limit = -1
+
+        results = []
+        while True:
+            # when we're close to the limit, only fetch what we need to
+            if limit > -1 and limit - len(results) < count:
+                count = limit - len(results)
+            params = {
+                "count": str(count),
+                "q": "chronFeed",
+                "start": len(results) + offset,
+            }
+
+            res = self._fetch(
+                f"/feed/updatesV2",
+                params = params,
+                headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+            )
+            data = res.json()
+
+            new_elements = []
+            elements = data.get("data", {}).get("*elements", [])
+            for element in elements:
+                new_elements.append(
+                    get_urn_from_raw_group_update(element)
+                )
+            results.extend(new_elements)
+
+            # break the loop if we're done searching
+            # NOTE: we could also check for the `total` returned in the response.
+            # This is in data["data"]["paging"]["total"]
+            if (
+                (
+                    limit > -1 and len(results) >= limit
+                )  # if our results exceed set limit
+                or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS
+            ) or len(new_elements) == 0:
+                break
+
+            self.logger.debug(f"results grew to {len(results)}")
+
+        return results

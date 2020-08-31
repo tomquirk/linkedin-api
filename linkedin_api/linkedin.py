@@ -8,7 +8,10 @@ from time import sleep, time
 from urllib.parse import urlencode, quote
 
 from linkedin_api.client import Client
-from linkedin_api.utils.helpers import get_id_from_urn
+from linkedin_api.utils.helpers import get_id_from_urn, \
+    get_update_author_name, get_update_old, get_update_content, \
+    get_update_author_profile, get_update_url, \
+    append_update_post_field_to_posts_list
 
 logger = logging.getLogger(__name__)
 
@@ -1115,3 +1118,89 @@ class Linkedin(object):
             err = True
 
         return err
+
+    def get_feed_updates(self, limit = -1, offset = 0, is_skip_promoted = True):
+        """Get a list of URNs from feed sorted by 'Recent'
+
+        :param limit: Maximum length of the returned list, defaults to -1 (no limit)
+        :type limit: int, optional
+        :param offset: Index to start searching from
+        :type offset: int, optional
+        :param is_skip_promoted: Exclude from the output promoted posts
+        :type is_skip_promoted: bool, optional
+
+        :return: List of URNs
+        :rtype: list
+        """
+
+        _PROMOTED_STRING = 'Promoted'
+        _PROFILE_URL = f"{self.client.LINKEDIN_BASE_URL}/in/"
+
+        count = Linkedin._MAX_SEARCH_COUNT
+        if limit is None:
+            limit = -1
+
+        results = []
+        while True:
+            # when we're close to the limit, only fetch what we need to
+            if limit > -1 and limit - len(results) < count:
+                count = limit - len(results)
+            params = {
+                "count": str(count),
+                "q": "chronFeed",
+                "start": len(results) + offset,
+            }
+
+            res = self._fetch(
+                f"/feed/updatesV2",
+                params = params,
+                headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+            )
+            l_data = res.json().get("included", {})
+
+            new_elements = []
+            for i in l_data:
+                author_name = get_update_author_name(i)
+                if author_name:
+                    new_elements = append_update_post_field_to_posts_list(i,
+                        new_elements, 'author_name', author_name)
+
+                author_profile = get_update_author_profile(i,
+                    self.client.LINKEDIN_BASE_URL)
+                if author_profile:
+                    new_elements = append_update_post_field_to_posts_list(i,
+                        new_elements, 'author_profile', author_profile)
+
+                old = get_update_old(i)
+                if old:
+                    new_elements = append_update_post_field_to_posts_list(i,
+                        new_elements, 'old', old)
+
+                content = get_update_content(i)
+                if content:
+                    new_elements = append_update_post_field_to_posts_list(i,
+                        new_elements, 'content', content)
+
+                url = get_update_url(i,
+                    self.client.LINKEDIN_BASE_URL)
+                if url:
+                    new_elements = append_update_post_field_to_posts_list(i,
+                        new_elements, 'url', url)
+
+            results.extend(new_elements)
+
+            # break the loop if we're done searching
+            # NOTE: we could also check for the `total` returned in the response.
+            # This is in data["data"]["paging"]["total"]
+            if (
+                (
+                    limit > -1 and len(results) >= limit
+                )  # if our results exceed set limit
+                or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS
+            ) or len(new_elements) == 0:
+                break
+
+            self.logger.debug(f"results grew to {len(results)}")
+
+        return results
+

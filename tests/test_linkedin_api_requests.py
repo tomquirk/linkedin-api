@@ -165,7 +165,9 @@ def test_search_people_by_keywords_filter(linkedin: Linkedin):
 
 
 def test_search_jobs(linkedin):
-    jobs = linkedin.search_jobs(keywords="data analyst", location="Germany", count=1)
+    jobs = linkedin.search_jobs(
+        keywords="data analyst", location="Germany", count=1
+    )
 
     assert jobs
 

@@ -4,7 +4,10 @@ import pytest
 import requests
 from datetime import datetime
 
-from linkedin_api.cookie_repository import CookieRepository, LinkedinSessionExpired
+from linkedin_api.cookie_repository import (
+    CookieRepository,
+    LinkedinSessionExpired,
+)
 
 
 def mock_cookies(date=datetime.strptime("2050-05-04", "%Y-%m-%d")):
@@ -37,7 +40,8 @@ def test_get_nonexistent_file():
 
 def test_get_expired():
     CookieRepository.save(
-        mock_cookies(date=datetime.strptime("2001-05-04", "%Y-%m-%d")), "testuserex"
+        mock_cookies(date=datetime.strptime("2001-05-04", "%Y-%m-%d")),
+        "testuserex",
     )
     try:
         CookieRepository.get("testuserex")

@@ -6,6 +6,7 @@ def get_id_from_urn(urn):
     """
     return urn.split(":")[3]
 
+
 def get_urn_from_raw_group_update(raw_string):
     """
     Return the URN of a raw group update
@@ -13,7 +14,8 @@ def get_urn_from_raw_group_update(raw_string):
     Example: urn:li:fs_miniProfile:<id>
     Example: urn:li:fs_updateV2:(<urn>,GROUP_FEED,EMPTY,DEFAULT,false)
     """
-    return raw_string.split('(')[1].split(',')[0]
+    return raw_string.split("(")[1].split(",")[0]
+
 
 def get_update_author_name(d_included):
     """Parse a dict and returns, if present, the post author name
@@ -25,11 +27,12 @@ def get_update_author_name(d_included):
     :rtype: str
     """
     try:
-        return d_included['actor']['name']['text']
+        return d_included["actor"]["name"]["text"]
     except KeyError:
-        return ''
+        return ""
     except TypeError:
-        return 'None'
+        return "None"
+
 
 def get_update_old(d_included):
     """Parse a dict and returns, if present, the post old string
@@ -41,11 +44,12 @@ def get_update_old(d_included):
     :rtype: str
     """
     try:
-        return d_included['actor']['subDescription']['text']
+        return d_included["actor"]["subDescription"]["text"]
     except KeyError:
-        return ''
+        return ""
     except TypeError:
-        return 'None'
+        return "None"
+
 
 def get_update_content(d_included):
     """Parse a dict and returns, if present, the post content
@@ -57,11 +61,12 @@ def get_update_content(d_included):
     :rtype: str
     """
     try:
-        return d_included['commentary']['text']['text']
+        return d_included["commentary"]["text"]["text"]
     except KeyError:
-        return ''
+        return ""
     except TypeError:
-        return 'None'
+        return "None"
+
 
 def get_update_author_profile(d_included, base_url):
     """Parse a dict and returns, if present, the URL corresponding the profile
@@ -75,17 +80,18 @@ def get_update_author_profile(d_included, base_url):
     :rtype: str
     """
     try:
-        urn = d_included['actor']['urn']
+        urn = d_included["actor"]["urn"]
     except KeyError:
-        return ''
+        return ""
     except TypeError:
-        return 'None'
+        return "None"
     else:
-        urn_id = urn.split(':')[-1]
-        if 'company' in urn:
+        urn_id = urn.split(":")[-1]
+        if "company" in urn:
             return f"{base_url}/company/{urn_id}"
-        elif 'member' in urn:
+        elif "member" in urn:
             return f"{base_url}/in/{urn_id}"
+
 
 def get_update_url(d_included, base_url):
     """Parse a dict and returns, if present, the post URL
@@ -99,16 +105,18 @@ def get_update_url(d_included, base_url):
     :rtype: str
     """
     try:
-        urn = d_included['updateMetadata']['urn']
+        urn = d_included["updateMetadata"]["urn"]
     except KeyError:
-        return ''
+        return ""
     except TypeError:
-        return 'None'
+        return "None"
     else:
         return f"{base_url}/feed/update/{urn}"
 
-def append_update_post_field_to_posts_list(d_included, l_posts, post_key,
-    post_value):
+
+def append_update_post_field_to_posts_list(
+    d_included, l_posts, post_key, post_value
+):
     """Parse a dict and returns, if present, the desired value. Finally it
     updates an already existing dict in the list or add a new dict to it
 

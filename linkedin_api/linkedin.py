@@ -1291,7 +1291,7 @@ class Linkedin(object):
         _PROFILE_URL = f"{self.client.LINKEDIN_BASE_URL}/in/"
 
         # If count>100 API will return HTTP 400
-        count = _MAX_UPDATE_COUNT
+        count = Linkedin._MAX_UPDATE_COUNT
         if limit is None:
             limit = -1
 

@@ -1290,7 +1290,8 @@ class Linkedin(object):
         _PROMOTED_STRING = "Promoted"
         _PROFILE_URL = f"{self.client.LINKEDIN_BASE_URL}/in/"
 
-        count = Linkedin._MAX_SEARCH_COUNT
+        # If count>100 API will return HTTP 400
+        count = 100
         if limit is None:
             limit = -1
 

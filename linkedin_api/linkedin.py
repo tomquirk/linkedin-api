@@ -1175,7 +1175,7 @@ class Linkedin(object):
         :param group_id: LinkedIn Group ID
         :type group_id: str
 
-        :return: Network data
+        :return: Dict with Linkedin group fields
         :rtype: dict
         """
         res = self._fetch(
@@ -1185,8 +1185,12 @@ class Linkedin(object):
         data = res.json()
         if res.status_code != 200:
             return {}
-        data = res.json()
-        return data.get("data", {})
+        data = res.json().get("data", {})
+        # TODO: extract more field from group
+        result = {
+            'name': data['name']['text']
+        }
+        return result
 
     def _get_list_feed_posts_and_list_feed_urns(
         self, limit=-1, offset=0, is_skip_promoted=True

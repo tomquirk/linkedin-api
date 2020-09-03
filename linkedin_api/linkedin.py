@@ -1188,94 +1188,6 @@ class Linkedin(object):
         data = res.json()
         return data.get("data", {})
 
-    def get_group_updates(self, group_id, limit=None, offset=0):
-        """Fetch posts URLs for a given LinkedIn group ID.
-
-        :param group_id: LinkedIn Group ID
-        :type group_id: int
-
-        :param limit: Maximum length of the returned list, defaults to -1 (no limit)
-        :type limit: int, optional
-
-        :param offset: Index to start searching from
-        :type offset: int, optional
-
-        :return: List of URNs correspoding to the group posts
-        :rtype: list
-        """
-        params = {
-            # If we try 101+ it will return no elements
-            "count": min(
-                value
-                for value in [Linkedin._MAX_UPDATE_COUNT, limit]
-                if limit is not None
-            ),
-            "groupId": group_id,
-            "q": "groupsFeed",
-            "start": offset,
-        }
-        res = self._fetch(
-            f"/groups/updatesV2",
-            params=params,
-            headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
-        )
-        data = res.json()
-        if res.status_code != 200:
-            return {}
-        data = res.json()
-        new_elements = []
-        data = data.get("data", {}).get("*elements", [])
-        results = []
-        for item in data:
-            results.append({"urn": get_urn_from_raw_group_update(item)})
-        return results
-
-    def get_groups(self, limit=None, offset=None):
-        """Fetch groups URLs which the logged in profile belongs to
-
-        :param limit: Maximum length of the returned list, defaults to -1 (no limit)
-        :type limit: int, optional
-
-        :param offset: Index to start searching from
-        :type offset: int, optional
-
-        :return: List of URN IDs correspoding to posts
-        :rtype: list
-        """
-        params = {
-            # If we try 101+ it will return no elements
-            # Converting to string since as a workaround NOT using params dict
-            "count": str(
-                min(
-                    value
-                    for value in [Linkedin._MAX_UPDATE_COUNT, limit]
-                    if limit is not None
-                )
-            ),
-            # Looks like the issue is here. It's mandatory, but looks like not
-            # parsed properly...
-            "membershipStatuses": "List(MANAGER,MEMBER,OWNER)",
-            "q": "member",
-            "start": offset,
-        }
-        res = self._fetch(
-            # BUG. If 'params' set, it returns 0 elements
-            # f"/groups/groups",
-            # params = params,
-            f"/groups/groups?count={params['count']}&membershipStatuses=List(MANAGER,MEMBER,OWNER)&q=member&start={params['start']}",
-            headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
-        )
-        data = res.json()
-        if res.status_code != 200:
-            return {}
-        data = res.json()
-        new_elements = []
-        data = data.get("data", {}).get("*elements", [])
-        results = []
-        for item in data:
-            results.append({"urn_id": get_id_from_urn(item)})
-        return results
-
     def _get_list_feed_posts_and_list_feed_urns(
         self, limit=-1, offset=0, is_skip_promoted=True
     ):
@@ -1373,3 +1285,173 @@ class Linkedin(object):
             limit, offset, is_skip_promoted
         )
         return get_list_posts_sorted_without_promoted(l_urns, l_posts)
+
+    def get_groups(self, limit=None, offset=0):
+        """Fetch groups URLs which the logged in profile belongs to
+
+        :param limit: Maximum length of the returned list, defaults to -1 (no limit)
+        :type limit: int, optional
+        :param offset: Index to start searching from
+        :type offset: int, optional
+
+        :return: List of URN IDs correspoding to groups
+        :rtype: list
+        """
+        # TODO: refactor to support +100 groups
+        if limit is None:
+            limit = Linkedin._MAX_UPDATE_COUNT
+        params = {
+            # If we try 101+ it will return no elements
+            # Converting to string since as a workaround NOT using params dict
+            "count": str(
+                min(
+                    value
+                    for value in [Linkedin._MAX_UPDATE_COUNT, limit]
+                    if limit is not None
+                )
+            ),
+            # Looks like the issue is here. It's mandatory, but looks like not
+            # parsed properly...
+            "membershipStatuses": "List(MANAGER,MEMBER,OWNER)",
+            "q": "member",
+            "start": offset,
+        }
+
+        res = self._fetch(
+            f"/groups/groups?count={params['count']}&membershipStatuses=List(MANAGER,MEMBER,OWNER)&q=member&start={params['start']}",
+            #f"/groups/groups",
+            # BUG. If 'params' set, it returns 0 elements
+            # f"/groups/groups",
+            #params = params,
+            headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+        )
+        data = res.json()
+        if res.status_code != 200:
+            return {}
+        data = res.json()
+        new_elements = []
+        data = data.get("data", {}).get("*elements", [])
+        results = []
+        for item in data:
+            results.append(get_id_from_urn(item))
+        return results
+
+    def get_feed_posts(self, limit=-1, offset=0, is_skip_promoted=True):
+        """Get a list of URNs from feed sorted by 'Recent'
+
+        :param limit: Maximum length of the returned list, defaults to -1 (no limit)
+        :type limit: int, optional
+        :param offset: Index to start searching from
+        :type offset: int, optional
+        :param is_skip_promoted: Exclude from the output promoted posts
+        :type is_skip_promoted: bool, optional
+
+        :return: List of URNs
+        :rtype: list
+        """
+        l_posts, l_urns = self._get_list_feed_posts_and_list_feed_urns(
+            limit, offset, is_skip_promoted
+        )
+        return get_list_posts_sorted_without_promoted(l_urns, l_posts)
+
+    def get_group_posts(self, group_id, limit=-1, offset=0):
+        """Fetch posts URLs for a given LinkedIn group ID.
+
+        :param group_id: LinkedIn Group ID
+        :type group_id: int
+
+        :param limit: Maximum length of the returned list, defaults to -1 (no limit)
+        :type limit: int, optional
+
+        :param offset: Index to start searching from
+        :type offset: int, optional
+
+        :return: List of URNs correspoding to the group posts
+        :rtype: list
+        """
+        l_posts, l_urns = self._get_list_group_posts_and_list_group_urns(
+            group_id, limit, offset
+        )
+        # Re-using the function, but so fat no promoted posts in groups
+        return get_list_posts_sorted_without_promoted(l_urns, l_posts)
+
+    def _get_list_group_posts_and_list_group_urns(
+        self, group_id, limit=-1, offset=0, is_skip_promoted=True
+    ):
+        """Get a list of URNs from group sorted by 'All' and a list of yet
+        unsorted posts, each one of them containing a dict per post.
+
+        :param group_id: Group ID. Example: '3814542'
+        :type group_id: int
+        :param limit: Maximum length of the returned list, defaults to -1 (no limit)
+        :type limit: int, optional
+        :param offset: Index to start searching from
+        :type offset: int, optional
+        :param is_skip_promoted: Exclude from the output promoted posts
+        :type is_skip_promoted: bool, optional
+
+        :return: List of posts and list of URNs
+        :rtype: (list, list)
+        """
+        l_posts = []
+        l_urns = []
+
+        # If count>100 API will return HTTP 400
+        count = Linkedin._MAX_UPDATE_COUNT
+        if limit is None:
+            limit = -1
+
+        results = []
+        while True:
+            # when we're close to the limit, only fetch what we need to
+            if limit > -1 and limit - len(results) < count:
+                count = limit - len(results)
+            params = {
+                "count": str(count),
+                "groupId": group_id,
+                "q": "groupsFeed",
+                "start": len(results) + offset,
+            }
+            res = self._fetch(
+                f"/groups/updatesV2",
+                params=params,
+                headers={
+                    "accept": "application/vnd.linkedin.normalized+json+2.1"
+                },
+            )
+            """
+            Response includes two keya:
+            - ['Data']['*elements']. It includes the posts URNs always
+            properly sorted as 'Recent', including yet sponsored posts. The
+            downside is that fetching one by one the posts is slower. We will
+            save the URNs to later on build a sorted list of posts purging
+            promotions
+            - ['included']. List with all the posts attributes, but not sorted as
+            'Recent' and including promoted posts
+            """
+            l_raw_posts = res.json().get("included", {})
+            l_raw_urns = res.json().get("data", {}).get("*elements", [])
+
+            l_new_posts = parse_list_raw_posts(
+                l_raw_posts, self.client.LINKEDIN_BASE_URL
+            )
+            l_posts.extend(l_new_posts)
+
+            l_urns.extend(parse_list_raw_urns(l_raw_urns))
+
+            # break the loop if we're done searching
+            # NOTE: we could also check for the `total` returned in the response.
+            # This is in data["data"]["paging"]["total"]
+            if (
+                (
+                    limit > -1 and len(l_posts) >= limit
+                )  # if our l_posts exceed set limit
+                or len(l_posts) / count >= Linkedin._MAX_REPEATED_REQUESTS
+            ) or len(l_new_posts) == 0:
+                break
+
+            self.logger.debug(f"l_posts grew to {len(l_posts)}")
+
+        return l_posts, l_urns
+
+

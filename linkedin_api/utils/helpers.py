@@ -142,3 +142,87 @@ def append_update_post_field_to_posts_list(
         else:
             l_posts.append({post_key: post_value})
     return l_posts
+
+
+def parse_list_raw_urns(l_raw_urns):
+    """Iterates a list containing posts URNS and retrieves list of URNs
+
+    :param l_raw_urns: List containing posts URNs
+    :type l_raw_posts: list
+
+    :return: List of URNs
+    :rtype: list
+    """
+    l_urns = []
+    for i in l_raw_urns:
+        l_urns.append(get_urn_from_raw_group_update(i))
+    return l_urns
+
+
+def parse_list_raw_posts(l_raw_posts, linkedin_base_url):
+    """Iterates a unsorted list containing post fields and assemble a
+    list of dicts, each one of them contains a post
+
+    :param l_raw_posts: Unsorted list containing posts information
+    :type l_raw_posts: list
+    :param linkedin_base_url: Linkedin URL
+    :type linkedin_base_url: str
+
+    :return: List of dicts, each one of them is a post
+    :rtype: list
+    """
+    l_posts = []
+    for i in l_raw_posts:
+        author_name = get_update_author_name(i)
+        if author_name:
+            l_posts = append_update_post_field_to_posts_list(
+                i, l_posts, "author_name", author_name
+            )
+
+        author_profile = get_update_author_profile(i, linkedin_base_url)
+        if author_profile:
+            l_posts = append_update_post_field_to_posts_list(
+                i, l_posts, "author_profile", author_profile
+            )
+
+        old = get_update_old(i)
+        if old:
+            l_posts = append_update_post_field_to_posts_list(
+                i, l_posts, "old", old
+            )
+
+        content = get_update_content(i)
+        if content:
+            l_posts = append_update_post_field_to_posts_list(
+                i, l_posts, "content", content
+            )
+
+        url = get_update_url(i, linkedin_base_url)
+        if url:
+            l_posts = append_update_post_field_to_posts_list(
+                i, l_posts, "url", url
+            )
+
+    return l_posts
+
+
+def get_list_posts_sorted_without_promoted(l_urns, l_posts):
+    """Iterates l_urns and looks for corresponding dicts in l_posts matching 'url' key.
+    If found, removes this dict from l_posts and appends it to the returned list of posts
+
+    :param l_urns: List of posts URNs
+    :type l_urns: list
+    :param l_posts: List of dicts, which each of them is a post
+    :type l_posts: list
+
+    :return: List of dicts, each one of them is a post
+    :rtype: list
+    """
+    l_posts_sorted_without_promoted = []
+    l_posts[:] = [d for d in l_posts if "Promoted" not in d.get("old")]
+    for urn in l_urns:
+        for post in l_posts:
+            if urn in post["url"]:
+                l_posts_sorted_without_promoted.append(post)
+                l_posts[:] = [d for d in l_posts if urn not in d.get("url")]
+    return l_posts_sorted_without_promoted

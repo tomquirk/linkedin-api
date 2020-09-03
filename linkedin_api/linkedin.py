@@ -17,6 +17,9 @@ from linkedin_api.utils.helpers import (
     get_update_author_profile,
     get_update_url,
     append_update_post_field_to_posts_list,
+    parse_list_raw_urns,
+    parse_list_raw_posts,
+    get_list_posts_sorted_without_promoted,
 )
 
 logger = logging.getLogger(__name__)
@@ -1273,8 +1276,11 @@ class Linkedin(object):
             results.append({"urn_id": get_id_from_urn(item)})
         return results
 
-    def get_feed_updates(self, limit=-1, offset=0, is_skip_promoted=True):
-        """Get a list of URNs from feed sorted by 'Recent'
+    def _get_list_feed_posts_and_list_feed_urns(
+        self, limit=-1, offset=0, is_skip_promoted=True
+    ):
+        """Get a list of URNs from feed sorted by 'Recent' and a list of yet
+        unsorted posts, each one of them containing a dict per post.
 
         :param limit: Maximum length of the returned list, defaults to -1 (no limit)
         :type limit: int, optional
@@ -1283,12 +1289,14 @@ class Linkedin(object):
         :param is_skip_promoted: Exclude from the output promoted posts
         :type is_skip_promoted: bool, optional
 
-        :return: List of URNs
-        :rtype: list
+        :return: List of posts and list of URNs
+        :rtype: (list, list)
         """
-
         _PROMOTED_STRING = "Promoted"
         _PROFILE_URL = f"{self.client.LINKEDIN_BASE_URL}/in/"
+
+        l_posts = []
+        l_urns = []
 
         # If count>100 API will return HTTP 400
         count = Linkedin._MAX_UPDATE_COUNT
@@ -1313,55 +1321,55 @@ class Linkedin(object):
                     "accept": "application/vnd.linkedin.normalized+json+2.1"
                 },
             )
-            l_data = res.json().get("included", {})
+            """
+            Response includes two keya:
+            - ['Data']['*elements']. It includes the posts URNs always
+            properly sorted as 'Recent', including yet sponsored posts. The
+            downside is that fetching one by one the posts is slower. We will
+            save the URNs to later on build a sorted list of posts purging
+            promotions
+            - ['included']. List with all the posts attributes, but not sorted as
+            'Recent' and including promoted posts
+            """
+            l_raw_posts = res.json().get("included", {})
+            l_raw_urns = res.json().get("data", {}).get("*elements", [])
 
-            new_elements = []
-            for i in l_data:
-                author_name = get_update_author_name(i)
-                if author_name:
-                    new_elements = append_update_post_field_to_posts_list(
-                        i, new_elements, "author_name", author_name
-                    )
+            l_new_posts = parse_list_raw_posts(
+                l_raw_posts, self.client.LINKEDIN_BASE_URL
+            )
+            l_posts.extend(l_new_posts)
 
-                author_profile = get_update_author_profile(
-                    i, self.client.LINKEDIN_BASE_URL
-                )
-                if author_profile:
-                    new_elements = append_update_post_field_to_posts_list(
-                        i, new_elements, "author_profile", author_profile
-                    )
-
-                old = get_update_old(i)
-                if old:
-                    new_elements = append_update_post_field_to_posts_list(
-                        i, new_elements, "old", old
-                    )
-
-                content = get_update_content(i)
-                if content:
-                    new_elements = append_update_post_field_to_posts_list(
-                        i, new_elements, "content", content
-                    )
-
-                url = get_update_url(i, self.client.LINKEDIN_BASE_URL)
-                if url:
-                    new_elements = append_update_post_field_to_posts_list(
-                        i, new_elements, "url", url
-                    )
-
-            results.extend(new_elements)
+            l_urns.extend(parse_list_raw_urns(l_raw_urns))
 
             # break the loop if we're done searching
             # NOTE: we could also check for the `total` returned in the response.
             # This is in data["data"]["paging"]["total"]
             if (
                 (
-                    limit > -1 and len(results) >= limit
-                )  # if our results exceed set limit
-                or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS
-            ) or len(new_elements) == 0:
+                    limit > -1 and len(l_posts) >= limit
+                )  # if our l_posts exceed set limit
+                or len(l_posts) / count >= Linkedin._MAX_REPEATED_REQUESTS
+            ) or len(l_new_posts) == 0:
                 break
 
-            self.logger.debug(f"results grew to {len(results)}")
+            self.logger.debug(f"l_posts grew to {len(l_posts)}")
 
-        return results
+        return l_posts, l_urns
+
+    def get_feed_posts(self, limit=-1, offset=0, is_skip_promoted=True):
+        """Get a list of URNs from feed sorted by 'Recent'
+
+        :param limit: Maximum length of the returned list, defaults to -1 (no limit)
+        :type limit: int, optional
+        :param offset: Index to start searching from
+        :type offset: int, optional
+        :param is_skip_promoted: Exclude from the output promoted posts
+        :type is_skip_promoted: bool, optional
+
+        :return: List of URNs
+        :rtype: list
+        """
+        l_posts, l_urns = self._get_list_feed_posts_and_list_feed_urns(
+            limit, offset, is_skip_promoted
+        )
+        return get_list_posts_sorted_without_promoted(l_urns, l_posts)

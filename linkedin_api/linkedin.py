@@ -1187,9 +1187,7 @@ class Linkedin(object):
             return {}
         data = res.json().get("data", {})
         # TODO: extract more field from group
-        result = {
-            'name': data['name']['text']
-        }
+        result = {"name": data["name"]["text"]}
         return result
 
     def _get_list_feed_posts_and_list_feed_urns(
@@ -1323,10 +1321,10 @@ class Linkedin(object):
 
         res = self._fetch(
             f"/groups/groups?count={params['count']}&membershipStatuses=List(MANAGER,MEMBER,OWNER)&q=member&start={params['start']}",
-            #f"/groups/groups",
+            # f"/groups/groups",
             # BUG. If 'params' set, it returns 0 elements
             # f"/groups/groups",
-            #params = params,
+            # params = params,
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
         )
         data = res.json()
@@ -1457,5 +1455,3 @@ class Linkedin(object):
             self.logger.debug(f"l_posts grew to {len(l_posts)}")
 
         return l_posts, l_urns
-
-

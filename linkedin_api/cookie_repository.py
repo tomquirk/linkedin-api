@@ -16,9 +16,9 @@ class LinkedinSessionExpired(Error):
 
 class CookieRepository(object):
     """
-        Class to act as a repository for the cookies.
+    Class to act as a repository for the cookies.
 
-        TODO: refactor to use http.cookiejar.FileCookieJar
+    TODO: refactor to use http.cookiejar.FileCookieJar
     """
 
     @staticmethod

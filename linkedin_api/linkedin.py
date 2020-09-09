@@ -48,8 +48,7 @@ class Linkedin(object):
         proxies={},
         cookies=None,
     ):
-        """Constructor method
-        """
+        """Constructor method"""
         self.client = Client(
             refresh_cookies=refresh_cookies, debug=debug, proxies=proxies
         )
@@ -65,16 +64,14 @@ class Linkedin(object):
                 self.client.authenticate(username, password)
 
     def _fetch(self, uri, evade=default_evade, base_request=False, **kwargs):
-        """GET request to Linkedin API
-        """
+        """GET request to Linkedin API"""
         evade()
 
         url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
         return self.client.session.get(url, **kwargs)
 
     def _post(self, uri, evade=default_evade, base_request=False, **kwargs):
-        """POST request to Linkedin API
-        """
+        """POST request to Linkedin API"""
         evade()
 
         url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
@@ -187,9 +184,9 @@ class Linkedin(object):
         :type contact_interests: list, optional
         :param service_categories: A list of service category URN IDs (str)
         :type service_categories: list, optional
-        :param network_depth: Deprecated, use `network_depths`. One of "F", "S" and "O" (first, second and third+ respectively) 
+        :param network_depth: Deprecated, use `network_depths`. One of "F", "S" and "O" (first, second and third+ respectively)
         :type network_depth: str, optional
-        :param network_depths: A list containing one or many of "F", "S" and "O" (first, second and third+ respectively) 
+        :param network_depths: A list containing one or many of "F", "S" and "O" (first, second and third+ respectively)
         :type network_depths: list, optional
         :param include_private_profiles: Include private profiles in search results. If False, only public profiles are included. Defaults to False
         :type include_private_profiles: boolean, optional
@@ -410,7 +407,7 @@ class Linkedin(object):
 
     def get_profile_contact_info(self, public_id=None, urn_id=None):
         """Fetch contact information for a given LinkedIn profile. Pass a [public_id] or a [urn_id].
-        
+
         :param public_id: LinkedIn public ID for a profile
         :type public_id: str, optional
         :param urn_id: LinkedIn URN ID for a profile
@@ -452,7 +449,7 @@ class Linkedin(object):
 
     def get_profile_skills(self, public_id=None, urn_id=None):
         """Fetch the skills listed on a given LinkedIn profile.
-        
+
         :param public_id: LinkedIn public ID for a profile
         :type public_id: str, optional
         :param urn_id: LinkedIn URN ID for a profile
@@ -476,7 +473,7 @@ class Linkedin(object):
 
     def get_profile(self, public_id=None, urn_id=None):
         """Fetch data for a given LinkedIn profile.
-        
+
         :param public_id: LinkedIn public ID for a profile
         :type public_id: str, optional
         :param urn_id: LinkedIn URN ID for a profile
@@ -588,7 +585,7 @@ class Linkedin(object):
         self, public_id=None, urn_id=None, max_results=None, results=[]
     ):
         """Fetch company updates (news activity) for a given LinkedIn company.
-        
+
         :param public_id: LinkedIn public ID for a company
         :type public_id: str, optional
         :param urn_id: LinkedIn URN ID for a company
@@ -630,7 +627,7 @@ class Linkedin(object):
         self, public_id=None, urn_id=None, max_results=None, results=[]
     ):
         """Fetch profile updates (newsfeed activity) for a given LinkedIn profile.
-        
+
         :param public_id: LinkedIn public ID for a profile
         :type public_id: str, optional
         :param urn_id: LinkedIn URN ID for a profile
@@ -688,7 +685,7 @@ class Linkedin(object):
 
     def get_school(self, public_id):
         """Fetch data about a given LinkedIn school.
-        
+
         :param public_id: LinkedIn public ID for a school
         :type public_id: str
 
@@ -715,7 +712,7 @@ class Linkedin(object):
 
     def get_company(self, public_id):
         """Fetch data about a given LinkedIn company.
-        
+
         :param public_id: LinkedIn public ID for a company
         :type public_id: str
 

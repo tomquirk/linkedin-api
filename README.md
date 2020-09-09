@@ -1,14 +1,13 @@
 # linkedin_api
 
-👨‍💼 Python Wrapper for the Linkedin API
+👨‍💼 Linkedin API for Python
 
 [![Build Status](https://travis-ci.com/tomquirk/linkedin-api.svg?branch=master)](https://travis-ci.com/tomquirk/linkedin-api)
 [![Documentation Status](https://readthedocs.org/projects/linkedin-api/badge/?version=latest)](https://linkedin-api.readthedocs.io/en/latest/?badge=latest)
 
-
 > No "official" API access required - just use a valid Linkedin account!
 
-Programmatically send messages, perform searches, get profile data and more, all with a regular Linkedin user account!
+Programmatically send messages, get jobs, search profiles and more, all with a regular Linkedin user account!
 
 Before using this project, please consult the [Terms and Conditions](#terms-and-conditions) and [Legal Notice](#legal).
 

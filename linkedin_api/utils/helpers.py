@@ -124,9 +124,7 @@ def get_update_url(d_included, base_url):
         return f"{base_url}/feed/update/{urn}"
 
 
-def append_update_post_field_to_posts_list(
-    d_included, l_posts, post_key, post_value
-):
+def append_update_post_field_to_posts_list(d_included, l_posts, post_key, post_value):
     """Parse a dict and returns, if present, the desired value. Finally it
     updates an already existing dict in the list or add a new dict to it
 
@@ -197,9 +195,7 @@ def parse_list_raw_posts(l_raw_posts, linkedin_base_url):
 
         old = get_update_old(i)
         if old:
-            l_posts = append_update_post_field_to_posts_list(
-                i, l_posts, "old", old
-            )
+            l_posts = append_update_post_field_to_posts_list(i, l_posts, "old", old)
 
         content = get_update_content(i, linkedin_base_url)
         if content:
@@ -209,9 +205,7 @@ def parse_list_raw_posts(l_raw_posts, linkedin_base_url):
 
         url = get_update_url(i, linkedin_base_url)
         if url:
-            l_posts = append_update_post_field_to_posts_list(
-                i, l_posts, "url", url
-            )
+            l_posts = append_update_post_field_to_posts_list(i, l_posts, "url", url)
 
     return l_posts
 

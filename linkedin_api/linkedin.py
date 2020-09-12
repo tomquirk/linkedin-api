@@ -69,7 +69,7 @@ class Linkedin(object):
         url = f"{self.client.API_BASE_URL}{uri}"
         return self.client.session.post(url, **kwargs)
 
-    def search(self, params, limit=None):
+    def search(self, params, limit=None, transformer=None):
         """
         Do a search.
         """
@@ -100,54 +100,11 @@ class Linkedin(object):
 
             new_elements = []
             for i in range(len(data["data"]["elements"])):
-                elements = data["data"]["elements"][i]["elements"]
-
-                # Get more information :
-                # For people (firstName, lastName, occupation, picture)
-                # For companies (picture, universalName)
-                for el in elements:
-                    if (
-                        "included" in data
-                        and "targetUrn" in el
-                        and (el["type"] in ["PROFILE", "COMPANY"])
-                    ):
-                        # Find the right item in the `included` list
-                        mini_details = next(
-                            (
-                                item
-                                for item in data["included"]
-                                if item["entityUrn"] == el["targetUrn"]
-                            ),
-                            {},
-                        )
-                        # Edit the picture or logo to output a nice dict
-                        # e.g: {"100_100": "https://medi...100_100/0?e=15984...", "200_200": ...}
-                        picture = mini_details.get("picture") or mini_details.get(
-                            "logo"
-                        )
-                        if picture:
-                            mini_details["picture"] = {
-                                f"{suffix['width']}_{suffix['height']}": picture[
-                                    "rootUrl"
-                                ]
-                                + suffix["fileIdentifyingUrlPathSegment"]
-                                for suffix in picture["artifacts"]
-                            }
-                        # Keep the keys we're interested in (firstName, lastName, occupation, picture, name)
-                        el["mini_details"] = {
-                            k: v
-                            for k, v in mini_details.items()
-                            if k
-                            in [
-                                "firstName",
-                                "lastName",
-                                "occupation",
-                                "picture",
-                                "universalName",
-                            ]
-                        }
-                    new_elements.append(el)
-
+                new_elements.extend(
+                    transformer(data, data["data"]["elements"][i]["elements"])
+                    if transformer
+                    else data["data"]["elements"][i]["elements"]
+                )
                 # not entirely sure what extendedElements generally refers to - keyword search gives back a single job?
                 # new_elements.extend(data["data"]["elements"][i]["extendedElements"])
             results.extend(new_elements)
@@ -164,6 +121,55 @@ class Linkedin(object):
             self.logger.debug(f"results grew to {len(results)}")
 
         return results
+
+    def _search_transformer(self, data, elements):
+        """
+        Enrichs the data we get for either the PEOPLE or COMPANY search.
+        It is used as a transformer parameter in the `search` method.
+
+        # For PEOPLE we add the following attributes to the elements : firstName, lastName, occupation, picture
+        # For COMPANY we add the following attributes to the elements : picture, universalName
+        """
+        transformed_elements = []
+        for el in elements:
+            if (
+                "included" in data
+                and "targetUrn" in el
+                and (el["type"] in ["PROFILE", "COMPANY"])
+            ):
+                # Find the right item in the `included` list
+                mini_details = next(
+                    (
+                        item
+                        for item in data["included"]
+                        if item["entityUrn"] == el["targetUrn"]
+                    ),
+                    {},
+                )
+                # Edit the picture or logo to output a nice dict
+                # e.g: {"100_100": "https://medi...100_100/0?e=15984...", "200_200": ...}
+                picture = mini_details.get("picture") or mini_details.get("logo")
+                if picture:
+                    mini_details["picture"] = {
+                        f"{suffix['width']}_{suffix['height']}": picture["rootUrl"]
+                        + suffix["fileIdentifyingUrlPathSegment"]
+                        for suffix in picture["artifacts"]
+                    }
+                # Keep the keys we're interested in (firstName, lastName, occupation, picture, name)
+                el["mini_details"] = {
+                    k: v
+                    for k, v in mini_details.items()
+                    if k
+                    in [
+                        "firstName",
+                        "lastName",
+                        "occupation",
+                        "picture",
+                        "universalName",
+                    ]
+                }
+            transformed_elements.append(el)
+        return transformed_elements
 
     def search_people(
         self,
@@ -227,7 +233,7 @@ class Linkedin(object):
         if keywords:
             params["keywords"] = keywords
 
-        data = self.search(params, limit=limit)
+        data = self.search(params, limit=limit, transformer=self._search_transformer)
 
         results = []
         for item in data:
@@ -258,7 +264,7 @@ class Linkedin(object):
         if keywords:
             params["keywords"] = keywords
 
-        data = self.search(params, limit=limit)
+        data = self.search(params, limit=limit, transformer=self._search_transformer)
 
         results = []
         for item in data:

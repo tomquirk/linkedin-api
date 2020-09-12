@@ -16,7 +16,6 @@ from linkedin_api.utils.helpers import (
     get_update_author_profile,
     get_update_url,
     append_update_post_field_to_posts_list,
-    parse_list_raw_urns,
     parse_list_raw_posts,
     get_list_posts_sorted_without_promoted,
 )

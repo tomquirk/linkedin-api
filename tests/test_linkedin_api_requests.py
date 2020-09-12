@@ -240,7 +240,22 @@ def test_reject_invitation(linkedin):
     assert len(invitations) == num_invitations - 1
 
 
-def test_unfollow_entity(linkedin):
-    urn = f"urn:li:member:ACoAACVmHBkBdk3IYY1uodl8Ht4W79rmdVFccOA"
-    err = linkedin.unfollow_entity(urn)
-    assert not err
+def test_get_feed_posts_pagination(linkedin):
+    results = linkedin.get_feed_posts(101)
+    assert results
+
+
+def test_get_feed_posts_pagination_with_limit(linkedin):
+    results = linkedin.get_feed_posts(4)
+    # Currently promotions are always removed from results
+    assert len(results) <= 4
+
+
+def test_get_feed_posts_posts_keys(linkedin):
+    results = linkedin.get_feed_posts(4)
+    for i in results:
+        assert i["author_name"]
+        assert i["author_profile"]
+        assert i["content"]
+        assert i["old"]
+        assert i["url"]

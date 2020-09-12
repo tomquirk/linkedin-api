@@ -1191,7 +1191,7 @@ class Linkedin(object):
         return result
 
     def _get_list_feed_posts_and_list_feed_urns(
-        self, limit=-1, offset=0, is_skip_promoted=True
+        self, limit=-1, offset=0, exclude_promoted_posts=True
     ):
         """Get a list of URNs from feed sorted by 'Recent' and a list of yet
         unsorted posts, each one of them containing a dict per post.
@@ -1200,8 +1200,8 @@ class Linkedin(object):
         :type limit: int, optional
         :param offset: Index to start searching from
         :type offset: int, optional
-        :param is_skip_promoted: Exclude from the output promoted posts
-        :type is_skip_promoted: bool, optional
+        :param exclude_promoted_posts: Exclude from the output promoted posts
+        :type exclude_promoted_posts: bool, optional
 
         :return: List of posts and list of URNs
         :rtype: (list, list)
@@ -1270,21 +1270,21 @@ class Linkedin(object):
 
         return l_posts, l_urns
 
-    def get_feed_posts(self, limit=-1, offset=0, is_skip_promoted=True):
+    def get_feed_posts(self, limit=-1, offset=0, exclude_promoted_posts=True):
         """Get a list of URNs from feed sorted by 'Recent'
 
         :param limit: Maximum length of the returned list, defaults to -1 (no limit)
         :type limit: int, optional
         :param offset: Index to start searching from
         :type offset: int, optional
-        :param is_skip_promoted: Exclude from the output promoted posts
-        :type is_skip_promoted: bool, optional
+        :param exclude_promoted_posts: Exclude from the output promoted posts
+        :type exclude_promoted_posts: bool, optional
 
         :return: List of URNs
         :rtype: list
         """
         l_posts, l_urns = self._get_list_feed_posts_and_list_feed_urns(
-            limit, offset, is_skip_promoted
+            limit, offset, exclude_promoted_posts
         )
         return get_list_posts_sorted_without_promoted(l_urns, l_posts)
 
@@ -1338,21 +1338,21 @@ class Linkedin(object):
             results.append(get_id_from_urn(item))
         return results
 
-    def get_feed_posts(self, limit=-1, offset=0, is_skip_promoted=True):
+    def get_feed_posts(self, limit=-1, offset=0, exclude_promoted_posts=True):
         """Get a list of URNs from feed sorted by 'Recent'
 
         :param limit: Maximum length of the returned list, defaults to -1 (no limit)
         :type limit: int, optional
         :param offset: Index to start searching from
         :type offset: int, optional
-        :param is_skip_promoted: Exclude from the output promoted posts
-        :type is_skip_promoted: bool, optional
+        :param exclude_promoted_posts: Exclude from the output promoted posts
+        :type exclude_promoted_posts: bool, optional
 
         :return: List of URNs
         :rtype: list
         """
         l_posts, l_urns = self._get_list_feed_posts_and_list_feed_urns(
-            limit, offset, is_skip_promoted
+            limit, offset, exclude_promoted_posts
         )
         return get_list_posts_sorted_without_promoted(l_urns, l_posts)
 
@@ -1378,7 +1378,7 @@ class Linkedin(object):
         return get_list_posts_sorted_without_promoted(l_urns, l_posts)
 
     def _get_list_group_posts_and_list_group_urns(
-        self, group_id, limit=-1, offset=0, is_skip_promoted=True
+        self, group_id, limit=-1, offset=0, exclude_promoted_posts=True
     ):
         """Get a list of URNs from group sorted by 'All' and a list of yet
         unsorted posts, each one of them containing a dict per post.
@@ -1389,8 +1389,8 @@ class Linkedin(object):
         :type limit: int, optional
         :param offset: Index to start searching from
         :type offset: int, optional
-        :param is_skip_promoted: Exclude from the output promoted posts
-        :type is_skip_promoted: bool, optional
+        :param exclude_promoted_posts: Exclude from the output promoted posts
+        :type exclude_promoted_posts: bool, optional
 
         :return: List of posts and list of URNs
         :rtype: (list, list)

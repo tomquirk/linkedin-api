@@ -7,7 +7,7 @@ def get_id_from_urn(urn):
     return urn.split(":")[3]
 
 
-def get_urn_from_raw_group_update(raw_string):
+def get_urn_from_raw_update(raw_string):
     """
     Return the URN of a raw group update
 
@@ -70,7 +70,7 @@ def get_update_content(d_included, base_url):
         # Let's see if its a reshared post...
         try:
             # TODO: call Linkedin API to fetch that particular post and extract content
-            urn = get_urn_from_raw_group_update(d_included["*resharedUpdate"])
+            urn = get_urn_from_raw_update(d_included["*resharedUpdate"])
             return f"{base_url}/feed/update/{urn}"
         except KeyError:
             return "IMAGE"
@@ -165,7 +165,7 @@ def parse_list_raw_urns(l_raw_urns):
     """
     l_urns = []
     for i in l_raw_urns:
-        l_urns.append(get_urn_from_raw_group_update(i))
+        l_urns.append(get_urn_from_raw_update(i))
     return l_urns
 
 

@@ -51,11 +51,13 @@ def get_update_old(d_included):
         return "None"
 
 
-def get_update_content(d_included):
+def get_update_content(d_included, base_url):
     """Parse a dict and returns, if present, the post content
 
     :param d_included: a dict, as returned by res.json().get("included", {})
     :type d_raw: dict
+    :param base_url: site URL
+    :type d_raw: str
 
     :return: Post content
     :rtype: str
@@ -65,7 +67,15 @@ def get_update_content(d_included):
     except KeyError:
         return ""
     except TypeError:
-        return "None"
+        # Let's see if its a reshared post...
+        try:
+            # TODO: call Linkedin API to fetch that particular post and extract content
+            urn = get_urn_from_raw_group_update(d_included["*resharedUpdate"])
+            return f"{base_url}/feed/update/{urn}"
+        except KeyError:
+            return "IMAGE"
+        except TypeError:
+            return "None"
 
 
 def get_update_author_profile(d_included, base_url):
@@ -191,7 +201,7 @@ def parse_list_raw_posts(l_raw_posts, linkedin_base_url):
                 i, l_posts, "old", old
             )
 
-        content = get_update_content(i)
+        content = get_update_content(i, linkedin_base_url)
         if content:
             l_posts = append_update_post_field_to_posts_list(
                 i, l_posts, "content", content

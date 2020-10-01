@@ -4,6 +4,7 @@ Provides linkedin api-related code
 import json
 import logging
 import random
+from operator import itemgetter
 from time import sleep, time
 from urllib.parse import urlencode, quote
 
@@ -502,6 +503,15 @@ class Linkedin(object):
             profile["profile_id"] = get_id_from_urn(profile["miniProfile"]["entityUrn"])
             profile["profile_urn"] = profile["miniProfile"]["entityUrn"]
             profile["member_urn"] = profile["miniProfile"]["objectUrn"]
+
+            images_data = profile["miniProfile"]["picture"][
+                "com.linkedin.common.VectorImage"
+            ]["artifacts"]
+            for img in images_data:
+                w, h, url_segment = itemgetter(
+                    "width", "height", "fileIdentifyingUrlPathSegment"
+                )(img)
+                profile[f"img_{w}_{h}"] = url_segment
 
             del profile["miniProfile"]
 

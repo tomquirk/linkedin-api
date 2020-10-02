@@ -336,8 +336,8 @@ class Linkedin(object):
         :param remote: Whether to include remote jobs. Defaults to True
         :type remote: boolean, optional
 
-        :return: Profile data
-        :rtype: dict
+        :return: List of jobs
+        :rtype: list
         """
         count = Linkedin._MAX_SEARCH_COUNT
         if limit is None:
@@ -369,13 +369,13 @@ class Linkedin(object):
             if limit > -1 and limit - len(results) < count:
                 count = limit - len(results)
             default_params = {
-                "decorationId": "com.linkedin.voyager.deco.jserp.WebJobSearchHitLite-8",
-                "count": str(count),
+                "decorationId": "com.linkedin.voyager.deco.jserp.WebJobSearchHitWithSalary-14",
+                "count": count,
                 "filters": f"List({filters})",
                 "origin": "JOB_SEARCH_RESULTS_PAGE",
                 "q": "jserpFilters",
                 "start": len(results) + offset,
-                "queryContext": "List(spellCorrectionEnabled->true,relatedSearchesEnabled->true,kcardTypes->PROFILE|COMPANY)",
+                "queryContext": "List(primaryHitType->JOBS,spellCorrectionEnabled->true)",
             }
             default_params.update(params)
 
@@ -385,12 +385,14 @@ class Linkedin(object):
             )
             data = res.json()
 
-            new_elements = []
-            elements = data.get("data", {}).get("elements", [])
-            for i in range(len(elements)):
-                new_elements.extend(elements[i])
-            results.extend(new_elements)
-
+            elements = data.get("included", [])
+            results.extend(
+                [
+                    i
+                    for i in elements
+                    if i["$type"] == "com.linkedin.voyager.jobs.JobPosting"
+                ]
+            )
             # break the loop if we're done searching
             # NOTE: we could also check for the `total` returned in the response.
             # This is in data["data"]["paging"]["total"]
@@ -399,7 +401,7 @@ class Linkedin(object):
                     limit > -1 and len(results) >= limit
                 )  # if our results exceed set limit
                 or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS
-            ) or len(new_elements) == 0:
+            ) or len(elements) == 0:
                 break
 
             self.logger.debug(f"results grew to {len(results)}")
@@ -1122,3 +1124,33 @@ class Linkedin(object):
             err = True
 
         return err
+
+    def get_profile_posts(self, profile_urn_id, member_urn):
+        full_urn = f"urn:li:fsd_profile:{profile_urn_id}"
+
+        params = {
+            "profileUrn": full_urn,
+            "count": 5,
+            "includeLongTermHistory": True,
+            "moduleKey": "member-shares:phone",
+            "numComments": 0,
+            "numLikes": 0,
+            "q": "memberShareFeed",
+        }
+
+        res = self._fetch(
+            f"/identity/profileUpdatesV2",
+            headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+            params=params,
+        )
+
+        data = res.json()
+
+        member_updates = [
+            update
+            for update in data["included"]
+            if update["$type"] == "com.linkedin.voyager.feed.render.UpdateV2"
+            and update.get("actor", {}).get("urn") == member_urn
+        ]
+
+        return member_updates

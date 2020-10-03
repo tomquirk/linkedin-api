@@ -502,18 +502,19 @@ class Linkedin(object):
                 profile["displayPictureUrl"] = profile["miniProfile"]["picture"][
                     "com.linkedin.common.VectorImage"
                 ]["rootUrl"]
+
+                images_data = profile["miniProfile"]["picture"][
+                    "com.linkedin.common.VectorImage"
+                ]["artifacts"]
+                for img in images_data:
+                    w, h, url_segment = itemgetter(
+                        "width", "height", "fileIdentifyingUrlPathSegment"
+                    )(img)
+                    profile[f"img_{w}_{h}"] = url_segment
+
             profile["profile_id"] = get_id_from_urn(profile["miniProfile"]["entityUrn"])
             profile["profile_urn"] = profile["miniProfile"]["entityUrn"]
             profile["member_urn"] = profile["miniProfile"]["objectUrn"]
-
-            images_data = profile["miniProfile"]["picture"][
-                "com.linkedin.common.VectorImage"
-            ]["artifacts"]
-            for img in images_data:
-                w, h, url_segment = itemgetter(
-                    "width", "height", "fileIdentifyingUrlPathSegment"
-                )(img)
-                profile[f"img_{w}_{h}"] = url_segment
 
             del profile["miniProfile"]
 
@@ -1124,33 +1125,3 @@ class Linkedin(object):
             err = True
 
         return err
-
-    def get_profile_posts(self, profile_urn_id, member_urn):
-        full_urn = f"urn:li:fsd_profile:{profile_urn_id}"
-
-        params = {
-            "profileUrn": full_urn,
-            "count": 5,
-            "includeLongTermHistory": True,
-            "moduleKey": "member-shares:phone",
-            "numComments": 0,
-            "numLikes": 0,
-            "q": "memberShareFeed",
-        }
-
-        res = self._fetch(
-            f"/identity/profileUpdatesV2",
-            headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
-            params=params,
-        )
-
-        data = res.json()
-
-        member_updates = [
-            update
-            for update in data["included"]
-            if update["$type"] == "com.linkedin.voyager.feed.render.UpdateV2"
-            and update.get("actor", {}).get("urn") == member_urn
-        ]
-
-        return member_updates

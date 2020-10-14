@@ -165,9 +165,7 @@ def test_search_people_by_keywords_filter(linkedin: Linkedin):
 
 
 def test_search_jobs(linkedin):
-    jobs = linkedin.search_jobs(
-        keywords="data analyst", location="Germany", count=1
-    )
+    jobs = linkedin.search_jobs(keywords="data analyst", location="Germany", count=1)
 
     assert jobs
 
@@ -259,3 +257,8 @@ def test_get_feed_posts_posts_keys(linkedin):
         assert i["content"]
         assert i["old"]
         assert i["url"]
+
+
+def test_get_feed_posts_urns_contains_no_duplicated(linkedin):
+    l_posts, l_urns = linkedin._get_list_feed_posts_and_list_feed_urns(101)
+    assert len(set([x for x in l_urns if l_urns.count(x) > 1])) == 0

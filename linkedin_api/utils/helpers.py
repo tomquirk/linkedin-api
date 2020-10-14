@@ -229,4 +229,5 @@ def get_list_posts_sorted_without_promoted(l_urns, l_posts):
             if urn in post["url"]:
                 l_posts_sorted_without_promoted.append(post)
                 l_posts[:] = [d for d in l_posts if urn not in d.get("url")]
+                break
     return l_posts_sorted_without_promoted

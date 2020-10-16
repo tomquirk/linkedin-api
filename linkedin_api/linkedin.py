@@ -16,6 +16,7 @@ from linkedin_api.utils.helpers import (
     get_update_author_profile,
     get_update_url,
     append_update_post_field_to_posts_list,
+    parse_list_raw_urns,
     parse_list_raw_posts,
     get_list_posts_sorted_without_promoted,
 )
@@ -1162,20 +1163,22 @@ class Linkedin(object):
 
         # If count>100 API will return HTTP 400
         count = Linkedin._MAX_UPDATE_COUNT
-        if limit is None:
-            limit = -1
+        if limit == -1:
+            limit = Linkedin._MAX_UPDATE_COUNT
 
-        results = []
+        # 'l_urns' equivalent to other functions 'results' variable
+        l_urns = []
+
         while True:
+
             # when we're close to the limit, only fetch what we need to
-            if limit > -1 and limit - len(results) < count:
-                count = limit - len(results)
+            if limit > -1 and limit - len(l_urns) < count:
+                count = limit - len(l_urns)
             params = {
                 "count": str(count),
                 "q": "chronFeed",
-                "start": len(results) + offset,
+                "start": len(l_urns) + offset,
             }
-
             res = self._fetch(
                 f"/feed/updatesV2",
                 params=params,
@@ -1205,14 +1208,12 @@ class Linkedin(object):
             # NOTE: we could also check for the `total` returned in the response.
             # This is in data["data"]["paging"]["total"]
             if (
-                (
-                    limit > -1 and len(l_posts) >= limit
-                )  # if our l_posts exceed set limit
-                or len(l_posts) / count >= Linkedin._MAX_REPEATED_REQUESTS
-            ) or len(l_new_posts) == 0:
+                (limit > -1 and len(l_urns) >= limit)  # if our results exceed set limit
+                or len(l_urns) / count >= Linkedin._MAX_REPEATED_REQUESTS
+            ) or len(l_raw_urns) == 0:
                 break
 
-            self.logger.debug(f"l_posts grew to {len(l_posts)}")
+            self.logger.debug(f"results grew to {len(l_urns)}")
 
         return l_posts, l_urns
 

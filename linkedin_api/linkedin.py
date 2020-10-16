@@ -1185,8 +1185,8 @@ class Linkedin(object):
 
         # If count>100 API will return HTTP 400
         count = Linkedin._MAX_UPDATE_COUNT
-        if limit is None:
-            limit = -1
+        if limit == -1:
+            limit = Linkedin._MAX_UPDATE_COUNT
 
         # 'l_urns' equivalent to other functions 'results' variable
         l_urns = []

@@ -48,10 +48,14 @@ class Linkedin(object):
         debug=False,
         proxies={},
         cookies=None,
+        cookies_dir=None,
     ):
         """Constructor method"""
         self.client = Client(
-            refresh_cookies=refresh_cookies, debug=debug, proxies=proxies
+            refresh_cookies=refresh_cookies,
+            debug=debug,
+            proxies=proxies,
+            cookies_dir=cookies_dir,
         )
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
         self.logger = logger
@@ -485,7 +489,6 @@ class Linkedin(object):
         :return: Profile data
         :rtype: dict
         """
-
         # NOTE this still works for now, but will probably eventually have to be converted to
         # https://www.linkedin.com/voyager/api/identity/profiles/ACoAAAKT9JQBsH7LwKaE9Myay9WcX8OVGuDq9Uw
         res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")

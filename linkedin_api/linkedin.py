@@ -4,6 +4,7 @@ Provides linkedin api-related code
 import json
 import logging
 import random
+from operator import itemgetter
 from time import sleep, time
 from urllib.parse import urlencode, quote
 
@@ -58,10 +59,14 @@ class Linkedin(object):
         debug=False,
         proxies={},
         cookies=None,
+        cookies_dir=None,
     ):
         """Constructor method"""
         self.client = Client(
-            refresh_cookies=refresh_cookies, debug=debug, proxies=proxies
+            refresh_cookies=refresh_cookies,
+            debug=debug,
+            proxies=proxies,
+            cookies_dir=cookies_dir,
         )
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
         self.logger = logger
@@ -346,8 +351,8 @@ class Linkedin(object):
         :param remote: Whether to include remote jobs. Defaults to True
         :type remote: boolean, optional
 
-        :return: Profile data
-        :rtype: dict
+        :return: List of jobs
+        :rtype: list
         """
         count = Linkedin._MAX_SEARCH_COUNT
         if limit is None:
@@ -379,13 +384,13 @@ class Linkedin(object):
             if limit > -1 and limit - len(results) < count:
                 count = limit - len(results)
             default_params = {
-                "decorationId": "com.linkedin.voyager.deco.jserp.WebJobSearchHitLite-8",
-                "count": str(count),
+                "decorationId": "com.linkedin.voyager.deco.jserp.WebJobSearchHitWithSalary-14",
+                "count": count,
                 "filters": f"List({filters})",
                 "origin": "JOB_SEARCH_RESULTS_PAGE",
                 "q": "jserpFilters",
                 "start": len(results) + offset,
-                "queryContext": "List(spellCorrectionEnabled->true,relatedSearchesEnabled->true,kcardTypes->PROFILE|COMPANY)",
+                "queryContext": "List(primaryHitType->JOBS,spellCorrectionEnabled->true)",
             }
             default_params.update(params)
 
@@ -395,12 +400,14 @@ class Linkedin(object):
             )
             data = res.json()
 
-            new_elements = []
-            elements = data.get("data", {}).get("elements", [])
-            for i in range(len(elements)):
-                new_elements.extend(elements[i])
-            results.extend(new_elements)
-
+            elements = data.get("included", [])
+            results.extend(
+                [
+                    i
+                    for i in elements
+                    if i["$type"] == "com.linkedin.voyager.jobs.JobPosting"
+                ]
+            )
             # break the loop if we're done searching
             # NOTE: we could also check for the `total` returned in the response.
             # This is in data["data"]["paging"]["total"]
@@ -409,7 +416,7 @@ class Linkedin(object):
                     limit > -1 and len(results) >= limit
                 )  # if our results exceed set limit
                 or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS
-            ) or len(new_elements) == 0:
+            ) or len(elements) == 0:
                 break
 
             self.logger.debug(f"results grew to {len(results)}")
@@ -493,7 +500,6 @@ class Linkedin(object):
         :return: Profile data
         :rtype: dict
         """
-
         # NOTE this still works for now, but will probably eventually have to be converted to
         # https://www.linkedin.com/voyager/api/identity/profiles/ACoAAAKT9JQBsH7LwKaE9Myay9WcX8OVGuDq9Uw
         res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")
@@ -510,6 +516,16 @@ class Linkedin(object):
                 profile["displayPictureUrl"] = profile["miniProfile"]["picture"][
                     "com.linkedin.common.VectorImage"
                 ]["rootUrl"]
+
+                images_data = profile["miniProfile"]["picture"][
+                    "com.linkedin.common.VectorImage"
+                ]["artifacts"]
+                for img in images_data:
+                    w, h, url_segment = itemgetter(
+                        "width", "height", "fileIdentifyingUrlPathSegment"
+                    )(img)
+                    profile[f"img_{w}_{h}"] = url_segment
+
             profile["profile_id"] = get_id_from_urn(profile["miniProfile"]["entityUrn"])
             profile["profile_urn"] = profile["miniProfile"]["entityUrn"]
             profile["member_urn"] = profile["miniProfile"]["objectUrn"]

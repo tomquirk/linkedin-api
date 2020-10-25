@@ -10,6 +10,7 @@ pytest = "*"
 pylint = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
+twine = "*"
 
 [packages]
 requests = "*"

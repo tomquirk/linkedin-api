@@ -22,7 +22,7 @@ class CookieRepository(object):
     """
 
     def __init__(self, cookies_dir=settings.COOKIE_PATH):
-        self.cookies_dir = cookies_dir
+        self.cookies_dir = cookies_dir or settings.COOKIE_PATH
 
     def save(self, cookies, username):
         self._ensure_cookies_dir()

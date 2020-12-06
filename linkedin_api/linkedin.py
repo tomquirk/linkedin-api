@@ -9,7 +9,18 @@ from time import sleep, time
 from urllib.parse import urlencode, quote
 
 from linkedin_api.client import Client
-from linkedin_api.utils.helpers import get_id_from_urn
+from linkedin_api.utils.helpers import (
+    get_id_from_urn,
+    get_update_author_name,
+    get_update_old,
+    get_update_content,
+    get_update_author_profile,
+    get_update_url,
+    append_update_post_field_to_posts_list,
+    parse_list_raw_urns,
+    parse_list_raw_posts,
+    get_list_posts_sorted_without_promoted,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -636,7 +647,10 @@ class Linkedin(object):
         self.logger.debug(f"results grew: {len(results)}")
 
         return self.get_company_updates(
-            public_id=public_id, urn_id=urn_id, results=results, max_results=max_results
+            public_id=public_id,
+            urn_id=urn_id,
+            results=results,
+            max_results=max_results,
         )
 
     def get_profile_updates(
@@ -678,7 +692,10 @@ class Linkedin(object):
         self.logger.debug(f"results grew: {len(results)}")
 
         return self.get_profile_updates(
-            public_id=public_id, urn_id=urn_id, results=results, max_results=max_results
+            public_id=public_id,
+            urn_id=urn_id,
+            results=results,
+            max_results=max_results,
         )
 
     def get_current_profile_views(self):
@@ -826,7 +843,10 @@ class Linkedin(object):
                     "com.linkedin.voyager.messaging.create.MessageCreate": {
                         "body": message_body,
                         "attachments": [],
-                        "attributedBody": {"text": message_body, "attributes": []},
+                        "attributedBody": {
+                            "text": message_body,
+                            "attributes": [],
+                        },
                         "mediaAttachments": [],
                     }
                 }
@@ -847,7 +867,9 @@ class Linkedin(object):
                 "conversationCreate": message_event,
             }
             res = self._post(
-                f"/messaging/conversations", params=params, data=json.dumps(payload)
+                f"/messaging/conversations",
+                params=params,
+                data=json.dumps(payload),
             )
 
         return res.status_code != 201
@@ -903,7 +925,8 @@ class Linkedin(object):
         }
 
         res = self._fetch(
-            f"{self.client.API_BASE_URL}/relationships/invitationViews", params=params
+            f"{self.client.API_BASE_URL}/relationships/invitationViews",
+            params=params,
         )
 
         if res.status_code != 200:
@@ -966,7 +989,10 @@ class Linkedin(object):
         res = self._post(
             "/li/track",
             base_request=True,
-            headers={"accept": "*/*", "content-type": "text/plain;charset=UTF-8"},
+            headers={
+                "accept": "*/*",
+                "content-type": "text/plain;charset=UTF-8",
+            },
             data=json.dumps(payload),
         )
 
@@ -1128,3 +1154,99 @@ class Linkedin(object):
             err = True
 
         return err
+
+    def _get_list_feed_posts_and_list_feed_urns(
+        self, limit=-1, offset=0, exclude_promoted_posts=True
+    ):
+        """Get a list of URNs from feed sorted by 'Recent' and a list of yet
+        unsorted posts, each one of them containing a dict per post.
+
+        :param limit: Maximum length of the returned list, defaults to -1 (no limit)
+        :type limit: int, optional
+        :param offset: Index to start searching from
+        :type offset: int, optional
+        :param exclude_promoted_posts: Exclude from the output promoted posts
+        :type exclude_promoted_posts: bool, optional
+
+        :return: List of posts and list of URNs
+        :rtype: (list, list)
+        """
+        _PROMOTED_STRING = "Promoted"
+        _PROFILE_URL = f"{self.client.LINKEDIN_BASE_URL}/in/"
+
+        l_posts = []
+        l_urns = []
+
+        # If count>100 API will return HTTP 400
+        count = Linkedin._MAX_UPDATE_COUNT
+        if limit == -1:
+            limit = Linkedin._MAX_UPDATE_COUNT
+
+        # 'l_urns' equivalent to other functions 'results' variable
+        l_urns = []
+
+        while True:
+
+            # when we're close to the limit, only fetch what we need to
+            if limit > -1 and limit - len(l_urns) < count:
+                count = limit - len(l_urns)
+            params = {
+                "count": str(count),
+                "q": "chronFeed",
+                "start": len(l_urns) + offset,
+            }
+            res = self._fetch(
+                f"/feed/updatesV2",
+                params=params,
+                headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+            )
+            """
+            Response includes two keya:
+            - ['Data']['*elements']. It includes the posts URNs always
+            properly sorted as 'Recent', including yet sponsored posts. The
+            downside is that fetching one by one the posts is slower. We will
+            save the URNs to later on build a sorted list of posts purging
+            promotions
+            - ['included']. List with all the posts attributes, but not sorted as
+            'Recent' and including promoted posts
+            """
+            l_raw_posts = res.json().get("included", {})
+            l_raw_urns = res.json().get("data", {}).get("*elements", [])
+
+            l_new_posts = parse_list_raw_posts(
+                l_raw_posts, self.client.LINKEDIN_BASE_URL
+            )
+            l_posts.extend(l_new_posts)
+
+            l_urns.extend(parse_list_raw_urns(l_raw_urns))
+
+            # break the loop if we're done searching
+            # NOTE: we could also check for the `total` returned in the response.
+            # This is in data["data"]["paging"]["total"]
+            if (
+                (limit > -1 and len(l_urns) >= limit)  # if our results exceed set limit
+                or len(l_urns) / count >= Linkedin._MAX_REPEATED_REQUESTS
+            ) or len(l_raw_urns) == 0:
+                break
+
+            self.logger.debug(f"results grew to {len(l_urns)}")
+
+        return l_posts, l_urns
+
+    def get_feed_posts(self, limit=-1, offset=0, exclude_promoted_posts=True):
+        """Get a list of URNs from feed sorted by 'Recent'
+
+        :param limit: Maximum length of the returned list, defaults to -1 (no limit)
+        :type limit: int, optional
+        :param offset: Index to start searching from
+        :type offset: int, optional
+        :param exclude_promoted_posts: Exclude from the output promoted posts
+        :type exclude_promoted_posts: bool, optional
+
+        :return: List of URNs
+        :rtype: list
+        """
+        l_posts, l_urns = self._get_list_feed_posts_and_list_feed_urns(
+            limit, offset, exclude_promoted_posts
+        )
+        return get_list_posts_sorted_without_promoted(l_urns, l_posts)

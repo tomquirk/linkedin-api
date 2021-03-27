@@ -325,7 +325,8 @@ class Linkedin(object):
         industries=None,
         location_name=None,
         remote=False,
-        listed_at=24*60*60,
+        listed_at=24 * 60 * 60,
+        distance=None,
         limit=-1,
         offset=0,
         **kwargs,
@@ -349,11 +350,13 @@ class Linkedin(object):
         :param remote: Whether to search only for remote jobs. Defaults to False.
         :type remote: boolean, optional
         :param listed_at: maximum number of seconds passed since job posting. 86400 will filter job postings posted in last 24 hours.
-        :type int/str, optional. Default value is equal to 24 hours.
+        :type listed_at: int/str, optional. Default value is equal to 24 hours.
+        :param distance: maximum distance from location in miles
+        :type distance: int/str, optional. If not specified, None or 0, the default value of 25 miles applied.
         :param limit: maximum number of results obtained from API queries. -1 means maximum which is defined by constants and is equal to 1000 now.
-        :type int, optional, default -1
+        :type limit: int, optional, default -1
         :param offset: indicates how many search results shall be skipped
-        :type int, optional
+        :type offset: int, optional
         :return: List of jobs
         :rtype: list
         """
@@ -377,10 +380,18 @@ class Linkedin(object):
         if industries:
             filters.append(f'industry->{"|".join(industries)}')
         if location_name:
-            filters.append(f'locationFallback->{location_name}')
+            filters.append(f"locationFallback->{location_name}")
         if remote:
-            filters.append(f'workRemoteAllowed->{remote}')
-        filters.append(f'timePostedRange->r{listed_at}')
+            filters.append(f"workRemoteAllowed->{remote}")
+        if distance:
+            filters.append(f"distance->{distance}")
+        filters.append(f"timePostedRange->r{listed_at}")
+        # add optional kwargs to a filter
+        for name, value in kwargs.items():
+            if type(value) in (list, tuple):
+                filters.append(f'{name}->{"|".join(value)}')
+            else:
+                filters.append(f"{name}->{value}")
 
         results = []
         while True:

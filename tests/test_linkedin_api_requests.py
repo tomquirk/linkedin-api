@@ -133,12 +133,12 @@ def test_search_pagination(linkedin):
     numbers_in_categories = dict()
     for result in results:
         try:
-            occurrence = numbers_in_categories[result['type']]
+            occurrence = numbers_in_categories[result["type"]]
         except KeyError:
             occurrence = 0
-            numbers_in_categories.update({result['type']: occurrence})
+            numbers_in_categories.update({result["type"]: occurrence})
         occurrence += 1
-        numbers_in_categories[result['type']] = occurrence
+        numbers_in_categories[result["type"]] = occurrence
     assert results
     assert max(numbers_in_categories.values()) == 4
 
@@ -154,25 +154,33 @@ def test_search_people(linkedin):
 
 
 def test_search_people_with_limit(linkedin):
-    results = linkedin.search_people(keywords="software", include_private_profiles=True, limit=1)
+    results = linkedin.search_people(
+        keywords="software", include_private_profiles=True, limit=1
+    )
     assert results
     assert len(results) == 1
 
 
 def test_search_people_by_region(linkedin):
-    results = linkedin.search_people(keywords="software", include_private_profiles=True, regions=["105080838"])
+    results = linkedin.search_people(
+        keywords="software", include_private_profiles=True, regions=["105080838"]
+    )
     assert results
 
 
 def test_search_people_by_keywords_filter(linkedin: Linkedin):
     results = linkedin.search_people(
-        keyword_first_name="John", keyword_last_name="Smith", include_private_profiles=True
+        keyword_first_name="John",
+        keyword_last_name="Smith",
+        include_private_profiles=True,
     )
     assert results
 
 
 def test_search_jobs(linkedin):
-    jobs = linkedin.search_jobs(keywords="data analyst", location_name="Germany", limit=1)
+    jobs = linkedin.search_jobs(
+        keywords="data analyst", location_name="Germany", limit=1
+    )
 
     assert jobs
 
@@ -180,7 +188,7 @@ def test_search_jobs(linkedin):
 def test_search_companies(linkedin):
     results = linkedin.search_companies(keywords="linkedin", limit=1)
     assert results
-    assert results[0]["urn_id"] == '1337'
+    assert results[0]["urn_id"] == "1337"
 
 
 # def test_search_people_distinct(linkedin):

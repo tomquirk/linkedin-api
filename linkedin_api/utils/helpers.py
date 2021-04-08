@@ -1,3 +1,6 @@
+import json
+
+
 def get_id_from_urn(urn):
     """
     Return the ID of a given Linkedin URN.

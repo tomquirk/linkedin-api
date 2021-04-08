@@ -716,6 +716,28 @@ class Linkedin(object):
             "numViews"
         ]
 
+    def get_group_members(self, group_id):
+        """Get a full list of group members.
+
+        :return: list group members
+        :rtype: list
+        """
+
+        start = 0
+        group_members = []
+
+        while True:
+            res = self._fetch(f"/groups/groups/urn%3Ali%3Agroup%3A{group_id}/members?count=100&membershipStatuses=List(OWNER,MANAGER,MEMBER)&q=membershipStatus&start={start}")
+            data = res.json()
+           
+            if data['elements'] == [] or (len(data['elements']) / 100 >= Linkedin._MAX_REPEATED_REQUESTS): break
+
+            group_members.extend(data["elements"])
+
+            start += 100
+        
+        return group_members
+
     def get_school(self, public_id):
         """Fetch data about a given LinkedIn school.
 

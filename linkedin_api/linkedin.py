@@ -925,7 +925,7 @@ class Linkedin(object):
         }
 
         res = self._fetch(
-            f"{self.client.API_BASE_URL}/relationships/invitationViews",
+            "/relationships/invitationViews",
             params=params,
         )
 

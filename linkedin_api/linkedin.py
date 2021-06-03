@@ -7,6 +7,7 @@ import random
 from operator import itemgetter
 from time import sleep, time
 from urllib.parse import urlencode, quote
+import base64
 
 from linkedin_api.client import Client
 from linkedin_api.utils.helpers import (
@@ -968,6 +969,65 @@ class Linkedin(object):
         )
 
         return res.status_code == 200
+
+
+    def generateTrackingId(self):
+        """Generates and returns a random trackingId
+        :return: Random trackingId string
+        :rtype: str
+        """
+        random_int_array = [random.randrange(256) for _ in range(16)]
+        rand_byte_array = bytearray(random_int_array)
+        return str(base64.b64encode(rand_byte_array))[2:-1]
+
+    def add_connection(self, profile_public_id, message="", profile_urn=None):
+        """Add a given profile id as a connection.
+        :param profile_public_id: public ID of a LinkedIn profile
+        :type profile_public_id: str
+        :param message: message to send along with connection request
+        :type profile_urn: str, optional
+        :param profile_urn: member URN for the given LinkedIn profile
+        :type profile_urn: str, optional
+        :return: Error state. True if error occurred
+        :rtype: boolean
+        """
+
+        ## Validating message length (max size is 300 characters)
+        if len(message) > 300:
+            self.logger.info("Message too long. Max size is 300 characters")
+            return False
+
+        if not profile_urn:
+            profile_urn_string = self.get_profile(public_id=profile_public_id)[
+                "profile_urn"
+            ]
+            # Returns string of the form 'urn:li:fs_miniProfile:ACoAACX1hoMBvWqTY21JGe0z91mnmjmLy9Wen4w'
+            # We extract the last part of the string
+            profile_urn = profile_urn_string.split(":")[-1]
+
+        trackingId = self.generateTrackingId()
+        payload = (
+            '{"trackingId":"'
+            + trackingId
+            + '", "message":"'
+            + message
+            + '", "invitations":[], "excludeInvitations":[],"invitee":{"com.linkedin.voyager.growth.invitation.InviteeProfile":\
+            {"profileId":"'
+            + profile_urn
+            + '"'
+            + "}}}"
+        )
+        res = self._post(
+            "/growth/normInvitations",
+            data=payload,
+            headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+        )
+
+        return res.status_code != 201
+
+
+
+
 
     def remove_connection(self, public_profile_id):
         """Remove a given profile as a connection.

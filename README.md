@@ -1,5 +1,13 @@
 # linkedin_api
 
+---
+
+## ⚠️ Want to be a maintainer?
+
+I don't have the time to commit to this project any more. Please get in contact with me if you want to help keep it alive.
+
+---
+
 👨‍💼 Linkedin API for Python
 
 [![Build Status](https://travis-ci.com/tomquirk/linkedin-api.svg?branch=master)](https://travis-ci.com/tomquirk/linkedin-api)

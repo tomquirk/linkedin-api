@@ -145,9 +145,7 @@ class Linkedin(object):
             # NOTE: we could also check for the `total` returned in the response.
             # This is in data["data"]["paging"]["total"]
             if (
-                (
-                    limit > -1 and len(results) >= limit
-                )  # if our results exceed set limit
+                (-1 < limit <= len(results))  # if our results exceed set limit
                 or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS
             ) or len(new_elements) == 0:
                 break
@@ -327,8 +325,9 @@ class Linkedin(object):
         job_title=None,
         industries=None,
         location_name=None,
-        remote=True,
-        listed_at=86400,
+        remote=False,
+        listed_at=24 * 60 * 60,
+        distance=None,
         limit=-1,
         offset=0,
         **kwargs,
@@ -347,11 +346,18 @@ class Linkedin(object):
         :type job_title: list, optional
         :param industries: A list of industry URN IDs (str)
         :type industries: list, optional
-        :param location_name: Name of the location to search within
+        :param location_name: Name of the location to search within. Example: "Kyiv City, Ukraine"
         :type location_name: str, optional
-        :param remote: Whether to include remote jobs. Defaults to True
+        :param remote: Whether to search only for remote jobs. Defaults to False.
         :type remote: boolean, optional
-
+        :param listed_at: maximum number of seconds passed since job posting. 86400 will filter job postings posted in last 24 hours.
+        :type listed_at: int/str, optional. Default value is equal to 24 hours.
+        :param distance: maximum distance from location in miles
+        :type distance: int/str, optional. If not specified, None or 0, the default value of 25 miles applied.
+        :param limit: maximum number of results obtained from API queries. -1 means maximum which is defined by constants and is equal to 1000 now.
+        :type limit: int, optional, default -1
+        :param offset: indicates how many search results shall be skipped
+        :type offset: int, optional
         :return: List of jobs
         :rtype: list
         """
@@ -375,9 +381,18 @@ class Linkedin(object):
         if industries:
             filters.append(f'industry->{"|".join(industries)}')
         if location_name:
-            filters.append(f'locationFallback->{"|".join(location_name)}')
+            filters.append(f"locationFallback->{location_name}")
         if remote:
-            filters.append(f"commuteFeatures->f_WRA")
+            filters.append(f"workRemoteAllowed->{remote}")
+        if distance:
+            filters.append(f"distance->{distance}")
+        filters.append(f"timePostedRange->r{listed_at}")
+        # add optional kwargs to a filter
+        for name, value in kwargs.items():
+            if type(value) in (list, tuple):
+                filters.append(f'{name}->{"|".join(value)}')
+            else:
+                filters.append(f"{name}->{value}")
 
         results = []
         while True:
@@ -385,9 +400,9 @@ class Linkedin(object):
             if limit > -1 and limit - len(results) < count:
                 count = limit - len(results)
             default_params = {
-                "decorationId": "com.linkedin.voyager.deco.jserp.WebJobSearchHitWithSalary-14",
+                "decorationId": "com.linkedin.voyager.deco.jserp.WebJobSearchHitLite-14",
                 "count": count,
-                "filters": f"List({filters})",
+                "filters": f"List({','.join(filters)})",
                 "origin": "JOB_SEARCH_RESULTS_PAGE",
                 "q": "jserpFilters",
                 "start": len(results) + offset,
@@ -413,9 +428,7 @@ class Linkedin(object):
             # NOTE: we could also check for the `total` returned in the response.
             # This is in data["data"]["paging"]["total"]
             if (
-                (
-                    limit > -1 and len(results) >= limit
-                )  # if our results exceed set limit
+                (-1 < limit <= len(results))  # if our results exceed set limit
                 or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS
             ) or len(elements) == 0:
                 break

@@ -5,6 +5,7 @@ import json
 import logging
 import random
 import base64
+import uuid
 from operator import itemgetter
 from time import sleep, time
 from urllib.parse import urlencode, quote
@@ -661,10 +662,7 @@ class Linkedin(object):
         self.logger.debug(f"results grew: {len(results)}")
 
         return self.get_company_updates(
-            public_id=public_id,
-            urn_id=urn_id,
-            results=results,
-            max_results=max_results,
+            public_id=public_id, urn_id=urn_id, results=results, max_results=max_results
         )
 
     def get_profile_updates(
@@ -706,10 +704,7 @@ class Linkedin(object):
         self.logger.debug(f"results grew: {len(results)}")
 
         return self.get_profile_updates(
-            public_id=public_id,
-            urn_id=urn_id,
-            results=results,
-            max_results=max_results,
+            public_id=public_id, urn_id=urn_id, results=results, max_results=max_results
         )
 
     def get_current_profile_views(self):
@@ -832,10 +827,20 @@ class Linkedin(object):
 
         return res.json()
 
+    def generateTrackingIdAsCharString(self):
+        """Generates and returns a random trackingId
+
+        :return: Random trackingId string
+        :rtype: str
+        """
+        random_int_array = [random.randrange(256) for _ in range(16)]
+        rand_byte_array = bytearray(random_int_array)
+        return "".join([chr(i) for i in rand_byte_array])
+
     def send_message(self, message_body, conversation_urn_id=None, recipients=None):
         """Send a message to a given conversation.
 
-        :param message_body: LinkedIn URN ID for a conversation
+        :param message_body: Message text to send
         :type message_body: str
         :param conversation_urn_id: LinkedIn URN ID for a conversation
         :type conversation_urn_id: str, optional
@@ -853,18 +858,19 @@ class Linkedin(object):
 
         message_event = {
             "eventCreate": {
+                "originToken": str(uuid.uuid4()),
                 "value": {
                     "com.linkedin.voyager.messaging.create.MessageCreate": {
-                        "body": message_body,
-                        "attachments": [],
                         "attributedBody": {
                             "text": message_body,
                             "attributes": [],
                         },
-                        "mediaAttachments": [],
+                        "attachments": [],
                     }
-                }
-            }
+                },
+                "trackingId": self.generateTrackingIdAsCharString(),
+            },
+            "dedupeByClientGeneratedToken": False,
         }
 
         if conversation_urn_id and not recipients:
@@ -1060,10 +1066,7 @@ class Linkedin(object):
         res = self._post(
             "/li/track",
             base_request=True,
-            headers={
-                "accept": "*/*",
-                "content-type": "text/plain;charset=UTF-8",
-            },
+            headers={"accept": "*/*", "content-type": "text/plain;charset=UTF-8"},
             data=json.dumps(payload),
         )
 

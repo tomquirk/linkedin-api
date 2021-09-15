@@ -95,6 +95,16 @@ class Linkedin(object):
         url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
         return self.client.session.post(url, **kwargs)
 
+    def get_profile_posts(self, public_id=None, urn_id=None):
+        res = self._fetch(
+            f"/identity/profileUpdatesV2?count=10&includeLongTermHistory=true&moduleKey=member-shares%3Aphone&profileUrn=urn%3Ali%3Afsd_profile%3AACoAAAaIVpEB4s1ycBZHbK2o6ieWGJYmqHzBZUY&q=memberShareFeed&start=0"
+        )
+        data = res.json()
+        if data and "status" in data and data["status"] != 200:
+            self.logger.info("request failed: {}".format(data["message"]))
+            return {}
+        return data
+
     def search(self, params, limit=-1, offset=0):
         """Perform a LinkedIn search.
 

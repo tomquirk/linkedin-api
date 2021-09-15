@@ -1,28 +1,24 @@
 """
 Provides linkedin api-related code
 """
+import base64
 import json
 import logging
 import random
-import base64
 import uuid
 from operator import itemgetter
 from time import sleep, time
-from urllib.parse import urlencode, quote
+from urllib.parse import quote, urlencode
 
 from linkedin_api.client import Client
-from linkedin_api.utils.helpers import (
-    get_id_from_urn,
-    get_update_author_name,
-    get_update_old,
-    get_update_content,
-    get_update_author_profile,
-    get_update_url,
-    append_update_post_field_to_posts_list,
-    parse_list_raw_urns,
-    parse_list_raw_posts,
-    get_list_posts_sorted_without_promoted,
-)
+from linkedin_api.utils.helpers import (append_update_post_field_to_posts_list,
+                                        get_id_from_urn,
+                                        get_list_posts_sorted_without_promoted,
+                                        get_update_author_name,
+                                        get_update_author_profile,
+                                        get_update_content, get_update_old,
+                                        get_update_url, parse_list_raw_posts,
+                                        parse_list_raw_urns)
 
 logger = logging.getLogger(__name__)
 
@@ -236,7 +232,7 @@ class Linkedin(object):
         if connection_of:
             filters.append(f"connectionOf->{connection_of}")
         if network_depths:
-            filters.append(f'network->{"|".join(network_depth)}')
+            filters.append(f'network->{"|".join(network_depths)}')
         elif network_depth:
             filters.append(f"network->{network_depth}")
         if regions:
@@ -250,7 +246,9 @@ class Linkedin(object):
         if profile_languages:
             filters.append(f'profileLanguage->{"|".join(profile_languages)}')
         if nonprofit_interests:
-            filters.append(f'nonprofitInterest->{"|".join(nonprofit_interests)}')
+            filters.append(
+                f'nonprofitInterest->{"|".join(nonprofit_interests)}'
+            )
         if schools:
             filters.append(f'schools->{"|".join(schools)}')
         if service_categories:

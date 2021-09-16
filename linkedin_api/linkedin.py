@@ -11,14 +11,18 @@ from time import sleep, time
 from urllib.parse import quote, urlencode
 
 from linkedin_api.client import Client
-from linkedin_api.utils.helpers import (append_update_post_field_to_posts_list,
-                                        get_id_from_urn,
-                                        get_list_posts_sorted_without_promoted,
-                                        get_update_author_name,
-                                        get_update_author_profile,
-                                        get_update_content, get_update_old,
-                                        get_update_url, parse_list_raw_posts,
-                                        parse_list_raw_urns)
+from linkedin_api.utils.helpers import (
+    append_update_post_field_to_posts_list,
+    get_id_from_urn,
+    get_list_posts_sorted_without_promoted,
+    get_update_author_name,
+    get_update_author_profile,
+    get_update_content,
+    get_update_old,
+    get_update_url,
+    parse_list_raw_posts,
+    parse_list_raw_urns,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -264,7 +268,7 @@ class Linkedin(object):
         if connection_of:
             filters.append(f"connectionOf->{connection_of}")
         if network_depths:
-            filters.append(f'network->{"|".join(network_depths)}')
+            filters.append(f'network->{"|".join(network_depth)}')
         elif network_depth:
             filters.append(f"network->{network_depth}")
         if regions:

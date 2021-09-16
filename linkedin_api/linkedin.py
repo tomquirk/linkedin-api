@@ -11,18 +11,14 @@ from time import sleep, time
 from urllib.parse import quote, urlencode
 
 from linkedin_api.client import Client
-from linkedin_api.utils.helpers import (
-    append_update_post_field_to_posts_list,
-    get_id_from_urn,
-    get_list_posts_sorted_without_promoted,
-    get_update_author_name,
-    get_update_author_profile,
-    get_update_content,
-    get_update_old,
-    get_update_url,
-    parse_list_raw_posts,
-    parse_list_raw_urns,
-)
+from linkedin_api.utils.helpers import (append_update_post_field_to_posts_list,
+                                        get_id_from_urn,
+                                        get_list_posts_sorted_without_promoted,
+                                        get_update_author_name,
+                                        get_update_author_profile,
+                                        get_update_content, get_update_old,
+                                        get_update_url, parse_list_raw_posts,
+                                        parse_list_raw_urns)
 
 logger = logging.getLogger(__name__)
 
@@ -96,44 +92,6 @@ class Linkedin(object):
 
         url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
         return self.client.session.post(url, **kwargs)
-
-    def get_profile_posts(self, public_id=None, urn_id=None):
-        """
-        get_profile_posts: Get profile posts
-
-        :param public_id: LinkedIn public ID for a profile
-        :type public_id: str, optional
-        :param urn_id: LinkedIn URN ID for a profile
-        :type urn_id: str, optional
-        :return: data in json format
-        :rtype: dict
-        """
-        url_params = {
-            "count": 10,
-            "start": 0,
-            "q": "memberShareFeed",
-            "moduleKey": "member-shares:phone",
-            "includeLongTermHistory": True,
-        }
-        profile = self.get_profile(public_id=public_id, urn_id=urn_id)
-        profile_urn = profile["profile_urn"].replace(
-            "fs_miniProfile", "fsd_profile"
-        )
-        url_params["profileUrn"] = profile_urn
-        url = f"/identity/profileUpdatesV2"
-        res = self._fetch(url, params=url_params)
-        data = res.json()
-        if data and "status" in data and data["status"] != 200:
-            self.logger.info("request failed: {}".format(data["message"]))
-            return {}
-        if data and data["metadata"]["paginationToken"] != "":
-            pagination_token = data["metadata"]["paginationToken"]
-            url_params["start"] = url_params["start"] + 10
-            url_params["paginationToken"] = pagination_token
-            res = self._fetch(url, params=url_params)
-            data["elements"] = data["elements"] + res.json()["elements"]
-            data["paging"] = res.json()["paging"]
-        return data
 
     def search(self, params, limit=-1, offset=0):
         """Perform a LinkedIn search.
@@ -270,7 +228,7 @@ class Linkedin(object):
         if network_depths:
             filters.append(f'network->{"|".join(network_depth)}')
         elif network_depth:
-            filters.append(f"network->{network_depth}")
+            filters.append(f"network->{network_depths}")
         if regions:
             filters.append(f'geoUrn->{"|".join(regions)}')
         if industries:

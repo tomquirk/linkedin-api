@@ -101,7 +101,7 @@ class Linkedin(object):
             "fs_miniProfile", "fsd_profile"
         )
         url_params["profileUrn"] = profile_urn
-        url = f"/identity/profileUpdatedV2?includeLongTermHistory=true&moduleKey=member-shares%3Aphone&{urllib.parse.urlencode(url_params)}&q=memberShareFeed"
+        url = f"/identity/profileUpdatesV2?includeLongTermHistory=true&moduleKey=member-shares%3Aphone&{urllib.parse.urlencode(url_params)}&q=memberShareFeed"
         res = self._fetch(url)
         data = res.json()
         if data and "status" in data and data["status"] != 200:

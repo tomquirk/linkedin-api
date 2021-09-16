@@ -5,7 +5,6 @@ import base64
 import json
 import logging
 import random
-import urllib
 import uuid
 from operator import itemgetter
 from time import sleep, time
@@ -95,18 +94,41 @@ class Linkedin(object):
         return self.client.session.post(url, **kwargs)
 
     def get_profile_posts(self, public_id=None, urn_id=None):
-        url_params = {"count": 10, "start": 0}
+        """
+        get_profile_posts: Get profile posts
+
+        :param public_id: LinkedIn public ID for a profile
+        :type public_id: str, optional
+        :param urn_id: LinkedIn URN ID for a profile
+        :type urn_id: str, optional
+        :return: data in json format
+        :rtype: dict
+        """
+        url_params = {
+            "count": 10,
+            "start": 0,
+            "q": "memberShareFeed",
+            "moduleKey": "member-shares:phone",
+            "includeLongTermHistory": True,
+        }
         profile = self.get_profile(public_id=public_id, urn_id=urn_id)
         profile_urn = profile["profile_urn"].replace(
             "fs_miniProfile", "fsd_profile"
         )
         url_params["profileUrn"] = profile_urn
-        url = f"/identity/profileUpdatesV2?includeLongTermHistory=true&moduleKey=member-shares%3Aphone&{urllib.parse.urlencode(url_params)}&q=memberShareFeed"
-        res = self._fetch(url)
+        url = f"/identity/profileUpdatesV2"
+        res = self._fetch(url, params=url_params)
         data = res.json()
         if data and "status" in data and data["status"] != 200:
             self.logger.info("request failed: {}".format(data["message"]))
             return {}
+        if data and data["metadata"]["paginationToken"] != "":
+            pagination_token = data["metadata"]["paginationToken"]
+            url_params["start"] = url_params["start"] + 10
+            url_params["paginationToken"] = pagination_token
+            res = self._fetch(url, params=url_params)
+            data["elements"] = data["elements"] + res.json()["elements"]
+            data["paging"] = res.json()["paging"]
         return data
 
     def search(self, params, limit=-1, offset=0):
@@ -289,7 +311,7 @@ class Linkedin(object):
                 continue
             results.append(
                 {
-                    "urn_id": {LINKEDIN_API_BASE_URL}id_from_urn(item.get("targetUrn")),
+                    "urn_id": get_id_from_urn(item.get("targetUrn")),
                     "distance": item.get("memberDistance", {}).get("value"),
                     "public_id": item.get("publicIdentifier"),
                     "tracking_id": get_id_from_urn(item.get("trackingUrn")),

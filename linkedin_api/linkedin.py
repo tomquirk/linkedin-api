@@ -11,14 +11,18 @@ from time import sleep, time
 from urllib.parse import quote, urlencode
 
 from linkedin_api.client import Client
-from linkedin_api.utils.helpers import (append_update_post_field_to_posts_list,
-                                        get_id_from_urn,
-                                        get_list_posts_sorted_without_promoted,
-                                        get_update_author_name,
-                                        get_update_author_profile,
-                                        get_update_content, get_update_old,
-                                        get_update_url, parse_list_raw_posts,
-                                        parse_list_raw_urns)
+from linkedin_api.utils.helpers import (
+    append_update_post_field_to_posts_list,
+    get_id_from_urn,
+    get_list_posts_sorted_without_promoted,
+    get_update_author_name,
+    get_update_author_profile,
+    get_update_content,
+    get_update_old,
+    get_update_url,
+    parse_list_raw_posts,
+    parse_list_raw_urns,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -486,6 +490,34 @@ class Linkedin(object):
         contact_info["websites"] = websites
 
         return contact_info
+
+    def get_profile_posts(self, public_id=None, urn_id=None):
+        url_params = {
+            "count": 10,
+            "start": 0,
+            "q": "memberShareFeed",
+            "moduleKey": "member-shares:phone",
+            "includeLongTermHistory": True,
+        }
+        profile = self.get_profile(public_id=public_id, urn_id=urn_id)
+        profile_urn = profile["profile_urn"].replace(
+            "fs_miniProfile", "fsd_profile"
+        )
+        url_params["profileUrn"] = profile_urn
+        url = f"/identity/profileUpdatesV2"
+        res = self._fetch(url, params=url_params)
+        data = res.json()
+        if data and "status" in data and data["status"] != 200:
+            self.logger.info("request failed: {}".format(data["message"]))
+            return {}
+        if data and data["metadata"]["paginationToken"] != "":
+            pagination_token = data["metadata"]["paginationToken"]
+            url_params["start"] = url_params["start"] + 10
+            url_params["paginationToken"] = pagination_token
+            res = self._fetch(url, params=url_params)
+            data["elements"] = data["elements"] + res.json()["elements"]
+            data["paging"] = res.json()["paging"]
+        return data
 
     def get_profile_skills(self, public_id=None, urn_id=None):
         """Fetch the skills listed on a given LinkedIn profile.

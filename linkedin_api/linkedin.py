@@ -97,7 +97,7 @@ class Linkedin(object):
         url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
         return self.client.session.post(url, **kwargs)
 
-    def get_profile_posts(self, public_id=None, urn_id=None):
+    def get_profile_posts(self, public_id=None, urn_id=None, post_count=100):
         """
         get_profile_posts: Get profile posts
 
@@ -108,6 +108,7 @@ class Linkedin(object):
         :return: data in json format
         :rtype: dict
         """
+        _MAX_POST_COUNT = 100
         url_params = {
             "count": 10,
             "start": 0,
@@ -126,13 +127,19 @@ class Linkedin(object):
         if data and "status" in data and data["status"] != 200:
             self.logger.info("request failed: {}".format(data["message"]))
             return {}
-        if data and data["metadata"]["paginationToken"] != "":
+        while data and data["metadata"]["paginationToken"] != "":
             pagination_token = data["metadata"]["paginationToken"]
             url_params["start"] = url_params["start"] + 10
             url_params["paginationToken"] = pagination_token
             res = self._fetch(url, params=url_params)
+            data["metadata"] = res.json()["metadata"]
             data["elements"] = data["elements"] + res.json()["elements"]
             data["paging"] = res.json()["paging"]
+            if (
+                len(data["elements"]) > post_count
+                or len(data["elements"]) > _MAX_POST_COUNT
+            ):
+                break
         return data
 
     def search(self, params, limit=-1, offset=0):

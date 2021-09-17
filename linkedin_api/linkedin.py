@@ -1,24 +1,28 @@
 """
 Provides linkedin api-related code
 """
-import base64
 import json
 import logging
 import random
+import base64
 import uuid
 from operator import itemgetter
 from time import sleep, time
-from urllib.parse import quote, urlencode
+from urllib.parse import urlencode, quote
 
 from linkedin_api.client import Client
-from linkedin_api.utils.helpers import (append_update_post_field_to_posts_list,
-                                        get_id_from_urn,
-                                        get_list_posts_sorted_without_promoted,
-                                        get_update_author_name,
-                                        get_update_author_profile,
-                                        get_update_content, get_update_old,
-                                        get_update_url, parse_list_raw_posts,
-                                        parse_list_raw_urns)
+from linkedin_api.utils.helpers import (
+    get_id_from_urn,
+    get_update_author_name,
+    get_update_old,
+    get_update_content,
+    get_update_author_profile,
+    get_update_url,
+    append_update_post_field_to_posts_list,
+    parse_list_raw_urns,
+    parse_list_raw_posts,
+    get_list_posts_sorted_without_promoted,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -28,15 +32,12 @@ def default_evade():
     A catch-all method to try and evade suspension from Linkedin.
     Currenly, just delays the request by a random (bounded) time
     """
-    sleep(
-        random.randint(2, 5)
-    )  # sleep a random duration to try and evade suspention
+    sleep(random.randint(2, 5))  # sleep a random duration to try and evade suspention
 
 
 class Linkedin(object):
     """
     Class for accessing the LinkedIn API.
-
     :param username: Username of LinkedIn account.
     :type username: str
     :param password: Password of LinkedIn account.
@@ -95,15 +96,12 @@ class Linkedin(object):
 
     def search(self, params, limit=-1, offset=0):
         """Perform a LinkedIn search.
-
         :param params: Search parameters (see code)
         :type params: dict
         :param limit: Maximum length of the returned list, defaults to -1 (no limit)
         :type limit: int, optional
         :param offset: Index to start searching from
         :type offset: int, optional
-
-
         :return: List of search results
         :rtype: list
         """
@@ -128,9 +126,7 @@ class Linkedin(object):
 
             res = self._fetch(
                 f"/search/blended?{urlencode(default_params, safe='(),')}",
-                headers={
-                    "accept": "application/vnd.linkedin.normalized+json+2.1"
-                },
+                headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
             )
             data = res.json()
 
@@ -173,7 +169,8 @@ class Linkedin(object):
         # Keywords filter
         keyword_first_name=None,
         keyword_last_name=None,
-        keyword_title=None,  # `keyword_title` and `title` are the same. We kept `title` for backward compatibility. Please only use one of them.
+        # `keyword_title` and `title` are the same. We kept `title` for backward compatibility. Please only use one of them.
+        keyword_title=None,
         keyword_company=None,
         keyword_school=None,
         network_depth=None,  # DEPRECATED - use network_depths
@@ -181,7 +178,6 @@ class Linkedin(object):
         **kwargs,
     ):
         """Perform a LinkedIn search for people.
-
         :param keywords: Keywords to search on
         :type keywords: str, optional
         :param current_company: A list of company URN IDs (str)
@@ -218,7 +214,6 @@ class Linkedin(object):
         :type keyword_school: str, optional
         :param connection_of: Connection of LinkedIn user, given by profile URN ID
         :type connection_of: str, optional
-
         :return: List of profiles (minimal data only)
         :rtype: list
         """
@@ -226,9 +221,9 @@ class Linkedin(object):
         if connection_of:
             filters.append(f"connectionOf->{connection_of}")
         if network_depths:
-            filters.append(f'network->{"|".join(network_depth)}')
+            filters.append(f'network->{"|".join(network_depths)}')
         elif network_depth:
-            filters.append(f"network->{network_depths}")
+            filters.append(f"network->{network_depth}")
         if regions:
             filters.append(f'geoUrn->{"|".join(regions)}')
         if industries:
@@ -241,8 +236,7 @@ class Linkedin(object):
             filters.append(f'profileLanguage->{"|".join(profile_languages)}')
         if nonprofit_interests:
             filters.append(
-                f'nonprofitInterest->{"|".join(nonprofit_interests)}'
-            )
+                f'nonprofitInterest->{"|".join(nonprofit_interests)}')
         if schools:
             filters.append(f'schools->{"|".join(schools)}')
         if service_categories:
@@ -284,10 +278,8 @@ class Linkedin(object):
 
     def search_companies(self, keywords=None, **kwargs):
         """Perform a LinkedIn search for companies.
-
         :param keywords: A list of search keywords (str)
         :type keywords: list, optional
-
         :return: List of companies
         :rtype: list
         """
@@ -336,7 +328,6 @@ class Linkedin(object):
         **kwargs,
     ):
         """Perform a LinkedIn search for jobs.
-
         :param keywords: Search keywords (str)
         :type keywords: str, optional
         :param companies: A list of company URN IDs (str)
@@ -415,9 +406,7 @@ class Linkedin(object):
 
             res = self._fetch(
                 f"/search/hits?{urlencode(default_params, safe='(),')}",
-                headers={
-                    "accept": "application/vnd.linkedin.normalized+json+2.1"
-                },
+                headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
             )
             data = res.json()
 
@@ -444,12 +433,10 @@ class Linkedin(object):
 
     def get_profile_contact_info(self, public_id=None, urn_id=None):
         """Fetch contact information for a given LinkedIn profile. Pass a [public_id] or a [urn_id].
-
         :param public_id: LinkedIn public ID for a profile
         :type public_id: str, optional
         :param urn_id: LinkedIn URN ID for a profile
         :type urn_id: str, optional
-
         :return: Contact data
         :rtype: dict
         """
@@ -469,10 +456,7 @@ class Linkedin(object):
 
         websites = data.get("websites", [])
         for item in websites:
-            if (
-                "com.linkedin.voyager.identity.profile.StandardWebsite"
-                in item["type"]
-            ):
+            if "com.linkedin.voyager.identity.profile.StandardWebsite" in item["type"]:
                 item["label"] = item["type"][
                     "com.linkedin.voyager.identity.profile.StandardWebsite"
                 ]["category"]
@@ -489,13 +473,10 @@ class Linkedin(object):
 
     def get_profile_skills(self, public_id=None, urn_id=None):
         """Fetch the skills listed on a given LinkedIn profile.
-
         :param public_id: LinkedIn public ID for a profile
         :type public_id: str, optional
         :param urn_id: LinkedIn URN ID for a profile
         :type urn_id: str, optional
-
-
         :return: List of skill objects
         :rtype: list
         """
@@ -513,20 +494,17 @@ class Linkedin(object):
 
     def get_profile(self, public_id=None, urn_id=None):
         """Fetch data for a given LinkedIn profile.
-
         :param public_id: LinkedIn public ID for a profile
         :type public_id: str, optional
         :param urn_id: LinkedIn URN ID for a profile
         :type urn_id: str, optional
-
         :return: Profile data
         :rtype: dict
         """
         # NOTE this still works for now, but will probably eventually have to be converted to
         # https://www.linkedin.com/voyager/api/identity/profiles/ACoAAAKT9JQBsH7LwKaE9Myay9WcX8OVGuDq9Uw
         res = self._fetch(
-            f"/identity/profiles/{public_id or urn_id}/profileView"
-        )
+            f"/identity/profiles/{public_id or urn_id}/profileView")
 
         data = res.json()
         if data and "status" in data and data["status"] != 200:
@@ -537,9 +515,9 @@ class Linkedin(object):
         profile = data["profile"]
         if "miniProfile" in profile:
             if "picture" in profile["miniProfile"]:
-                profile["displayPictureUrl"] = profile["miniProfile"][
-                    "picture"
-                ]["com.linkedin.common.VectorImage"]["rootUrl"]
+                profile["displayPictureUrl"] = profile["miniProfile"]["picture"][
+                    "com.linkedin.common.VectorImage"
+                ]["rootUrl"]
 
                 images_data = profile["miniProfile"]["picture"][
                     "com.linkedin.common.VectorImage"
@@ -551,8 +529,7 @@ class Linkedin(object):
                     profile[f"img_{w}_{h}"] = url_segment
 
             profile["profile_id"] = get_id_from_urn(
-                profile["miniProfile"]["entityUrn"]
-            )
+                profile["miniProfile"]["entityUrn"])
             profile["profile_urn"] = profile["miniProfile"]["entityUrn"]
             profile["member_urn"] = profile["miniProfile"]["objectUrn"]
 
@@ -625,10 +602,8 @@ class Linkedin(object):
 
     def get_profile_connections(self, urn_id):
         """Fetch first-degree connections for a given LinkedIn profile.
-
         :param urn_id: LinkedIn URN ID for a profile
         :type urn_id: str
-
         :return: List of search results
         :rtype: list
         """
@@ -638,12 +613,10 @@ class Linkedin(object):
         self, public_id=None, urn_id=None, max_results=None, results=[]
     ):
         """Fetch company updates (news activity) for a given LinkedIn company.
-
         :param public_id: LinkedIn public ID for a company
         :type public_id: str, optional
         :param urn_id: LinkedIn URN ID for a company
         :type urn_id: str, optional
-
         :return: List of company update objects
         :rtype: list
         """
@@ -664,8 +637,7 @@ class Linkedin(object):
             or (max_results is not None and len(results) >= max_results)
             or (
                 max_results is not None
-                and len(results) / max_results
-                >= Linkedin._MAX_REPEATED_REQUESTS
+                and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS
             )
         ):
             return results
@@ -674,22 +646,17 @@ class Linkedin(object):
         self.logger.debug(f"results grew: {len(results)}")
 
         return self.get_company_updates(
-            public_id=public_id,
-            urn_id=urn_id,
-            results=results,
-            max_results=max_results,
+            public_id=public_id, urn_id=urn_id, results=results, max_results=max_results
         )
 
     def get_profile_updates(
         self, public_id=None, urn_id=None, max_results=None, results=[]
     ):
         """Fetch profile updates (newsfeed activity) for a given LinkedIn profile.
-
         :param public_id: LinkedIn public ID for a profile
         :type public_id: str, optional
         :param urn_id: LinkedIn URN ID for a profile
         :type urn_id: str, optional
-
         :return: List of profile update objects
         :rtype: list
         """
@@ -710,8 +677,7 @@ class Linkedin(object):
             or (max_results is not None and len(results) >= max_results)
             or (
                 max_results is not None
-                and len(results) / max_results
-                >= Linkedin._MAX_REPEATED_REQUESTS
+                and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS
             )
         ):
             return results
@@ -720,15 +686,11 @@ class Linkedin(object):
         self.logger.debug(f"results grew: {len(results)}")
 
         return self.get_profile_updates(
-            public_id=public_id,
-            urn_id=urn_id,
-            results=results,
-            max_results=max_results,
+            public_id=public_id, urn_id=urn_id, results=results, max_results=max_results
         )
 
     def get_current_profile_views(self):
         """Get profile view statistics, including chart data.
-
         :return: Profile view data
         :rtype: dict
         """
@@ -746,10 +708,8 @@ class Linkedin(object):
 
     def get_school(self, public_id):
         """Fetch data about a given LinkedIn school.
-
         :param public_id: LinkedIn public ID for a school
         :type public_id: str
-
         :return: School data
         :rtype: dict
         """
@@ -773,10 +733,8 @@ class Linkedin(object):
 
     def get_company(self, public_id):
         """Fetch data about a given LinkedIn company.
-
         :param public_id: LinkedIn public ID for a company
         :type public_id: str
-
         :return: Company data
         :rtype: dict
         """
@@ -800,10 +758,8 @@ class Linkedin(object):
 
     def get_conversation_details(self, profile_urn_id):
         """Fetch conversation (message thread) details for a given LinkedIn profile.
-
         :param profile_urn_id: LinkedIn URN ID for a profile
         :type profile_urn_id: str
-
         :return: Conversation data
         :rtype: dict
         """
@@ -823,7 +779,6 @@ class Linkedin(object):
 
     def get_conversations(self):
         """Fetch list of conversations the user is in.
-
         :return: List of conversations
         :rtype: list
         """
@@ -835,22 +790,18 @@ class Linkedin(object):
 
     def get_conversation(self, conversation_urn_id):
         """Fetch data about a given conversation.
-
         :param conversation_urn_id: LinkedIn URN ID for a conversation
         :type conversation_urn_id: str
-
         :return: Conversation data
         :rtype: dict
         """
         res = self._fetch(
-            f"/messaging/conversations/{conversation_urn_id}/events"
-        )
+            f"/messaging/conversations/{conversation_urn_id}/events")
 
         return res.json()
 
     def generateTrackingIdAsCharString(self):
         """Generates and returns a random trackingId
-
         :return: Random trackingId string
         :rtype: str
         """
@@ -858,18 +809,14 @@ class Linkedin(object):
         rand_byte_array = bytearray(random_int_array)
         return "".join([chr(i) for i in rand_byte_array])
 
-    def send_message(
-        self, message_body, conversation_urn_id=None, recipients=None
-    ):
+    def send_message(self, message_body, conversation_urn_id=None, recipients=None):
         """Send a message to a given conversation.
-
         :param message_body: Message text to send
         :type message_body: str
         :param conversation_urn_id: LinkedIn URN ID for a conversation
         :type conversation_urn_id: str, optional
         :param recipients: List of profile urn id's
         :type recipients: list, optional
-
         :return: Error state. If True, an error occured.
         :rtype: boolean
         """
@@ -877,8 +824,7 @@ class Linkedin(object):
 
         if not (conversation_urn_id or recipients):
             self.logger.debug(
-                "Must provide [conversation_urn_id] or [recipients]."
-            )
+                "Must provide [conversation_urn_id] or [recipients].")
             return True
 
         message_event = {
@@ -921,10 +867,8 @@ class Linkedin(object):
 
     def mark_conversation_as_seen(self, conversation_urn_id):
         """Send 'seen' to a given conversation.
-
         :param conversation_urn_id: LinkedIn URN ID for a conversation
         :type conversation_urn_id: str
-
         :return: Error state. If True, an error occured.
         :rtype: boolean
         """
@@ -938,7 +882,6 @@ class Linkedin(object):
 
     def get_user_profile(self, use_cache=True):
         """Get the current user profile. If not cached, a network request will be fired.
-
         :return: Profile data for currently logged in user
         :rtype: dict
         """
@@ -953,12 +896,10 @@ class Linkedin(object):
 
     def get_invitations(self, start=0, limit=3):
         """Fetch connection invitations for the currently logged in user.
-
         :param start: How much to offset results by
         :type start: int
         :param limit: Maximum amount of invitations to return
         :type limit: int
-
         :return: List of invitation objects
         :rtype: list
         """
@@ -978,22 +919,18 @@ class Linkedin(object):
             return []
 
         response_payload = res.json()
-        return [
-            element["invitation"] for element in response_payload["elements"]
-        ]
+        return [element["invitation"] for element in response_payload["elements"]]
 
     def reply_invitation(
         self, invitation_entity_urn, invitation_shared_secret, action="accept"
     ):
         """Respond to a connection invitation. By default, accept the invitation.
-
         :param invitation_entity_urn: URN ID of the invitation
         :type invitation_entity_urn: int
         :param invitation_shared_secret: Shared secret of invitation
         :type invitation_shared_secret: str
         :param action: "accept" or "reject". Defaults to "accept"
         :type action: str, optional
-
         :return: Success state. True if successful
         :rtype: boolean
         """
@@ -1017,7 +954,6 @@ class Linkedin(object):
 
     def generateTrackingId(self):
         """Generates and returns a random trackingId
-
         :return: Random trackingId string
         :rtype: str
         """
@@ -1027,19 +963,17 @@ class Linkedin(object):
 
     def add_connection(self, profile_public_id, message="", profile_urn=None):
         """Add a given profile id as a connection.
-
         :param profile_public_id: public ID of a LinkedIn profile
         :type profile_public_id: str
         :param message: message to send along with connection request
         :type profile_urn: str, optional
         :param profile_urn: member URN for the given LinkedIn profile
         :type profile_urn: str, optional
-
         :return: Error state. True if error occurred
         :rtype: boolean
         """
 
-        ## Validating message length (max size is 300 characters)
+        # Validating message length (max size is 300 characters)
         if len(message) > 300:
             self.logger.info("Message too long. Max size is 300 characters")
             return False
@@ -1074,10 +1008,8 @@ class Linkedin(object):
 
     def remove_connection(self, public_profile_id):
         """Remove a given profile as a connection.
-
         :param public_profile_id: public ID of a LinkedIn profile
         :type public_profile_id: str
-
         :return: Error state. True if error occurred
         :rtype: boolean
         """
@@ -1093,10 +1025,8 @@ class Linkedin(object):
         res = self._post(
             "/li/track",
             base_request=True,
-            headers={
-                "accept": "*/*",
-                "content-type": "text/plain;charset=UTF-8",
-            },
+            headers={"accept": "*/*",
+                     "content-type": "text/plain;charset=UTF-8"},
             data=json.dumps(payload),
         )
 
@@ -1109,17 +1039,14 @@ class Linkedin(object):
         network_distance=None,
     ):
         """View a profile, notifying the user that you "viewed" their profile.
-
         Provide [target_profile_member_urn_id] and [network_distance] to save 2 network requests and
         speed up the execution of this function.
-
         :param target_profile_public_id: public ID of a LinkedIn profile
         :type target_profile_public_id: str
         :param network_distance: How many degrees of separation exist e.g. 2
         :type network_distance: int, optional
         :param target_profile_member_urn_id: member URN id for target profile
         :type target_profile_member_urn_id: str, optional
-
         :return: Error state. True if error occurred
         :rtype: boolean
         """
@@ -1128,8 +1055,7 @@ class Linkedin(object):
         if not target_profile_member_urn_id:
             profile = self.get_profile(public_id=target_profile_public_id)
             target_profile_member_urn_id = int(
-                get_id_from_urn(profile["member_urn"])
-            )
+                get_id_from_urn(profile["member_urn"]))
 
         if not network_distance:
             profile_network_info = self.get_profile_network_info(
@@ -1144,9 +1070,7 @@ class Linkedin(object):
         viewer_privacy_setting = "F"
         me_member_id = me_profile["plainId"]
 
-        client_application_instance = self.client.metadata[
-            "clientApplicationInstance"
-        ]
+        client_application_instance = self.client.metadata["clientApplicationInstance"]
 
         eventBody = {
             "viewerPrivacySetting": viewer_privacy_setting,
@@ -1186,10 +1110,8 @@ class Linkedin(object):
 
     def get_profile_privacy_settings(self, public_profile_id):
         """Fetch privacy settings for a given LinkedIn profile.
-
         :param public_profile_id: public ID of a LinkedIn profile
         :type public_profile_id: str
-
         :return: Privacy settings data
         :rtype: dict
         """
@@ -1205,10 +1127,8 @@ class Linkedin(object):
 
     def get_profile_member_badges(self, public_profile_id):
         """Fetch badges for a given LinkedIn profile.
-
         :param public_profile_id: public ID of a LinkedIn profile
         :type public_profile_id: str
-
         :return: Badges data
         :rtype: dict
         """
@@ -1224,10 +1144,8 @@ class Linkedin(object):
 
     def get_profile_network_info(self, public_profile_id):
         """Fetch network information for a given LinkedIn profile.
-
         :param public_profile_id: public ID of a LinkedIn profile
         :type public_profile_id: str
-
         :return: Network data
         :rtype: dict
         """
@@ -1243,10 +1161,8 @@ class Linkedin(object):
 
     def unfollow_entity(self, urn_id):
         """Unfollow a given entity.
-
         :param urn_id: URN ID of entity to unfollow
         :type urn_id: str
-
         :return: Error state. Returns True if error occurred
         :rtype: boolean
         """
@@ -1268,14 +1184,12 @@ class Linkedin(object):
     ):
         """Get a list of URNs from feed sorted by 'Recent' and a list of yet
         unsorted posts, each one of them containing a dict per post.
-
         :param limit: Maximum length of the returned list, defaults to -1 (no limit)
         :type limit: int, optional
         :param offset: Index to start searching from
         :type offset: int, optional
         :param exclude_promoted_posts: Exclude from the output promoted posts
         :type exclude_promoted_posts: bool, optional
-
         :return: List of posts and list of URNs
         :rtype: (list, list)
         """
@@ -1306,9 +1220,7 @@ class Linkedin(object):
             res = self._fetch(
                 f"/feed/updatesV2",
                 params=params,
-                headers={
-                    "accept": "application/vnd.linkedin.normalized+json+2.1"
-                },
+                headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
             )
             """
             Response includes two keya:
@@ -1334,9 +1246,8 @@ class Linkedin(object):
             # NOTE: we could also check for the `total` returned in the response.
             # This is in data["data"]["paging"]["total"]
             if (
-                (
-                    limit > -1 and len(l_urns) >= limit
-                )  # if our results exceed set limit
+                # if our results exceed set limit
+                (limit > -1 and len(l_urns) >= limit)
                 or len(l_urns) / count >= Linkedin._MAX_REPEATED_REQUESTS
             ) or len(l_raw_urns) == 0:
                 break
@@ -1347,14 +1258,12 @@ class Linkedin(object):
 
     def get_feed_posts(self, limit=-1, offset=0, exclude_promoted_posts=True):
         """Get a list of URNs from feed sorted by 'Recent'
-
         :param limit: Maximum length of the returned list, defaults to -1 (no limit)
         :type limit: int, optional
         :param offset: Index to start searching from
         :type offset: int, optional
         :param exclude_promoted_posts: Exclude from the output promoted posts
         :type exclude_promoted_posts: bool, optional
-
         :return: List of URNs
         :rtype: list
         """

@@ -1,27 +1,27 @@
 """
 Provides linkedin api-related code
 """
-import base64
 import json
 import logging
 import random
+import base64
 import uuid
 from operator import itemgetter
 from time import sleep, time
-from urllib.parse import quote, urlencode
+from urllib.parse import urlencode, quote
 
 from linkedin_api.client import Client
 from linkedin_api.utils.helpers import (
-    append_update_post_field_to_posts_list,
     get_id_from_urn,
-    get_list_posts_sorted_without_promoted,
     get_update_author_name,
-    get_update_author_profile,
-    get_update_content,
     get_update_old,
+    get_update_content,
+    get_update_author_profile,
     get_update_url,
-    parse_list_raw_posts,
+    append_update_post_field_to_posts_list,
     parse_list_raw_urns,
+    parse_list_raw_posts,
+    get_list_posts_sorted_without_promoted,
 )
 
 logger = logging.getLogger(__name__)
@@ -222,7 +222,8 @@ class Linkedin(object):
         # Keywords filter
         keyword_first_name=None,
         keyword_last_name=None,
-        keyword_title=None,  # `keyword_title` and `title` are the same. We kept `title` for backward compatibility. Please only use one of them.
+        # `keyword_title` and `title` are the same. We kept `title` for backward compatibility. Please only use one of them.
+        keyword_title=None,
         keyword_company=None,
         keyword_school=None,
         network_depth=None,  # DEPRECATED - use network_depths
@@ -1088,7 +1089,7 @@ class Linkedin(object):
         :rtype: boolean
         """
 
-        ## Validating message length (max size is 300 characters)
+        # Validating message length (max size is 300 characters)
         if len(message) > 300:
             self.logger.info("Message too long. Max size is 300 characters")
             return False

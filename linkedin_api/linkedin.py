@@ -226,7 +226,7 @@ class Linkedin(object):
         if connection_of:
             filters.append(f"connectionOf->{connection_of}")
         if network_depths:
-            filters.append(f'network->{"|".join(network_depth)}')
+            filters.append(f'network->{"|".join(network_depths)}')
         elif network_depth:
             filters.append(f"network->{network_depth}")
         if regions:

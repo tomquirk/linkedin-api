@@ -11,18 +11,14 @@ from time import sleep, time
 from urllib.parse import quote, urlencode
 
 from linkedin_api.client import Client
-from linkedin_api.utils.helpers import (
-    append_update_post_field_to_posts_list,
-    get_id_from_urn,
-    get_list_posts_sorted_without_promoted,
-    get_update_author_name,
-    get_update_author_profile,
-    get_update_content,
-    get_update_old,
-    get_update_url,
-    parse_list_raw_posts,
-    parse_list_raw_urns,
-)
+from linkedin_api.utils.helpers import (append_update_post_field_to_posts_list,
+                                        get_id_from_urn,
+                                        get_list_posts_sorted_without_promoted,
+                                        get_update_author_name,
+                                        get_update_author_profile,
+                                        get_update_content, get_update_old,
+                                        get_update_url, parse_list_raw_posts,
+                                        parse_list_raw_urns)
 
 logger = logging.getLogger(__name__)
 
@@ -131,7 +127,7 @@ class Linkedin(object):
             return {}
         while data and data["metadata"]["paginationToken"] != "":
             pagination_token = data["metadata"]["paginationToken"]
-            url_params["start"] = url_params["start"] + 10
+            url_params["start"] = url_params["start"] + self._MAX_POST_COUNT
             url_params["paginationToken"] = pagination_token
             res = self._fetch(url, params=url_params)
             data["metadata"] = res.json()["metadata"]

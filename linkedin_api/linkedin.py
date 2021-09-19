@@ -11,18 +11,14 @@ from time import sleep, time
 from urllib.parse import quote, urlencode
 
 from linkedin_api.client import Client
-from linkedin_api.utils.helpers import (
-    append_update_post_field_to_posts_list,
-    get_id_from_urn,
-    get_list_posts_sorted_without_promoted,
-    get_update_author_name,
-    get_update_author_profile,
-    get_update_content,
-    get_update_old,
-    get_update_url,
-    parse_list_raw_posts,
-    parse_list_raw_urns,
-)
+from linkedin_api.utils.helpers import (append_update_post_field_to_posts_list,
+                                        get_id_from_urn,
+                                        get_list_posts_sorted_without_promoted,
+                                        get_update_author_name,
+                                        get_update_author_profile,
+                                        get_update_content, get_update_old,
+                                        get_update_url, parse_list_raw_posts,
+                                        parse_list_raw_urns)
 
 logger = logging.getLogger(__name__)
 
@@ -96,7 +92,7 @@ class Linkedin(object):
         url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
         return self.client.session.post(url, **kwargs)
 
-    def get_profile_posts(self, public_id=None, urn_id=None, post_count=100):
+    def get_profile_posts(self, public_id=None, urn_id=None, post_count=10):
         """
         get_profile_posts: Get profile posts
 

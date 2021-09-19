@@ -139,7 +139,7 @@ class Linkedin(object):
             data["paging"] = res.json()["paging"]
             if len(data["elements"]) > post_count:
                 break
-        return data
+        return data["elements"]
 
     def search(self, params, limit=-1, offset=0):
         """Perform a LinkedIn search.

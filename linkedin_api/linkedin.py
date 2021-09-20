@@ -1,27 +1,27 @@
 """
 Provides linkedin api-related code
 """
+import base64
 import json
 import logging
 import random
-import base64
 import uuid
 from operator import itemgetter
 from time import sleep, time
-from urllib.parse import urlencode, quote
+from urllib.parse import quote, urlencode
 
 from linkedin_api.client import Client
 from linkedin_api.utils.helpers import (
-    get_id_from_urn,
-    get_update_author_name,
-    get_update_old,
-    get_update_content,
-    get_update_author_profile,
-    get_update_url,
     append_update_post_field_to_posts_list,
-    parse_list_raw_urns,
-    parse_list_raw_posts,
+    get_id_from_urn,
     get_list_posts_sorted_without_promoted,
+    get_update_author_name,
+    get_update_author_profile,
+    get_update_content,
+    get_update_old,
+    get_update_url,
+    parse_list_raw_posts,
+    parse_list_raw_urns,
 )
 
 logger = logging.getLogger(__name__)
@@ -45,6 +45,7 @@ class Linkedin(object):
     :type password: str
     """
 
+    _MAX_POST_COUNT = 100  # max seems to be 100 posts per page
     _MAX_UPDATE_COUNT = 100  # max seems to be 100
     _MAX_SEARCH_COUNT = 49  # max seems to be 49, and min seems to be 2
     _MAX_REPEATED_REQUESTS = (
@@ -94,6 +95,52 @@ class Linkedin(object):
 
         url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
         return self.client.session.post(url, **kwargs)
+
+    def get_profile_posts(self, public_id=None, urn_id=None, post_count=10):
+        """
+        get_profile_posts: Get profile posts
+
+        :param public_id: LinkedIn public ID for a profile
+        :type public_id: str, optional
+        :param urn_id: LinkedIn URN ID for a profile
+        :type urn_id: str, optional
+        :param post_count: Number of posts to fetch
+        :type post_count: int, optional
+        :return: List of posts
+        :rtype: list
+        """
+        url_params = {
+            "count": min(post_count, self._MAX_POST_COUNT),
+            "start": 0,
+            "q": "memberShareFeed",
+            "moduleKey": "member-shares:phone",
+            "includeLongTermHistory": True,
+        }
+        if urn_id:
+            profile_urn = f"urn:li:fsd_profile:{urn_id}"
+        else:
+            profile = self.get_profile(public_id=public_id)
+            profile_urn = profile["profile_urn"].replace(
+                "fs_miniProfile", "fsd_profile"
+            )
+        url_params["profileUrn"] = profile_urn
+        url = f"/identity/profileUpdatesV2"
+        res = self._fetch(url, params=url_params)
+        data = res.json()
+        if data and "status" in data and data["status"] != 200:
+            self.logger.info("request failed: {}".format(data["message"]))
+            return {}
+        while data and data["metadata"]["paginationToken"] != "":
+            if len(data["elements"]) >= post_count:
+                break
+            pagination_token = data["metadata"]["paginationToken"]
+            url_params["start"] = url_params["start"] + self._MAX_POST_COUNT
+            url_params["paginationToken"] = pagination_token
+            res = self._fetch(url, params=url_params)
+            data["metadata"] = res.json()["metadata"]
+            data["elements"] = data["elements"] + res.json()["elements"]
+            data["paging"] = res.json()["paging"]
+        return data["elements"]
 
     def search(self, params, limit=-1, offset=0):
         """Perform a LinkedIn search.
@@ -173,7 +220,8 @@ class Linkedin(object):
         # Keywords filter
         keyword_first_name=None,
         keyword_last_name=None,
-        keyword_title=None,  # `keyword_title` and `title` are the same. We kept `title` for backward compatibility. Please only use one of them.
+        # `keyword_title` and `title` are the same. We kept `title` for backward compatibility. Please only use one of them.
+        keyword_title=None,
         keyword_company=None,
         keyword_school=None,
         network_depth=None,  # DEPRECATED - use network_depths
@@ -662,7 +710,10 @@ class Linkedin(object):
         self.logger.debug(f"results grew: {len(results)}")
 
         return self.get_company_updates(
-            public_id=public_id, urn_id=urn_id, results=results, max_results=max_results
+            public_id=public_id,
+            urn_id=urn_id,
+            results=results,
+            max_results=max_results,
         )
 
     def get_profile_updates(
@@ -704,7 +755,10 @@ class Linkedin(object):
         self.logger.debug(f"results grew: {len(results)}")
 
         return self.get_profile_updates(
-            public_id=public_id, urn_id=urn_id, results=results, max_results=max_results
+            public_id=public_id,
+            urn_id=urn_id,
+            results=results,
+            max_results=max_results,
         )
 
     def get_current_profile_views(self):
@@ -1012,7 +1066,7 @@ class Linkedin(object):
         :rtype: boolean
         """
 
-        ## Validating message length (max size is 300 characters)
+        # Validating message length (max size is 300 characters)
         if len(message) > 300:
             self.logger.info("Message too long. Max size is 300 characters")
             return False
@@ -1066,7 +1120,10 @@ class Linkedin(object):
         res = self._post(
             "/li/track",
             base_request=True,
-            headers={"accept": "*/*", "content-type": "text/plain;charset=UTF-8"},
+            headers={
+                "accept": "*/*",
+                "content-type": "text/plain;charset=UTF-8",
+            },
             data=json.dumps(payload),
         )
 

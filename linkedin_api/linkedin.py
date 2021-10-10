@@ -851,6 +851,9 @@ class Linkedin(object):
 
         data = res.json()
 
+        if data["elements"] == []:
+            return {}
+
         item = data["elements"][0]
         item["id"] = get_id_from_urn(item["entityUrn"])
 

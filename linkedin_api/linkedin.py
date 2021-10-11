@@ -118,10 +118,13 @@ class Linkedin(object):
             "moduleKey": "member-shares:phone",
             "includeLongTermHistory": True,
         }
-        profile = self.get_profile(public_id=public_id, urn_id=urn_id)
-        profile_urn = profile["profile_urn"].replace(
-            "fs_miniProfile", "fsd_profile"
-        )
+        if urn_id:
+            profile_urn = f"urn:li:fsd_profile:{urn_id}"
+        else:
+            profile = self.get_profile(public_id=public_id)
+            profile_urn = profile["profile_urn"].replace(
+                "fs_miniProfile", "fsd_profile"
+            )
         url_params["profileUrn"] = profile_urn
         url = f"/identity/profileUpdatesV2"
         res = self._fetch(url, params=url_params)
@@ -130,6 +133,8 @@ class Linkedin(object):
             self.logger.info("request failed: {}".format(data["message"]))
             return {}
         while data and data["metadata"]["paginationToken"] != "":
+            if len(data["elements"]) >= post_count:
+                break
             pagination_token = data["metadata"]["paginationToken"]
             url_params["start"] = url_params["start"] + self._MAX_POST_COUNT
             url_params["paginationToken"] = pagination_token
@@ -190,6 +195,8 @@ class Linkedin(object):
                 if len(data["elements"]) > comment_count:
                     break
         return data
+
+        return data["elements"]
 
     def search(self, params, limit=-1, offset=0):
         """Perform a LinkedIn search.
@@ -325,7 +332,7 @@ class Linkedin(object):
         if connection_of:
             filters.append(f"connectionOf->{connection_of}")
         if network_depths:
-            filters.append(f'network->{"|".join(network_depth)}')
+            filters.append(f'network->{"|".join(network_depths)}')
         elif network_depth:
             filters.append(f"network->{network_depths}")
         if regions:
@@ -942,6 +949,9 @@ class Linkedin(object):
         )
 
         data = res.json()
+
+        if data["elements"] == []:
+            return {}
 
         item = data["elements"][0]
         item["id"] = get_id_from_urn(item["entityUrn"])

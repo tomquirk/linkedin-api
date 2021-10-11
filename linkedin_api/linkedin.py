@@ -174,7 +174,7 @@ class Linkedin(object):
             "q": "comments",
             "sortOrder": "RELEVANCE",
         }
-        url = f"/identity/profileUpdatesV2"
+        url = f"/feed/comments"
         for activity_feed_id in activity_feed_ids:
             url_params["updateId"] = "activity:" + activity_feed_id
             res = self._fetch(url, params=url_params)

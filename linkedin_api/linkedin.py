@@ -11,14 +11,18 @@ from time import sleep, time
 from urllib.parse import quote, urlencode
 
 from linkedin_api.client import Client
-from linkedin_api.utils.helpers import (append_update_post_field_to_posts_list,
-                                        get_id_from_urn,
-                                        get_list_posts_sorted_without_promoted,
-                                        get_update_author_name,
-                                        get_update_author_profile,
-                                        get_update_content, get_update_old,
-                                        get_update_url, parse_list_raw_posts,
-                                        parse_list_raw_urns)
+from linkedin_api.utils.helpers import (
+    append_update_post_field_to_posts_list,
+    get_id_from_urn,
+    get_list_posts_sorted_without_promoted,
+    get_update_author_name,
+    get_update_author_profile,
+    get_update_content,
+    get_update_old,
+    get_update_url,
+    parse_list_raw_posts,
+    parse_list_raw_urns,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -132,6 +136,56 @@ class Linkedin(object):
             if len(data["elements"]) > post_count:
                 break
         return data["elements"]
+
+    def get_profile_posts_comments(
+        self, public_id=None, urn_id=None, post_count=100, comment_count=100
+    ):
+        """
+        get_profile_posts_comments: Get profile posts comments
+
+        :param public_id: LinkedIn public ID for a profile
+        :type public_id: str, optional
+        :param urn_id: LinkedIn URN ID for a profile
+        :type urn_id: str, optional
+        :param post_count: Number of posts comments to fetch
+        :type post_count: int, optional
+        :return: List of posts
+        :rtype: list
+        """
+        # profile = self.get_profile(public_id=public_id, urn_id=urn_id)
+        profile_posts = self.get_profile_posts(
+            public_id=public_id, urn_id=urn_id, post_count=100
+        )
+        activity_feed_ids = []
+        for profile_post in profile_posts["elements"]:
+            activity_feed_ids.append(
+                profile_post["updateMetadata"]["urn"].split(":")[-1]
+            )
+        url_params = {
+            "count": min(comment_count, self._MAX_POST_COUNT),
+            "start": 0,
+            "q": "comments",
+            "sortOrder": "RELEVANCE",
+        }
+        url = f"/identity/profileUpdatesV2"
+        for activity_feed_id in activity_feed_ids:
+            url_params["updateId"] = "activity:" + activity_feed_id
+            res = self._fetch(url, params=url_params)
+            data = res.json()
+            if data and "status" in data and data["status"] != 200:
+                self.logger.info("request failed: {}".format(data["status"]))
+                return {}
+            while data and data["metadata"]["paginationToken"] != "":
+                pagination_token = data["metadata"]["paginationToken"]
+                url_params["start"] = url_params["start"] + 10
+                url_params["paginationToken"] = pagination_token
+                res = self._fetch(url, params=url_params)
+                data["metadata"] = res.json()["metadata"]
+                data["elements"] = data["elements"] + res.json()["elements"]
+                data["paging"] = res.json()["paging"]
+                if len(data["elements"]) > comment_count:
+                    break
+        return data
 
     def search(self, params, limit=-1, offset=0):
         """Perform a LinkedIn search.
@@ -528,9 +582,7 @@ class Linkedin(object):
             "includeLongTermHistory": True,
         }
         profile = self.get_profile(public_id=public_id, urn_id=urn_id)
-        profile_urn = profile["profile_urn"].replace(
-            "fs_miniProfile", "fsd_profile"
-        )
+        profile_urn = profile["profile_urn"].replace("fs_miniProfile", "fsd_profile")
         url_params["profileUrn"] = profile_urn
         url = f"/identity/profileUpdatesV2"
         res = self._fetch(url, params=url_params)

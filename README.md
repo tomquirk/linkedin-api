@@ -1,10 +1,14 @@
 # linkedin_api
 
----
+<h3 align="center">Sponsors</h3>
 
-## ⚠️ Want to be a maintainer?
+<p align="center">
+  <a href="https://serpsbot.com" target="_blank">
+    <img width="150px" src="https://serpsbot.com/wp-content/uploads/2021/07/serpsbot-logo-purple.png" alt="serpsbot">
+  </a>
+</p>
 
-I don't have the time to commit to this project any more. Please get in contact with me if you want to help keep it alive.
+<h5 align="center"><a href="https://github.com/sponsors/tomquirk/sponsorships?sponsor=tomquirk&tier_id=96653&preview=false" target="_blank">Become a sponsor</a></h5>
 
 ---
 

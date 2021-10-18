@@ -3,8 +3,8 @@
 <h3 align="center">Sponsors</h3>
 
 <p align="center">
-  <a href="https://serpsbot.com" target="_blank">
-    <img width="150px" src="https://serpsbot.com/wp-content/uploads/2021/07/serpsbot-logo-purple.png" alt="serpsbot">
+  <a href="https://iscraper.io/" target="_blank">
+    <img width="150px" src="https://iscraper.io/static/front/images/logo-dark.png" alt="serpsbot">
   </a>
 </p>
 

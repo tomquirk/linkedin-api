@@ -166,6 +166,27 @@ class Linkedin(object):
             if data and "status" in data and data["status"] != 200:
                 self.logger.info("request failed: {}".format(data["status"]))
                 return {}
+            while data and data["metadata"]["paginationToken"] != "":
+                pagination_token = data["metadata"]["paginationToken"]
+                url_params["start"] = url_params["start"] + self._MAX_POST_COUNT
+                url_params["paginationToken"] = pagination_token
+                res = self._fetch(url, params=url_params)
+                if (
+                    res.json()
+                    and "status" in res.json()
+                    and res.json()["status"] != 200
+                ):
+                    self.logger.info("request failed: {}".format(data["status"]))
+                    return {}
+                data["metadata"] = res.json()["metadata"]
+                if data["elements"] and len(data["elements"]) == 0:
+                    break
+                data["elements"] = data["elements"] + res.json()["elements"]
+                data["paging"] = res.json()["paging"]
+                if (len(data["elements"]) > comment_count) or (
+                    data["metadata"]["paginationToken"] == pagination_token
+                ):
+                    break
             return data["elements"]
 
     def search(self, params, limit=-1, offset=0):

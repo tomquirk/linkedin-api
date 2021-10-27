@@ -142,6 +142,32 @@ class Linkedin(object):
             data["paging"] = res.json()["paging"]
         return data["elements"]
 
+        def get_post_comments(self, post_urn, comment_count=100):
+            """
+            get_post_comments: Get post comments
+
+            :param post_urn: Post URN
+            :type post_urn: str
+            :param comment_count: Number of comments to fetch
+            :type comment_count: int, optional
+            :return: List of post comments
+            :rtype: list
+            """
+            url_params = {
+                "count": min(comment_count, self._MAX_POST_COUNT),
+                "start": 0,
+                "q": "comments",
+                "sortOrder": "RELEVANCE",
+            }
+            url = f"/feed/comments"
+            url_params["updateId"] = "activity:" + post_urn
+            res = self._fetch(url, params=url_params)
+            data = res.json()
+            if data and "status" in data and data["status"] != 200:
+                self.logger.info("request failed: {}".format(data["status"]))
+                return {}
+            return data["elements"]
+
     def search(self, params, limit=-1, offset=0):
         """Perform a LinkedIn search.
 

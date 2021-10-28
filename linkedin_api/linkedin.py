@@ -179,13 +179,13 @@ class Linkedin(object):
                     self.logger.info("request failed: {}".format(data["status"]))
                     return {}
                 data["metadata"] = res.json()["metadata"]
+                """ When the number of comments exceed total available 
+                comments, the api starts returning an empty list of elements"""
                 if data["elements"] and len(data["elements"]) == 0:
                     break
                 data["elements"] = data["elements"] + res.json()["elements"]
                 data["paging"] = res.json()["paging"]
-                if (len(data["elements"]) > comment_count) or (
-                    data["metadata"]["paginationToken"] == pagination_token
-                ):
+                if len(data["elements"]) > comment_count:
                     break
             return data["elements"]
 

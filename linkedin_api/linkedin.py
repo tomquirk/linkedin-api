@@ -184,7 +184,7 @@ class Linkedin(object):
                 data["metadata"] = res.json()["metadata"]
                 """ When the number of comments exceed total available 
                 comments, the api starts returning an empty list of elements"""
-                if data["elements"] and len(data["elements"]) == 0:
+                if data["elements"] and len(res.json()["elements"]) == 0:
                     break
                 data["elements"] = data["elements"] + res.json()["elements"]
                 data["paging"] = res.json()["paging"]

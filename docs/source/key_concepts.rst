@@ -21,5 +21,5 @@ Public ID
 *********
 
 A public ID is generally a string and something that is human-readable.
-For example, for the LinkedIn profile at the URL https://www.linkedin.com/li/tom-quirk, the "public ID" is "tom-quirk".
+For example, for the LinkedIn profile at the URL https://www.linkedin.com/in/tom-quirk, the "public ID" is "tom-quirk".
 The same applies for other entities across LinkedIn

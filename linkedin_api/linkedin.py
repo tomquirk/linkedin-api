@@ -142,6 +142,52 @@ class Linkedin(object):
             data["paging"] = res.json()["paging"]
         return data["elements"]
 
+    def get_post_comments(self, post_urn, comment_count=100):
+        """
+        get_post_comments: Get post comments
+
+        :param post_urn: Post URN
+        :type post_urn: str
+        :param comment_count: Number of comments to fetch
+        :type comment_count: int, optional
+        :return: List of post comments
+        :rtype: list
+        """
+        url_params = {
+            "count": min(comment_count, self._MAX_POST_COUNT),
+            "start": 0,
+            "q": "comments",
+            "sortOrder": "RELEVANCE",
+        }
+        url = f"/feed/comments"
+        url_params["updateId"] = "activity:" + post_urn
+        res = self._fetch(url, params=url_params)
+        data = res.json()
+        if data and "status" in data and data["status"] != 200:
+            self.logger.info("request failed: {}".format(data["status"]))
+            return {}
+        while data and data["metadata"]["paginationToken"] != "":
+            if len(data["elements"]) >= comment_count:
+                break
+            pagination_token = data["metadata"]["paginationToken"]
+            url_params["start"] = url_params["start"] + self._MAX_POST_COUNT
+            url_params["count"] = self._MAX_POST_COUNT
+            url_params["paginationToken"] = pagination_token
+            res = self._fetch(url, params=url_params)
+            if res.json() and "status" in res.json() and res.json()["status"] != 200:
+                self.logger.info("request failed: {}".format(data["status"]))
+                return {}
+            data["metadata"] = res.json()["metadata"]
+            """ When the number of comments exceed total available 
+            comments, the api starts returning an empty list of elements"""
+            if res.json()["elements"] and len(res.json()["elements"]) == 0:
+                break
+            if data["elements"] and len(res.json()["elements"]) == 0:
+                break
+            data["elements"] = data["elements"] + res.json()["elements"]
+            data["paging"] = res.json()["paging"]
+        return data["elements"]
+
     def search(self, params, limit=-1, offset=0):
         """Perform a LinkedIn search.
 

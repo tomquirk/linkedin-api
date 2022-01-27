@@ -704,6 +704,12 @@ class Linkedin(object):
             del item["entityUrn"]
         profile["honors"] = honors
 
+        # massage [projects] data
+        projects = data["projectView"]["elements"]
+        for item in projects:
+            del item["entityUrn"]
+        profile["projects"] = projects
+
         return profile
 
     def get_profile_connections(self, urn_id):

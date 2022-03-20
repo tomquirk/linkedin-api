@@ -27,6 +27,13 @@ Before using this project, please consult the [Terms and Conditions](#terms-and-
 
 > ⚠️ Python >= 3.6 required
 
+To install the package with the latest changes in this repo
+```bash
+pip3 install git+https://github.com/tomquirk/linkedin-api.git
+```
+
+To install PyPI version:
+
 ```bash
 pip3 install linkedin-api~=2.0.0a
 ```

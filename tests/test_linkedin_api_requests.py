@@ -1,14 +1,19 @@
-import os
 import sys
 import pytest
+from os import getenv
+from dotenv import load_dotenv
 
 from linkedin_api import Linkedin
 
-TEST_LINKEDIN_USERNAME = os.getenv("LINKEDIN_USERNAME")
-TEST_LINKEDIN_PASSWORD = os.getenv("LINKEDIN_PASSWORD")
-TEST_PROFILE_ID = os.getenv("TEST_PROFILE_ID")
-TEST_PUBLIC_PROFILE_ID = os.getenv("TEST_PUBLIC_PROFILE_ID")
-TEST_CONVERSATION_ID = os.getenv("TEST_CONVERSATION_ID")
+
+# Load env
+load_dotenv()
+
+TEST_LINKEDIN_USERNAME = getenv("LINKEDIN_USERNAME")
+TEST_LINKEDIN_PASSWORD = getenv("LINKEDIN_PASSWORD")
+TEST_PROFILE_ID = getenv("TEST_PROFILE_ID")
+TEST_PUBLIC_PROFILE_ID = getenv("TEST_PUBLIC_PROFILE_ID")
+TEST_CONVERSATION_ID = getenv("TEST_CONVERSATION_ID")
 
 if not (
     TEST_LINKEDIN_USERNAME

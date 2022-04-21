@@ -1,5 +1,17 @@
 # linkedin_api
 
+<h3 align="center">Sponsors</h3>
+
+<p align="center">
+  <a href="https://iscraper.io/" target="_blank">
+    <img width="150px" src="https://iscraper.io/static/front/images/logo-dark.png" alt="serpsbot">
+  </a>
+</p>
+
+<h5 align="center"><a href="https://github.com/sponsors/tomquirk/sponsorships?sponsor=tomquirk&tier_id=96653&preview=false" target="_blank">Become a sponsor</a></h5>
+
+---
+
 👨‍💼 Linkedin API for Python
 
 [![Build Status](https://travis-ci.com/tomquirk/linkedin-api.svg?branch=master)](https://travis-ci.com/tomquirk/linkedin-api)
@@ -14,6 +26,13 @@ Before using this project, please consult the [Terms and Conditions](#terms-and-
 ## Installation
 
 > ⚠️ Python >= 3.6 required
+
+To install the package with the latest changes in this repo
+```bash
+pip3 install git+https://github.com/tomquirk/linkedin-api.git
+```
+
+To install PyPI version:
 
 ```bash
 pip3 install linkedin-api~=2.0.0a

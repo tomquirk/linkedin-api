@@ -229,8 +229,9 @@ class Linkedin(object):
 
             new_elements = []
             elements = data.get("data", {}).get("elements", [])
-            for i in range(len(elements)):
-                new_elements.extend(elements[i].get("elements", {}))
+            
+            for element in elements:
+                new_elements.extend(element.get("elements", {}))
                 # not entirely sure what extendedElements generally refers to - keyword search gives back a single job?
                 # new_elements.extend(data["data"]["elements"][i]["extendedElements"])
             results.extend(new_elements)

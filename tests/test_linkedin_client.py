@@ -4,6 +4,10 @@ import os
 import sys
 from linkedin_api.client import Client
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 TEST_LINKEDIN_USERNAME = os.getenv("LINKEDIN_USERNAME")
 TEST_LINKEDIN_PASSWORD = os.getenv("LINKEDIN_PASSWORD")
 

@@ -3,6 +3,9 @@ import sys
 import pytest
 
 from linkedin_api import Linkedin
+from dotenv import load_dotenv
+
+load_dotenv()
 
 TEST_LINKEDIN_USERNAME = os.getenv("LINKEDIN_USERNAME")
 TEST_LINKEDIN_PASSWORD = os.getenv("LINKEDIN_PASSWORD")

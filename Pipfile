@@ -11,6 +11,7 @@ pylint = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
 twine = "*"
+python-dotenv = "*"
 
 [packages]
 requests = "*"

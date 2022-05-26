@@ -23,8 +23,8 @@ jobs:
       - run:
           name: "Say hello"
           command: |
-            echo "Hello, World!"
             pipenv install --dev
             pipenv shell
+            echo "Hello, World!"
 
 

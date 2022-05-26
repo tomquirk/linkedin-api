@@ -25,6 +25,8 @@ jobs:
           command: |
             apt install -y pip 
             pip install pipenv
+            PYTHON_BIN_PATH="$(python3 -m site --user-base)/bin"
+            PATH="$PATH:$PYTHON_BIN_PATH"
             pipenv install --dev
             pipenv shell
             

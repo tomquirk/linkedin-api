@@ -23,7 +23,8 @@ jobs:
       - run:
           name: "Say hello"
           command: |
-            apt install -y pip pipenv
+            apt install -y pip 
+            pip install pipenv
             pipenv install --dev
             pipenv shell
             

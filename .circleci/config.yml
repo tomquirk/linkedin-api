@@ -22,7 +22,8 @@ jobs:
       - checkout
       - run:
           name: "Say hello"
-          command: | 
+          command: |
+            apt install -y pip pipenv
             pipenv install --dev
             pipenv shell
             

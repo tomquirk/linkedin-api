@@ -25,6 +25,6 @@ jobs:
           command: |
             pipenv install --dev
             pipenv shell
-            echo "Hello, World!"
+            
 
 

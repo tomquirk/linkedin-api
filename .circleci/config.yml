@@ -45,7 +45,7 @@ jobs:
           # This assumes pytest is installed via the install-package step above
           command: |
             sudo pipenv install --dev
-            sudo pipenv shell
+            sudo pipenv shell 
             sudo python -m pytest tests
 
 

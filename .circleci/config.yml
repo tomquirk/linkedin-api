@@ -22,7 +22,7 @@ jobs:
       - checkout
       - run:
           name: "Say hello"
-          command: |
+          command: | 
             pipenv install --dev
             pipenv shell
             

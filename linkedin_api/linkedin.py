@@ -369,6 +369,9 @@ class Linkedin(object):
                     "distance": item.get("memberDistance", {}).get("value"),
                     "public_id": item.get("publicIdentifier"),
                     "tracking_id": get_id_from_urn(item.get("trackingUrn")),
+                    "jobtitle": item.get("headline", {}).get("text"),
+                    "location": item.get("subline", {}).get("text"),
+                    "name": item.get("title", {}).get("text"),
                 }
             )
 

@@ -260,18 +260,14 @@ class Linkedin(object):
         regions=None,
         industries=None,
         schools=None,
-        contact_interests=None,
         service_categories=None,
         include_private_profiles=False,  # profiles without a public id, "Linkedin Member"
         # Keywords filter
         keyword_first_name=None,
         keyword_last_name=None,
-        # `keyword_title` and `title` are the same. We kept `title` for backward compatibility. Please only use one of them.
         keyword_title=None,
         keyword_company=None,
         keyword_school=None,
-        network_depth=None,  # DEPRECATED - use network_depths
-        title=None,  # DEPRECATED - use keyword_title
         **kwargs,
     ):
         """Perform a LinkedIn search for people.
@@ -290,12 +286,8 @@ class Linkedin(object):
         :type schools: list, optional
         :param profile_languages: A list of 2-letter language codes (str)
         :type profile_languages: list, optional
-        :param contact_interests: A list containing one or both of "proBono" and "boardMember"
-        :type contact_interests: list, optional
         :param service_categories: A list of service category URN IDs (str)
         :type service_categories: list, optional
-        :param network_depth: Deprecated, use `network_depths`. One of "F", "S" and "O" (first, second and third+ respectively)
-        :type network_depth: str, optional
         :param network_depths: A list containing one or many of "F", "S" and "O" (first, second and third+ respectively)
         :type network_depths: list, optional
         :param include_private_profiles: Include private profiles in search results. If False, only public profiles are included. Defaults to False
@@ -321,8 +313,6 @@ class Linkedin(object):
             filters.append(f"connectionOf->{connection_of}")
         if network_depths:
             filters.append(f'network->{"|".join(network_depths)}')
-        elif network_depth:
-            filters.append(f"network->{network_depth}")
         if regions:
             filters.append(f'geoUrn->{"|".join(regions)}')
         if industries:
@@ -340,7 +330,6 @@ class Linkedin(object):
         if service_categories:
             filters.append(f'serviceCategory->{"|".join(service_categories)}')
         # `Keywords` filter
-        keyword_title = keyword_title if keyword_title else title
         if keyword_first_name:
             filters.append(f"firstName->{keyword_first_name}")
         if keyword_last_name:
@@ -1438,7 +1427,6 @@ class Linkedin(object):
         return get_list_posts_sorted_without_promoted(l_urns, l_posts)
     
     def get_geo_urn_ids(self, search_loc):
-
         res = self._fetch(
                 f"/typeahead/hitsV2?keywords={quote(search_loc)}&origin=OTHER&q=type&queryContext=List(geoVersion->3,bingGeoSubTypeFilters->MARKET_AREA|COUNTRY_REGION|ADMIN_DIVISION_1|CITY)&type=GEO",
                 headers={"accept": "application/vnd.linkedin.normalized+json+2.1",
@@ -1448,9 +1436,17 @@ class Linkedin(object):
         return data.get('data', {}).get('elements', [])
     
     def get_company_urn_ids(self, search_comp):
-
         res = self._fetch(
                 f"/typeahead/hitsV2?keywords={quote(search_comp)}&origin=OTHER&q=type&queryContext=List()&type=COMPANY",
+                headers={"accept": "application/vnd.linkedin.normalized+json+2.1",
+                         "x-restli-protocol-version": "2.0.0"}
+            )
+        data = res.json()
+        return data.get('data', {}).get('elements', [])
+
+    def get_contact_urn_ids(self, search_contact):
+        res = self._fetch(
+                f"/typeahead/hitsV2?keywords={quote(search_contact)}&origin=OTHER&q=type&queryContext=List()&type=PEOPLE",
                 headers={"accept": "application/vnd.linkedin.normalized+json+2.1",
                          "x-restli-protocol-version": "2.0.0"}
             )

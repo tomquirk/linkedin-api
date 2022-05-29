@@ -1436,12 +1436,21 @@ class Linkedin(object):
             limit, offset, exclude_promoted_posts
         )
         return get_list_posts_sorted_without_promoted(l_urns, l_posts)
-
     
     def get_geo_urn_ids(self, search_loc):
 
         res = self._fetch(
                 f"/typeahead/hitsV2?keywords={quote(search_loc)}&origin=OTHER&q=type&queryContext=List(geoVersion->3,bingGeoSubTypeFilters->MARKET_AREA|COUNTRY_REGION|ADMIN_DIVISION_1|CITY)&type=GEO",
+                headers={"accept": "application/vnd.linkedin.normalized+json+2.1",
+                         "x-restli-protocol-version": "2.0.0"}
+            )
+        data = res.json()
+        return data.get('data', {}).get('elements', [])
+    
+    def get_company_urn_ids(self, search_comp):
+
+        res = self._fetch(
+                f"/typeahead/hitsV2?keywords={quote(search_comp)}&origin=OTHER&q=type&queryContext=List()&type=COMPANY",
                 headers={"accept": "application/vnd.linkedin.normalized+json+2.1",
                          "x-restli-protocol-version": "2.0.0"}
             )

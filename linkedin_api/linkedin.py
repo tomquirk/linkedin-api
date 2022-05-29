@@ -973,7 +973,10 @@ class Linkedin(object):
                 "originToken": str(uuid.uuid4()),
                 "value": {
                     "com.linkedin.voyager.messaging.create.MessageCreate": {
-                        "attributedBody": {"text": message_body, "attributes": [],},
+                        "attributedBody": {
+                            "text": message_body,
+                            "attributes": [],
+                        },
                         "attachments": [],
                     }
                 },
@@ -996,7 +999,9 @@ class Linkedin(object):
                 "conversationCreate": message_event,
             }
             res = self._post(
-                f"/messaging/conversations", params=params, data=json.dumps(payload),
+                f"/messaging/conversations",
+                params=params,
+                data=json.dumps(payload),
             )
 
         return res.status_code != 201
@@ -1051,7 +1056,10 @@ class Linkedin(object):
             "q": "receivedInvitation",
         }
 
-        res = self._fetch("/relationships/invitationViews", params=params,)
+        res = self._fetch(
+            "/relationships/invitationViews",
+            params=params,
+        )
 
         if res.status_code != 200:
             return []
@@ -1170,7 +1178,10 @@ class Linkedin(object):
         res = self._post(
             "/li/track",
             base_request=True,
-            headers={"accept": "*/*", "content-type": "text/plain;charset=UTF-8",},
+            headers={
+                "accept": "*/*",
+                "content-type": "text/plain;charset=UTF-8",
+            },
             data=json.dumps(payload),
         )
 

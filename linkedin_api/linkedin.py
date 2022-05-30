@@ -32,7 +32,7 @@ def default_evade():
     A catch-all method to try and evade suspension from Linkedin.
     Currenly, just delays the request by a random (bounded) time
     """
-    sleep(random.randint(2, 5))  # sleep a random duration to try and evade suspention
+    sleep(random.randint(150, 350)/100)  # sleep a random duration to try and evade suspention
 
 
 class Linkedin(object):
@@ -1427,8 +1427,8 @@ class Linkedin(object):
         return get_list_posts_sorted_without_promoted(l_urns, l_posts)
     
     def get_geo_urn_ids(self, search_loc):
-        res = self._fetch(
-                f"/typeahead/hitsV2?keywords={quote(search_loc)}&origin=OTHER&q=type&queryContext=List(geoVersion->3,bingGeoSubTypeFilters->MARKET_AREA|COUNTRY_REGION|ADMIN_DIVISION_1|CITY)&type=GEO",
+        res = self.client.session.get(
+                f"{self.client.API_BASE_URL}/typeahead/hitsV2?keywords={quote(search_loc)}&origin=OTHER&q=type&queryContext=List(geoVersion->3,bingGeoSubTypeFilters->MARKET_AREA|COUNTRY_REGION|ADMIN_DIVISION_1|CITY)&type=GEO",
                 headers={"accept": "application/vnd.linkedin.normalized+json+2.1",
                          "x-restli-protocol-version": "2.0.0"}
             )
@@ -1436,8 +1436,8 @@ class Linkedin(object):
         return data.get('data', {}).get('elements', [])
     
     def get_company_urn_ids(self, search_comp):
-        res = self._fetch(
-                f"/typeahead/hitsV2?keywords={quote(search_comp)}&origin=OTHER&q=type&queryContext=List()&type=COMPANY",
+        res = self.client.session.get(
+                f"{self.client.API_BASE_URL}/typeahead/hitsV2?keywords={quote(search_comp)}&origin=OTHER&q=type&queryContext=List()&type=COMPANY",
                 headers={"accept": "application/vnd.linkedin.normalized+json+2.1",
                          "x-restli-protocol-version": "2.0.0"}
             )
@@ -1445,8 +1445,8 @@ class Linkedin(object):
         return data.get('data', {}).get('elements', [])
 
     def get_contact_urn_ids(self, search_contact):
-        res = self._fetch(
-                f"/typeahead/hitsV2?keywords={quote(search_contact)}&origin=OTHER&q=type&queryContext=List()&type=PEOPLE",
+        res = self.client.session.get(
+                f"{self.client.API_BASE_URL}/typeahead/hitsV2?keywords={quote(search_contact)}&origin=OTHER&q=type&queryContext=List()&type=PEOPLE",
                 headers={"accept": "application/vnd.linkedin.normalized+json+2.1",
                          "x-restli-protocol-version": "2.0.0"}
             )

@@ -326,7 +326,7 @@ class Linkedin(object):
         if nonprofit_interests:
             filters.append(f'nonprofitInterest->{"|".join(nonprofit_interests)}')
         if schools:
-            filters.append(f'schools->{"|".join(schools)}')
+            filters.append(f'school->{"|".join(schools)}')
         if service_categories:
             filters.append(f'serviceCategory->{"|".join(service_categories)}')
         # `Keywords` filter
@@ -339,7 +339,7 @@ class Linkedin(object):
         if keyword_company:
             filters.append(f"company->{keyword_company}")
         if keyword_school:
-            filters.append(f"school->{keyword_school}")
+            filters.append(f"schoolFreetext->{keyword_school}")
 
         params = {"filters": "List({})".format(",".join(filters))}
 
@@ -1447,6 +1447,34 @@ class Linkedin(object):
     def get_contact_urn_ids(self, search_contact):
         res = self.client.session.get(
                 f"{self.client.API_BASE_URL}/typeahead/hitsV2?keywords={quote(search_contact)}&origin=OTHER&q=type&queryContext=List()&type=PEOPLE",
+                headers={"accept": "application/vnd.linkedin.normalized+json+2.1",
+                         "x-restli-protocol-version": "2.0.0"}
+            )
+        data = res.json()
+        return data.get('data', {}).get('elements', [])
+
+    def get_school_urn_ids(self, search_school):
+        res = self.client.session.get(
+                f"{self.client.API_BASE_URL}/typeahead/hitsV2?keywords={quote(search_school)}&origin=OTHER&q=type&queryContext=List()&type=SCHOOL",
+                headers={"accept": "application/vnd.linkedin.normalized+json+2.1",
+                         "x-restli-protocol-version": "2.0.0"}
+            )
+        data = res.json()
+        return data.get('data', {}).get('elements', [])
+
+    def get_industry_urn_ids(self, search_industry):
+        res = self.client.session.get(
+                f"{self.client.API_BASE_URL}/typeahead/hitsV2?keywords={quote(search_industry)}&origin=OTHER&q=type&queryContext=List()&type=INDUSTRY",
+                headers={"accept": "application/vnd.linkedin.normalized+json+2.1",
+                         "x-restli-protocol-version": "2.0.0"}
+            )
+        data = res.json()
+        return data.get('data', {}).get('elements', [])
+
+    def get_service_cat_urn_ids(self, search_service_cat):
+        #not working
+        res = self.client.session.get(
+                f"{self.client.API_BASE_URL}/typeahead/hitsV2?keywords={quote(search_service_cat)}&origin=OTHER&q=type&queryContext=List()&type=SERVICE_CAT",
                 headers={"accept": "application/vnd.linkedin.normalized+json+2.1",
                          "x-restli-protocol-version": "2.0.0"}
             )

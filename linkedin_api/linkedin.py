@@ -874,6 +874,29 @@ class Linkedin(object):
 
         return company
 
+    def get_job(self, job_urn):
+        """Fetch data about a given job.
+
+        :param public_id: LinkedIn public ID for a job
+        :type public_id: str
+
+        :return: Job data
+        :rtype: dict
+        """
+        params = {
+            "decorationId": "com.linkedin.voyager.deco.jobs.web.shared.WebLightJobPosting-23",
+        }
+
+        res = self._fetch(f"/jobs/jobPostings/{job_urn}", params=params)
+
+        data = res.json()
+
+        if data and "status" in data and data["status"] != 200:
+            self.logger.info("request failed: {}".format(data["message"]))
+            return {}
+
+        return data
+
     def get_conversation_details(self, profile_urn_id):
         """Fetch conversation (message thread) details for a given LinkedIn profile.
 
@@ -1425,6 +1448,9 @@ class Linkedin(object):
             limit, offset, exclude_promoted_posts
         )
         return get_list_posts_sorted_without_promoted(l_urns, l_posts)
+
+
+    # Typeahead:
     
     def get_geo_urn_ids(self, search_loc):
         res = self.client.session.get(

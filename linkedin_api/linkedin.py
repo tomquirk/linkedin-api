@@ -34,6 +34,11 @@ def default_evade():
     """
     sleep(random.randint(150, 350)/100)  # sleep a random duration to try and evade suspention
 
+def get_index_in_sorted_res(entity_urn, elements):
+    for i, e in enumerate(elements):
+        if entity_urn in e.get('hitInfo', '').values():
+            return i
+    return len(elements)
 
 class Linkedin(object):
     """
@@ -410,6 +415,7 @@ class Linkedin(object):
         industries=None,
         location_name=None,
         remote=False,
+        sort_by = "R",
         listed_at=24 * 60 * 60,
         distance=None,
         limit=-1,
@@ -434,6 +440,8 @@ class Linkedin(object):
         :type location_name: str, optional
         :param remote: Whether to search only for remote jobs. Defaults to False.
         :type remote: boolean, optional
+        :param sort_by: sort value by relevance ("R") or most recent ("DD").
+        :type sort_by: str, optional. Default value is equal to "R".
         :param listed_at: maximum number of seconds passed since job posting. 86400 will filter job postings posted in last 24 hours.
         :type listed_at: int/str, optional. Default value is equal to 24 hours.
         :param distance: maximum distance from location in miles
@@ -470,6 +478,8 @@ class Linkedin(object):
             filters.append(f"workRemoteAllowed->{remote}")
         if distance:
             filters.append(f"distance->{distance}")
+
+        filters.append(f"sortBy->{sort_by}")
         filters.append(f"timePostedRange->r{listed_at}")
         # add optional kwargs to a filter
         for name, value in kwargs.items():
@@ -500,7 +510,9 @@ class Linkedin(object):
             )
             data = res.json()
 
-            elements = data.get("included", [])
+            elements = sorted(data.get("included", []),
+                        key=lambda x: get_index_in_sorted_res(x['entityUrn'], data['data'].get('elements', [])))
+
             results.extend(
                 [
                     i

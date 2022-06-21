@@ -414,6 +414,7 @@ class Linkedin(object):
         job_title=None,
         industries=None,
         location_name=None,
+        geo_urn_ids=[],
         remote=False,
         sort_by = "R",
         listed_at=24 * 60 * 60,
@@ -474,6 +475,8 @@ class Linkedin(object):
             filters.append(f'industry->{"|".join(industries)}')
         if location_name:
             filters.append(f"locationFallback->{location_name}")
+        if geo_urn_ids:
+            filters.append(f'populatedPlace->{"|".join(geo_urn_ids)}')
         if remote:
             filters.append(f"workRemoteAllowed->{remote}")
         if distance:

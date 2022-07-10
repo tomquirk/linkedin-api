@@ -34,8 +34,13 @@ def default_evade():
     A catch-all method to try and evade suspension from Linkedin.
     Currenly, just delays the request by a random (bounded) time
     """
-    sleep(random.randint(2, 5))  # sleep a random duration to try and evade suspention
+    sleep(random.randint(150, 350)/100)  # sleep a random duration to try and evade suspention
 
+def get_index_in_sorted_res(entity_urn, elements):
+    for i, e in enumerate(elements):
+        if entity_urn in e.get('hitInfo', '').values():
+            return i
+    return len(elements)
 
 class Linkedin(object):
     """
@@ -168,7 +173,7 @@ class Linkedin(object):
         if data and "status" in data and data["status"] != 200:
             self.logger.info("request failed: {}".format(data["status"]))
             return {}
-        while data and data["metadata"]["paginationToken"] != "":
+        while data and data["metadata"].get("paginationToken", "") != "":
             if len(data["elements"]) >= comment_count:
                 break
             pagination_token = data["metadata"]["paginationToken"]
@@ -262,18 +267,14 @@ class Linkedin(object):
         regions=None,
         industries=None,
         schools=None,
-        contact_interests=None,
         service_categories=None,
         include_private_profiles=False,  # profiles without a public id, "Linkedin Member"
         # Keywords filter
         keyword_first_name=None,
         keyword_last_name=None,
-        # `keyword_title` and `title` are the same. We kept `title` for backward compatibility. Please only use one of them.
         keyword_title=None,
         keyword_company=None,
         keyword_school=None,
-        network_depth=None,  # DEPRECATED - use network_depths
-        title=None,  # DEPRECATED - use keyword_title
         **kwargs,
     ):
         """Perform a LinkedIn search for people.
@@ -292,12 +293,8 @@ class Linkedin(object):
         :type schools: list, optional
         :param profile_languages: A list of 2-letter language codes (str)
         :type profile_languages: list, optional
-        :param contact_interests: A list containing one or both of "proBono" and "boardMember"
-        :type contact_interests: list, optional
         :param service_categories: A list of service category URN IDs (str)
         :type service_categories: list, optional
-        :param network_depth: Deprecated, use `network_depths`. One of "F", "S" and "O" (first, second and third+ respectively)
-        :type network_depth: str, optional
         :param network_depths: A list containing one or many of "F", "S" and "O" (first, second and third+ respectively)
         :type network_depths: list, optional
         :param include_private_profiles: Include private profiles in search results. If False, only public profiles are included. Defaults to False
@@ -323,8 +320,6 @@ class Linkedin(object):
             filters.append(f"connectionOf->{connection_of}")
         if network_depths:
             filters.append(f'network->{"|".join(network_depths)}')
-        elif network_depth:
-            filters.append(f"network->{network_depth}")
         if regions:
             filters.append(f'geoUrn->{"|".join(regions)}')
         if industries:
@@ -338,11 +333,10 @@ class Linkedin(object):
         if nonprofit_interests:
             filters.append(f'nonprofitInterest->{"|".join(nonprofit_interests)}')
         if schools:
-            filters.append(f'schools->{"|".join(schools)}')
+            filters.append(f'school->{"|".join(schools)}')
         if service_categories:
             filters.append(f'serviceCategory->{"|".join(service_categories)}')
         # `Keywords` filter
-        keyword_title = keyword_title if keyword_title else title
         if keyword_first_name:
             filters.append(f"firstName->{keyword_first_name}")
         if keyword_last_name:
@@ -352,7 +346,7 @@ class Linkedin(object):
         if keyword_company:
             filters.append(f"company->{keyword_company}")
         if keyword_school:
-            filters.append(f"school->{keyword_school}")
+            filters.append(f"schoolFreetext->{keyword_school}")
 
         params = {"filters": "List({})".format(",".join(filters))}
 
@@ -425,7 +419,9 @@ class Linkedin(object):
         job_title=None,
         industries=None,
         location_name=None,
+        geo_urn_ids=[],
         remote=False,
+        sort_by = "R",
         listed_at=24 * 60 * 60,
         distance=None,
         limit=-1,
@@ -450,6 +446,8 @@ class Linkedin(object):
         :type location_name: str, optional
         :param remote: Whether to search only for remote jobs. Defaults to False.
         :type remote: boolean, optional
+        :param sort_by: sort value by relevance ("R") or most recent ("DD").
+        :type sort_by: str, optional. Default value is equal to "R".
         :param listed_at: maximum number of seconds passed since job posting. 86400 will filter job postings posted in last 24 hours.
         :type listed_at: int/str, optional. Default value is equal to 24 hours.
         :param distance: maximum distance from location in miles
@@ -482,10 +480,14 @@ class Linkedin(object):
             filters.append(f'industry->{"|".join(industries)}')
         if location_name:
             filters.append(f"locationFallback->{location_name}")
+        if geo_urn_ids:
+            filters.append(f'populatedPlace->{"|".join(geo_urn_ids)}')
         if remote:
             filters.append(f"workRemoteAllowed->{remote}")
         if distance:
             filters.append(f"distance->{distance}")
+
+        filters.append(f"sortBy->{sort_by}")
         filters.append(f"timePostedRange->r{listed_at}")
         # add optional kwargs to a filter
         for name, value in kwargs.items():
@@ -516,7 +518,9 @@ class Linkedin(object):
             )
             data = res.json()
 
-            elements = data.get("included", [])
+            elements = sorted(data.get("included", []),
+                        key=lambda x: get_index_in_sorted_res(x['entityUrn'], data['data'].get('elements', [])))
+
             results.extend(
                 [
                     i
@@ -889,6 +893,29 @@ class Linkedin(object):
         company = data["elements"][0]
 
         return company
+
+    def get_job(self, job_urn):
+        """Fetch data about a given job.
+
+        :param public_id: LinkedIn public ID for a job
+        :type public_id: str
+
+        :return: Job data
+        :rtype: dict
+        """
+        params = {
+            "decorationId": "com.linkedin.voyager.deco.jobs.web.shared.WebLightJobPosting-23",
+        }
+
+        res = self._fetch(f"/jobs/jobPostings/{job_urn}", params=params)
+
+        data = res.json()
+
+        if data and "status" in data and data["status"] != 200:
+            self.logger.info("request failed: {}".format(data["message"]))
+            return {}
+
+        return data
 
     def get_conversation_details(self, profile_urn_id):
         """Fetch conversation (message thread) details for a given LinkedIn profile.
@@ -1421,3 +1448,61 @@ class Linkedin(object):
             limit, offset, exclude_promoted_posts
         )
         return get_list_posts_sorted_without_promoted(l_urns, l_posts)
+
+
+    # Typeahead:
+    
+    def get_geo_urn_ids(self, search_loc):
+        res = self.client.session.get(
+                f"{self.client.API_BASE_URL}/typeahead/hitsV2?keywords={quote(search_loc)}&origin=OTHER&q=type&queryContext=List(geoVersion->3,bingGeoSubTypeFilters->MARKET_AREA|COUNTRY_REGION|ADMIN_DIVISION_1|CITY)&type=GEO",
+                headers={"accept": "application/vnd.linkedin.normalized+json+2.1",
+                         "x-restli-protocol-version": "2.0.0"}
+            )
+        data = res.json()
+        return data.get('data', {}).get('elements', [])
+    
+    def get_company_urn_ids(self, search_comp):
+        res = self.client.session.get(
+                f"{self.client.API_BASE_URL}/typeahead/hitsV2?keywords={quote(search_comp)}&origin=OTHER&q=type&queryContext=List()&type=COMPANY",
+                headers={"accept": "application/vnd.linkedin.normalized+json+2.1",
+                         "x-restli-protocol-version": "2.0.0"}
+            )
+        data = res.json()
+        return data.get('data', {}).get('elements', [])
+
+    def get_contact_urn_ids(self, search_contact):
+        res = self.client.session.get(
+                f"{self.client.API_BASE_URL}/typeahead/hitsV2?keywords={quote(search_contact)}&origin=OTHER&q=type&queryContext=List()&type=PEOPLE",
+                headers={"accept": "application/vnd.linkedin.normalized+json+2.1",
+                         "x-restli-protocol-version": "2.0.0"}
+            )
+        data = res.json()
+        return data.get('data', {}).get('elements', [])
+
+    def get_school_urn_ids(self, search_school):
+        res = self.client.session.get(
+                f"{self.client.API_BASE_URL}/typeahead/hitsV2?keywords={quote(search_school)}&origin=OTHER&q=type&queryContext=List()&type=SCHOOL",
+                headers={"accept": "application/vnd.linkedin.normalized+json+2.1",
+                         "x-restli-protocol-version": "2.0.0"}
+            )
+        data = res.json()
+        return data.get('data', {}).get('elements', [])
+
+    def get_industry_urn_ids(self, search_industry):
+        res = self.client.session.get(
+                f"{self.client.API_BASE_URL}/typeahead/hitsV2?keywords={quote(search_industry)}&origin=OTHER&q=type&queryContext=List()&type=INDUSTRY",
+                headers={"accept": "application/vnd.linkedin.normalized+json+2.1",
+                         "x-restli-protocol-version": "2.0.0"}
+            )
+        data = res.json()
+        return data.get('data', {}).get('elements', [])
+
+    def get_service_cat_urn_ids(self, search_service_cat):
+        #not working
+        res = self.client.session.get(
+                f"{self.client.API_BASE_URL}/typeahead/hitsV2?keywords={quote(search_service_cat)}&origin=OTHER&q=type&queryContext=List()&type=SERVICE_CAT",
+                headers={"accept": "application/vnd.linkedin.normalized+json+2.1",
+                         "x-restli-protocol-version": "2.0.0"}
+            )
+        data = res.json()
+        return data.get('data', {}).get('elements', [])

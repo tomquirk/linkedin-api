@@ -22,6 +22,8 @@ from linkedin_api.utils.helpers import (
     get_update_url,
     parse_list_raw_posts,
     parse_list_raw_urns,
+    generate_trackingId,
+    generate_trackingId_as_charString,
 )
 
 logger = logging.getLogger(__name__)
@@ -936,16 +938,6 @@ class Linkedin(object):
 
         return res.json()
 
-    def generateTrackingIdAsCharString(self):
-        """Generates and returns a random trackingId
-
-        :return: Random trackingId string
-        :rtype: str
-        """
-        random_int_array = [random.randrange(256) for _ in range(16)]
-        rand_byte_array = bytearray(random_int_array)
-        return "".join([chr(i) for i in rand_byte_array])
-
     def send_message(self, message_body, conversation_urn_id=None, recipients=None):
         """Send a message to a given conversation.
 
@@ -977,7 +969,7 @@ class Linkedin(object):
                         "attachments": [],
                     }
                 },
-                "trackingId": self.generateTrackingIdAsCharString(),
+                "trackingId": generate_trackingId_as_charString(),
             },
             "dedupeByClientGeneratedToken": False,
         }
@@ -1097,16 +1089,6 @@ class Linkedin(object):
 
         return res.status_code == 200
 
-    def generateTrackingId(self):
-        """Generates and returns a random trackingId
-
-        :return: Random trackingId string
-        :rtype: str
-        """
-        random_int_array = [random.randrange(256) for _ in range(16)]
-        rand_byte_array = bytearray(random_int_array)
-        return str(base64.b64encode(rand_byte_array))[2:-1]
-
     def add_connection(self, profile_public_id, message="", profile_urn=None):
         """Add a given profile id as a connection.
 
@@ -1134,21 +1116,21 @@ class Linkedin(object):
             # We extract the last part of the string
             profile_urn = profile_urn_string.split(":")[-1]
 
-        trackingId = self.generateTrackingId()
-        payload = (
-            '{"trackingId":"'
-            + trackingId
-            + '", "message":"'
-            + message
-            + '", "invitations":[], "excludeInvitations":[],"invitee":{"com.linkedin.voyager.growth.invitation.InviteeProfile":\
-            {"profileId":"'
-            + profile_urn
-            + '"'
-            + "}}}"
-        )
+        trackingId = generate_trackingId()
+        payload = {
+            "trackingId": trackingId,
+            "message": message,
+            "invitations": [],
+            "excludeInvitations": [],
+            "invitee": {
+                "com.linkedin.voyager.growth.invitation.InviteeProfile": {
+                    "profileId": profile_urn
+                }
+            },
+        }
         res = self._post(
             "/growth/normInvitations",
-            data=payload,
+            data=json.dumps(payload),
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
         )
 

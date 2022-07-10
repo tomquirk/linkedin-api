@@ -1,3 +1,7 @@
+import random
+import base64
+
+
 def get_id_from_urn(urn):
     """
     Return the ID of a given Linkedin URN.
@@ -231,3 +235,25 @@ def get_list_posts_sorted_without_promoted(l_urns, l_posts):
                 l_posts[:] = [d for d in l_posts if urn not in d.get("url")]
                 break
     return l_posts_sorted_without_promoted
+
+
+def generate_trackingId_as_charString():
+    """Generates and returns a random trackingId
+
+    :return: Random trackingId string
+    :rtype: str
+    """
+    random_int_array = [random.randrange(256) for _ in range(16)]
+    rand_byte_array = bytearray(random_int_array)
+    return "".join([chr(i) for i in rand_byte_array])
+
+
+def generate_trackingId():
+    """Generates and returns a random trackingId
+
+    :return: Random trackingId string
+    :rtype: str
+    """
+    random_int_array = [random.randrange(256) for _ in range(16)]
+    rand_byte_array = bytearray(random_int_array)
+    return str(base64.b64encode(rand_byte_array))[2:-1]

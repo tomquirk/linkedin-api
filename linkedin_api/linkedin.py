@@ -1418,3 +1418,25 @@ class Linkedin(object):
             limit, offset, exclude_promoted_posts
         )
         return get_list_posts_sorted_without_promoted(l_urns, l_posts)
+
+    def get_job(self, job_id):
+        """Fetch data about a given job.
+        :param job_id: LinkedIn job ID
+        :type job_id: str
+
+        :return: Job data
+        :rtype: dict
+        """
+        params = {
+            "decorationId": "com.linkedin.voyager.deco.jobs.web.shared.WebLightJobPosting-23",
+        }
+
+        res = self._fetch(f"/jobs/jobPostings/{job_id}", params=params)
+
+        data = res.json()
+
+        if data and "status" in data and data["status"] != 200:
+            self.logger.info("request failed: {}".format(data["message"]))
+            return {}
+
+        return data

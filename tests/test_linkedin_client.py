@@ -1,11 +1,16 @@
 import pytest
 import json
-import os
+from os import getenv
 import sys
 from linkedin_api.client import Client
+from dotenv import load_dotenv
 
-TEST_LINKEDIN_USERNAME = os.getenv("LINKEDIN_USERNAME")
-TEST_LINKEDIN_PASSWORD = os.getenv("LINKEDIN_PASSWORD")
+
+# Load env
+load_dotenv()
+
+TEST_LINKEDIN_USERNAME = getenv("LINKEDIN_USERNAME")
+TEST_LINKEDIN_PASSWORD = getenv("LINKEDIN_PASSWORD")
 
 if not (TEST_LINKEDIN_USERNAME and TEST_LINKEDIN_PASSWORD):
     print("Test config incomplete. Exiting...")

@@ -11,6 +11,7 @@ pylint = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
 twine = "*"
+dotenv = "*"
 
 [packages]
 requests = "*"
@@ -18,7 +19,7 @@ beautifulsoup4 = "*"
 lxml = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"
 
 [pipenv]
 allow_prereleases = true

@@ -161,7 +161,7 @@ You can also use the `network` tab in you browsers developer tools, but you will
 
 ### How Clients query Voyager
 
-LinkedIn use [Rest-li Protocol]([url](https://linkedin.github.io/rest.li/spec/protocol)) an internal query language/syntax where Clients (i.e. front-ends like linkedin.com) to specify what data they want (similar to the GraphQL concept). Rest-li is implemented in the java's ecosystem with specify HTTP frameworks like [Netty](https://netty.io/). Maybe a future open source project will use this stack as a microservice for some use cases.
+linkedin.com queries data using the [Rest-li Protocol](https://linkedin.github.io/rest.li/spec/protocol). Rest-li is an internal query language/syntax where clients (like linkedin.com) to specify what data they want (similar to the GraphQL concept).
 
 
 Here's an example of making a request for an organisation's `name` and `groups` (the Linkedin groups it manages):

@@ -161,7 +161,8 @@ You can also use the `network` tab in you browsers developer tools, but you will
 
 ### How Clients query Voyager
 
-Linkedin seems to have developed an internal query language/syntax where Clients (i.e. front-ends like linkedin.com) to specify what data they want (similar to the GraphQL concept). **If anyone knows what this is, I'd love to know!**.
+linkedin.com queries data using the [Rest-li Protocol](https://linkedin.github.io/rest.li/spec/protocol). Rest-li is an internal query language/syntax where clients (like linkedin.com) to specify what data they want (similar to the GraphQL concept).
+
 
 Here's an example of making a request for an organisation's `name` and `groups` (the Linkedin groups it manages):
 

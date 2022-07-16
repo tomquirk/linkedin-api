@@ -1,4 +1,3 @@
-import json
 
 
 def get_id_from_urn(urn):

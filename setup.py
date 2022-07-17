@@ -33,9 +33,9 @@ setuptools.setup(
     license="MIT",
     packages=setuptools.find_packages(),
     install_requires=["requests", "beautifulsoup4", "lxml"],
-    classifiers=(
+    classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-    ),
+    ],
 )

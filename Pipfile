@@ -4,13 +4,10 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-ipdb = "*"
 black = "*"
 pytest = "*"
-pylint = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
-twine = "*"
 
 [packages]
 requests = "*"

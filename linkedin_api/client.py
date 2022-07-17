@@ -114,14 +114,16 @@ class Client(object):
             headers=Client.AUTH_REQUEST_HEADERS,
             proxies=self.proxies,
         )
-        
+
         soup = BeautifulSoup(res.text, "lxml")
 
         clientApplicationInstanceRaw = soup.find(
             "meta", attrs={"name": "applicationInstance"}
         )
         if clientApplicationInstanceRaw:
-            clientApplicationInstanceRaw = clientApplicationInstanceRaw.attrs.get("content") or {}
+            clientApplicationInstanceRaw = (
+                clientApplicationInstanceRaw.attrs.get("content") or {}
+            )
             clientApplicationInstance = json.loads(clientApplicationInstanceRaw)
             self.metadata["clientApplicationInstance"] = clientApplicationInstance
 

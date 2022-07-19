@@ -1,4 +1,5 @@
 import json
+
 from linkedin_api import Linkedin
 
 with open("credentials.json", "r") as f:
@@ -12,3 +13,6 @@ if credentials:
         "ACoAABQ11fIBQLGQbB1V1XPBZJsRwfK5r1U2Rzw"
     )
     connections = linkedin.get_profile_connections(profile["profile_id"])
+    # send a message
+    linkedin.send_message(recipients=[
+                          profile["profile_id"]], message="Hello, Hola, Namaste, Hii, Bonjour, Guten Tag")

@@ -1444,3 +1444,25 @@ class Linkedin(object):
             return {}
 
         return data
+
+    def get_easyapply_job_form(self, job_id):
+        """Fetch the easy-apply form data for a given job.
+        :param job_id: LinkedIn job ID
+        :type job_id: str
+
+        :return: Job data
+        :rtype: dict
+        """
+
+        # Set kwargs for the request to include the header X-LI-Track
+        header = {"X-LI-Track": '{"clientVersion":"0.0.0","osName":"web","clientTimestamp":'+str(time())+',"timezoneOffset":-2}'}
+
+        res = self._fetch(f"/job-apply/api/easyApplyJobApplicationForms/{job_id}", base_request=True, headers=header)
+
+        data = res.json()
+
+        if data and "status" in data and data["status"] != 200:
+            self.logger.info("request failed: {}".format(data["status"]))
+            return {}
+
+        return data

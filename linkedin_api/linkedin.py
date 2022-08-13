@@ -1455,9 +1455,11 @@ class Linkedin(object):
         """
 
         # Set kwargs for the request to include the header X-LI-Track
-        header = {"X-LI-Track": '{"clientVersion":"0.0.0","osName":"web","clientTimestamp":'+str(time())+',"timezoneOffset":-2}'}
+        header = {"X-LI-Track": '{"clientVersion":"0.0.0","osName":"web","clientTimestamp":' +
+                  str(time())+',"timezoneOffset":-2}'}
 
-        res = self._fetch(f"/job-apply/api/easyApplyJobApplicationForms/{job_id}", base_request=True, headers=header)
+        res = self._fetch(
+            f"/job-apply/api/easyApplyJobApplicationForms/{job_id}", base_request=True, headers=header)
 
         data = res.json()
 

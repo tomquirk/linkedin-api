@@ -1,5 +1,7 @@
 # Minimal makefile for Sphinx documentation
 #
+html:
+	@cd D:/Users/olatomi/Documents/project/linkedin-api; python setup.py build_ext --inplace
 
 # You can set these variables from the command line, and also
 # from the environment for the first two.

@@ -1,5 +1,6 @@
 import requests
 import logging
+from .linkedin_login import login
 from linkedin_api.cookie_repository import CookieRepository
 from bs4 import BeautifulSoup
 import json
@@ -8,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class ChallengeException(Exception):
+    print(Exception)
     pass
 
 
@@ -81,7 +83,7 @@ class Client(object):
         Set cookies of the current session and save them to a file named as the username.
         """
         self.session.cookies = cookies
-        self.session.headers["csrf-token"] = self.session.cookies["JSESSIONID"].strip(
+        self.session.headers["csrf-token"] = self.session.cookies.get("JSESSIONID","").strip(
             '"'
         )
 
@@ -90,9 +92,11 @@ class Client(object):
         return self.session.cookies
 
     def authenticate(self, username, password):
+        print("********USERNAME********\n", username)
         if self._use_cookie_cache:
             self.logger.debug("Attempting to use cached cookies")
             cookies = self._cookie_repository.get(username)
+            print("********cookies********\n", cookies)
             if cookies:
                 self.logger.debug("Using cached cookies")
                 self._set_session_cookies(cookies)
@@ -148,18 +152,26 @@ class Client(object):
             "JSESSIONID": self.session.cookies["JSESSIONID"],
         }
 
-        res = requests.post(
-            f"{Client.LINKEDIN_BASE_URL}/uas/authenticate",
-            data=payload,
-            cookies=self.session.cookies,
-            headers=Client.AUTH_REQUEST_HEADERS,
-            proxies=self.proxies,
-        )
+        # res = requests.post(
+        #     f"{Client.LINKEDIN_BASE_URL}/uas/authenticate",
+        #     data=payload,
+        #     cookies=self.session.cookies,
+        #     headers=Client.AUTH_REQUEST_HEADERS,
+        #     proxies=self.proxies,
+        # )
+        
+        res = login(payload["session_key"], payload["session_password"], 
+                    self.session.cookies["JSESSIONID"], self.session)
 
-        data = res.json()
-
-        if data and data["login_result"] != "PASS":
-            raise ChallengeException(data["login_result"])
+        data = res.status_code
+        print(data)
+        print(res.cookies.keys())
+        print(res.cookies.items())
+        import os
+        os.system('pause')
+        # if data and data["login_result"] != "PASS":
+        #     print("*******************DATA*****>>>>>>>>>>>>>>>>>>\n", data)
+        #     raise Exception(data["login_result"])
 
         if res.status_code == 401:
             raise UnauthorizedException()

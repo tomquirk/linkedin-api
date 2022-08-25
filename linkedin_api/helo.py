@@ -4,7 +4,7 @@ from linkedin_api import Linkedin
 log = logging.getLogger(__name__)
 
 # Authenticate using any Linkedin account credentials
-api = Linkedin('olayodepossible@gmail.com', 'olayode_5344')
+api = Linkedin('yourUsername', 'your password')
 print("*******APIs", api)
 
 # GET a profile

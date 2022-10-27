@@ -11,7 +11,7 @@
     <img width="150px" src="./assets/logos/piloterr.png" alt="piloterr">
   </a>
 
-  <a href="https://www.enrich.com/" target="_blank">
+  <a href="https://enrich.tools/" target="_blank">
     <img width="150px" src="./assets/logos/enrich.png" alt="enrich">
   </a>
 </p>

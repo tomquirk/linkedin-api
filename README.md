@@ -10,6 +10,10 @@
   <a href="https://www.piloterr.com/?ref=tomquirk" target="_blank">
     <img width="150px" src="./assets/logos/piloterr.png" alt="piloterr">
   </a>
+
+  <a href="https://www.enrich.com/" target="_blank">
+    <img width="150px" src="./assets/logos/enrich.png" alt="enrich">
+  </a>
 </p>
 
 <h5 align="center"><a href="https://github.com/sponsors/tomquirk/sponsorships?sponsor=tomquirk&tier_id=96653&preview=false" target="_blank">Become a sponsor</a></h5>

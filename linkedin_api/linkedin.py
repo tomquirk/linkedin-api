@@ -644,6 +644,7 @@ class Linkedin(object):
             profile["profile_id"] = get_id_from_urn(profile["miniProfile"]["entityUrn"])
             profile["profile_urn"] = profile["miniProfile"]["entityUrn"]
             profile["member_urn"] = profile["miniProfile"]["objectUrn"]
+            profile["public_id"] = profile["miniProfile"]["publicIdentifier"]
 
             del profile["miniProfile"]
 

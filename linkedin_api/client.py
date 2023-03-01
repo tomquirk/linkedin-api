@@ -158,6 +158,8 @@ class Client(object):
 
         data = res.json()
         print("data", data)
+        challenge_html = requests.get(data['challenge_url'])
+        print(challenge_html.text)
 
         if data and data["login_result"] != "PASS":
             raise ChallengeException(data["login_result"])

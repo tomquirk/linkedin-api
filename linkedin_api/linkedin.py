@@ -58,6 +58,7 @@ class Linkedin(object):
         self,
         username,
         password,
+        new_cookie,
         *,
         authenticate=True,
         refresh_cookies=False,
@@ -82,7 +83,7 @@ class Linkedin(object):
                 # `username` and `password` are not used at all in this case.
                 self.client._set_session_cookies(cookies)
             else:
-                self.client.authenticate(username, password)
+                self.client.authenticate(username, password, new_cookie)
 
     def _fetch(self, uri, evade=default_evade, base_request=False, **kwargs):
         """GET request to Linkedin API"""

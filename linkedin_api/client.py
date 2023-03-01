@@ -134,13 +134,14 @@ class Client(object):
             clientPageInstanceId = clientPageInstanceIdRaw.attrs.get("content") or {}
             self.metadata["clientPageInstanceId"] = clientPageInstanceId
 
-    def _do_authentication_request(self, username, password):
+    def _do_authentication_request(self, username, password, cookies):
         """
         Authenticate with Linkedin.
 
         Return a session object that is authenticated.
         """
-        self._set_session_cookies(self._request_session_cookies())
+        #self._set_session_cookies(self._request_session_cookies())
+        self._set_session_cookies(cookies)
 
         payload = {
             "session_key": username,

@@ -84,7 +84,7 @@ class Client(object):
         print("type", type(cookies))
         self.session.cookies = cookies
         print(self.session.cookies[14])
-        self.session.headers["csrf-token"] = self.session.cookies[14]["value"].strip(
+        self.session.headers["csrf-token"] = self.session.cookies[13]["value"].strip(
             '"'
         )
 

@@ -143,8 +143,6 @@ class Client(object):
         """
         self._set_session_cookies(self._request_session_cookies())
         #self._set_session_cookies(cookies)
-        
-        print(self.session.cookies)
 
         payload = {
             "session_key": username,
@@ -162,6 +160,7 @@ class Client(object):
 
         data = res.json()
         print("data", data)
+        print(self.session.cookies)
 
         if data and data["login_result"] != "PASS":
             raise ChallengeException(data["login_result"])

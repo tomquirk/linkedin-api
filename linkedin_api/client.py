@@ -94,6 +94,7 @@ class Client(object):
             self.logger.debug("Attempting to use cached cookies")
             cookies = self._cookie_repository.get(username)
             if cookies:
+                print("in authenticate function: ", cookies)
                 self.logger.debug("Using cached cookies")
                 self._set_session_cookies(cookies)
                 self._fetch_metadata()

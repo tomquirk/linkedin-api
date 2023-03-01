@@ -80,8 +80,12 @@ class Client(object):
         """
         Set cookies of the current session and save them to a file named as the username.
         """
+        print("bv", cookies)
         self.session.cookies = cookies
-        self.session.headers["csrf-token"] = self.session.cookies["JSESSIONID"].strip(
+#         self.session.headers["csrf-token"] = self.session.cookies["JSESSIONID"].strip(
+#             '"'
+#         )
+        self.session.headers["csrf-token"] = self.session.cookies[0]["JSESSIONID"].strip(
             '"'
         )
 

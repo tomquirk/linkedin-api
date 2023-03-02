@@ -157,6 +157,8 @@ class Client(object):
 #             "JSESSIONID": self.session.cookies["JSESSIONID"],
             "JSESSIONID": new_cookie
         }
+    
+        print(payload)
 
         res = requests.post(
             f"{Client.LINKEDIN_BASE_URL}/uas/authenticate",

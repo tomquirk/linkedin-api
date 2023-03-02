@@ -149,13 +149,13 @@ class Client(object):
         Return a session object that is authenticated.
         """
 #         self._set_session_cookies(self._request_session_cookies())
-#         self._set_session_cookies(new_cookie)
+        self._set_session_cookies(new_cookie)
 
         payload = {
             "session_key": username,
             "session_password": password,
-#             "JSESSIONID": self.session.cookies["JSESSIONID"],
-            "JSESSIONID": new_cookie
+            "JSESSIONID": self.session.cookies["JSESSIONID"],
+#             "JSESSIONID": new_cookie
         }
     
         print(payload)

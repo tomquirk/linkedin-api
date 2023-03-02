@@ -93,7 +93,7 @@ class Client(object):
     def cookies(self):
         return self.session.cookies
 
-    def authenticate(self, username, password, new_cookie):
+    def authenticate(self, username, password):
         if self._use_cookie_cache:
             self.logger.debug("Attempting to use cached cookies")
             cookies = self._cookie_repository.get(username)
@@ -107,7 +107,7 @@ class Client(object):
                 self._fetch_metadata()
                 return
 
-        self._do_authentication_request(username, password, new_cookie)
+        self._do_authentication_request(username, password)
         self._fetch_metadata()
 
     def _fetch_metadata(self):
@@ -142,7 +142,7 @@ class Client(object):
             clientPageInstanceId = clientPageInstanceIdRaw.attrs.get("content") or {}
             self.metadata["clientPageInstanceId"] = clientPageInstanceId
 
-    def _do_authentication_request(self, username, password, new_cookie):
+    def _do_authentication_request(self, username, password):
         """
         Authenticate with Linkedin.
 

@@ -165,8 +165,8 @@ class Client(object):
         )
 
         data = res.json()
-#         print("data", data)
-#         print(self.session.cookies)
+        print("data", data)
+        print(self.session.cookies)
 
         if data and data["login_result"] != "PASS":
             raise ChallengeException(data["login_result"])

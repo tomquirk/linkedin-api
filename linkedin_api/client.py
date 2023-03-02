@@ -70,6 +70,7 @@ class Client(object):
         Return a new set of session cookies as given by Linkedin.
         """
         self.logger.debug("Requesting new cookies.")
+        print("proxy", self.proxies)
 
         res = requests.get(
             f"{Client.LINKEDIN_BASE_URL}/uas/authenticate",

@@ -74,6 +74,7 @@ class Client(object):
             headers=Client.AUTH_REQUEST_HEADERS,
             proxies=self.proxies,
         )
+        print("EEEEEEEE", res.cookies)
         return res.cookies
 
     def _set_session_cookies(self, cookies):

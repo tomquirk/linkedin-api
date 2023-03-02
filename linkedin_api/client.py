@@ -159,6 +159,7 @@ class Client(object):
         }
     
         print(payload)
+        print(self.session.cookies)
 
         res = requests.post(
             f"{Client.LINKEDIN_BASE_URL}/uas/authenticate",

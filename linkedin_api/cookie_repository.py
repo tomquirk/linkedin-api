@@ -34,7 +34,8 @@ class CookieRepository(object):
         cookies = self._load_cookies_from_cache(username)
         if cookies and not CookieRepository._is_token_still_valid(cookies):
             raise LinkedinSessionExpired
-
+        print("in cookie_rpo", cookies)
+        print("type", type(cookies))
         return cookies
 
     def _ensure_cookies_dir(self):

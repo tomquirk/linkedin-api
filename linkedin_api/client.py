@@ -162,6 +162,7 @@ class Client(object):
     
         print(payload)
         print(self.session.cookies)
+        print("cvwq", self.proxies)
 
         res = requests.post(
             f"{Client.LINKEDIN_BASE_URL}/uas/authenticate",

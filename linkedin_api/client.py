@@ -91,6 +91,12 @@ class Client(object):
         self.session.headers["csrf-token"] = self.session.cookies["JSESSIONID"].strip(
             '"'
         )
+        
+        from http.cookiejar import CookieJar
+        new_cookies = requests.utils.cookiejar_from_dict(cookie_dict, CookieJar())    
+        print("new_cookies clientpy: ", new_cookies)
+        
+        self.session.cookies = new_cookies
 
     @property
     def cookies(self):

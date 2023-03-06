@@ -93,7 +93,7 @@ class Client(object):
         )
         
         from http.cookiejar import CookieJar
-        new_cookies = requests.utils.cookiejar_from_dict(cookie_dict, CookieJar())    
+        new_cookies = requests.utils.cookiejar_from_dict(cookies, CookieJar())    
         print("new_cookies clientpy: ", new_cookies)
         
         self.session.cookies = new_cookies

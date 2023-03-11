@@ -56,8 +56,8 @@ class Linkedin(object):
 
     def __init__(
         self,
-        username,
-        password,
+        username=None,
+        password=None,
         *,
         authenticate=True,
         refresh_cookies=False,

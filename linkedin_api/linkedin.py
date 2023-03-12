@@ -228,7 +228,7 @@ class Linkedin(object):
                 f"/search/blended?{urlencode(default_params, safe='(),')}",
                 headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
             )
-            print(res, res.status)
+            print(res, res.status_code)
             data = res.json()
 
             new_elements = []

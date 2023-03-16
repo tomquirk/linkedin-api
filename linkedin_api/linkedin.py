@@ -622,6 +622,7 @@ class Linkedin(object):
         res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")
         try:
             data = res.json()
+            print(data)
         except:
             data = res.text
             print("dd", data)

@@ -619,13 +619,15 @@ class Linkedin(object):
         """
         # NOTE this still works for now, but will probably eventually have to be converted to
         # https://www.linkedin.com/voyager/api/identity/profiles/ACoAAAKT9JQBsH7LwKaE9Myay9WcX8OVGuDq9Uw
-        res = self._fetch(f"/identity/profiles/{public_id or urn_id}")
+        res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")
+        
         try:
             data = res.json()
             print(data)
         except:
-            data = res.text
+            data = res.url
             print("dd", data)
+        
         if data and "status" in data and data["status"] != 200:
             self.logger.info("request failed: {}".format(data["message"]))
             return {}

@@ -624,7 +624,7 @@ class Linkedin(object):
             data = res.json()
         except:
             data = res.text
-            print(data)
+            print("dd", data)
         if data and "status" in data and data["status"] != 200:
             self.logger.info("request failed: {}".format(data["message"]))
             return {}

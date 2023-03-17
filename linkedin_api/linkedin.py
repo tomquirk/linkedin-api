@@ -606,7 +606,7 @@ class Linkedin(object):
 
         return skills
 
-    def get_profile(self, public_id=None, urn_id=None):
+    def get_profile(self, public_id=None, urn_id=None, cookies=None):
         """Fetch data for a given LinkedIn profile.
 
         :param public_id: LinkedIn public ID for a profile
@@ -620,7 +620,7 @@ class Linkedin(object):
         # NOTE this still works for now, but will probably eventually have to be converted to
         # https://www.linkedin.com/voyager/api/identity/profiles/ACoAAAKT9JQBsH7LwKaE9Myay9WcX8OVGuDq9Uw
 #         res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")
-        res = self._fetch(f"/identity/profiles/{public_id or urn_id}")
+        res = self._fetch(f"/identity/profiles/{public_id or urn_id}", cookies=cookies)
 #         sleep(3)
         try:
             data = res.json()

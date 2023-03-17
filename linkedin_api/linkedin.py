@@ -622,7 +622,7 @@ class Linkedin(object):
 #         res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")
 
         res = self._fetch(f"/identity/dash/profiles/urn:li:fsd_profile:ACoAAAKT9JQBsH7LwKaE9Myay9WcX8OVGuDq9Uw?decorationId=com.linkedin.voyager.dash.deco.identity.profile.FullProfile-74")
-        print("yyy")
+        print("new new")
 
         try:
             data = res.json()
@@ -630,7 +630,7 @@ class Linkedin(object):
             print(res.headers)
         except:
             data = res.headers
-            print("dd", data)
+            print("new headers: ", data)
         
         if data and "status" in data and data["status"] != 200:
             self.logger.info("request failed: {}".format(data["message"]))

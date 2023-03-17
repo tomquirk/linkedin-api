@@ -620,8 +620,10 @@ class Linkedin(object):
         # NOTE this still works for now, but will probably eventually have to be converted to
         # https://www.linkedin.com/voyager/api/identity/profiles/ACoAAAKT9JQBsH7LwKaE9Myay9WcX8OVGuDq9Uw
 #         res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")
-        res = self._fetch(f"/identity/profiles/ACoAAAKT9JQBsH7LwKaE9Myay9WcX8OVGuDq9Uw")
+
+        res = self._fetch(f"/identity/dash/profiles/urn:li:fsd_profile:ACoAAAKT9JQBsH7LwKaE9Myay9WcX8OVGuDq9Uw?decorationId=com.linkedin.voyager.dash.deco.identity.profile.FullProfile-74")
         print("yyy")
+
         try:
             data = res.json()
             print(data)

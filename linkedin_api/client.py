@@ -60,9 +60,7 @@ class Client(object):
         self.metadata = {}
         self._use_cookie_cache = not refresh_cookies
         self._cookie_repository = CookieRepository(cookies_dir=cookies_dir)
-        
-        print(self._cookie_repository)
-
+       
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
 
     def _request_session_cookies(self):
@@ -70,31 +68,26 @@ class Client(object):
         Return a new set of session cookies as given by Linkedin.
         """
         self.logger.debug("Requesting new cookies.")
-        print("proxy", self.proxies)
 
         res = requests.get(
             f"{Client.LINKEDIN_BASE_URL}/uas/authenticate",
             headers=Client.AUTH_REQUEST_HEADERS,
             proxies=self.proxies,
         )
-        print("EEEEEEEE", res.cookies)
+        
         return res.cookies
 
     def _set_session_cookies(self, cookies):
         """
         Set cookies of the current session and save them to a file named as the username.
         """
-        print("bv", cookies)
-        print("type", type(cookies))
-        self.session.cookies = cookies
- 
+        self.session.cookies = cookies 
         self.session.headers["csrf-token"] = self.session.cookies["JSESSIONID"].strip(
             '"'
         )
         
         from http.cookiejar import CookieJar
         new_cookies = requests.utils.cookiejar_from_dict(cookies, CookieJar())    
-        print("new_cookies clientpy: ", new_cookies)
         
         self.session.cookies = new_cookies
 
@@ -106,12 +99,8 @@ class Client(object):
         if self._use_cookie_cache:
             self.logger.debug("Attempting to use cached cookies")
             cookies = self._cookie_repository.get(username)
-            if cookies:
-                
+            if cookies:    
                 self.logger.debug("Using cached cookies")
-                
-                print("DDDDDDDDDDDDDDDDDD")
-                
                 self._set_session_cookies(cookies)
                 self._fetch_metadata()
                 return
@@ -158,7 +147,6 @@ class Client(object):
         Return a session object that is authenticated.
         """
         self._set_session_cookies(self._request_session_cookies())
-#         self._set_session_cookies(new_cookie)
 
         payload = {
             "session_key": username,
@@ -166,10 +154,6 @@ class Client(object):
             "JSESSIONID": self.session.cookies["JSESSIONID"]
         }
     
-        print(payload)
-        print(self.session.cookies)
-        print("cvwq", self.proxies)
-
         res = requests.post(
             f"{Client.LINKEDIN_BASE_URL}/uas/authenticate",
             data=payload,
@@ -179,8 +163,6 @@ class Client(object):
         )
 
         data = res.json()
-        print("data", data)
-        print(self.session.cookies)
 
         if data and data["login_result"] != "PASS":
             raise ChallengeException(data["login_result"])

@@ -626,7 +626,7 @@ class Linkedin(object):
             data = res.json()
             print(data)
         except:
-            data = res.content
+            data = res.headers
             print("dd", data)
         
         if data and "status" in data and data["status"] != 200:

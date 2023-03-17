@@ -621,7 +621,7 @@ class Linkedin(object):
         # https://www.linkedin.com/voyager/api/identity/profiles/ACoAAAKT9JQBsH7LwKaE9Myay9WcX8OVGuDq9Uw
 #         res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")
         res = self._fetch(f"/identity/profiles/ACoAAAKT9JQBsH7LwKaE9Myay9WcX8OVGuDq9Uw")
-#         sleep(3)
+        print("yyy")
         try:
             data = res.json()
             print(data)

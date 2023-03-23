@@ -3,6 +3,9 @@
 <h3 align="center">Sponsors</h3>
 
 <p align="center">
+  <a href="https://nubela.co/" target="_blank">
+    <img width="150px" src="https://nubela.co/proxycurl/media/imgs/proxycurl@4x.png" alt="nubela">
+  </a>
   <a href="https://iscraper.io/" target="_blank">
     <img width="150px" src="./assets/logos/iscraper.png" alt="serpsbot">
   </a>

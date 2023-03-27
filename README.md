@@ -19,34 +19,22 @@
 
 ---
 
-👨‍💼 Linkedin API for Python
+# Linkedin API for Python
 
-[![Build Status](https://travis-ci.com/tomquirk/linkedin-api.svg?branch=master)](https://travis-ci.com/tomquirk/linkedin-api)
-[![Documentation Status](https://readthedocs.org/projects/linkedin-api/badge/?version=latest)](https://linkedin-api.readthedocs.io/en/latest/?badge=latest)
+Programmatically send messages, get jobs, and search profiles with a regular Linkedin user account.
 
-> No "official" API access required - just use a valid Linkedin account!
+No "official" API access required - just use a valid Linkedin account!
 
-Programmatically send messages, get jobs, search profiles and more, all with a regular Linkedin user account!
-
-Before using this project, please consult the [Terms and Conditions](#terms-and-conditions) and [Legal Notice](#legal).
 
 ## Installation
 
-> ⚠️ Python >= 3.6 required
+> Python >= 3.6 required
 
 To install the package with the latest changes in this repo
 
 ```bash
 pip3 install git+https://github.com/tomquirk/linkedin-api.git
 ```
-
-To install PyPI version:
-
-```bash
-pip3 install linkedin-api~=2.0.0a
-```
-
-> [Why v2.0.0a?](#versioning-note)
 
 ### Example usage
 
@@ -68,7 +56,29 @@ connections = api.get_profile_connections('1234asc12304')
 
 ## Documentation
 
+> Before using this project, please consult the [Terms and Conditions](#terms-and-conditions) and [Legal Notice](#legal).
+
 For a complete reference documentation, see the [documentation website](https://linkedin-api.readthedocs.io/).
+
+[Learn more](#overview) about how it works.
+
+## Commercial
+
+> This is a paid advertisement
+
+Scrape public LinkedIn profile data at scale with Proxycurl APIs.
+
+- Scraping Public profiles are battle tested in court in HiQ VS LinkedIn case.
+- GDPR, CCPA, SOC2 compliant
+- High rate limit - 300 requests/minute
+- Fast - APIs respond in ~2s
+- Fresh data - 88% of data is scraped real-time, other 12% are not older than 29 days
+- High accuracy
+- Tons of data points returned per profile
+
+Built for developers, by developers.
+
+> End of advertisement
 
 ## Overview
 

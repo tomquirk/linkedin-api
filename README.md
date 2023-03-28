@@ -38,6 +38,8 @@ pip3 install git+https://github.com/tomquirk/linkedin-api.git
 
 ### Example usage
 
+> See all methods on the [documentation website](https://linkedin-api.readthedocs.io/).
+
 ```python
 from linkedin_api import Linkedin
 
@@ -53,12 +55,6 @@ contact_info = api.get_profile_contact_info('billy-g')
 # GET 1st degree connections of a given profile
 connections = api.get_profile_connections('1234asc12304')
 ```
-
-## Documentation
-
-For a complete reference documentation, see the [documentation website](https://linkedin-api.readthedocs.io/).
-
-[Learn more](#overview) about how it works.
 
 ## Commercial Alternative
 
@@ -77,6 +73,12 @@ Scrape public LinkedIn profile data at scale with [Proxycurl APIs](https://nubel
 Built for developers, by developers.
 
 > End sponsored section
+
+## Documentation
+
+For a complete reference documentation, see the [documentation website](https://linkedin-api.readthedocs.io/).
+
+[Learn more](#overview) about how it works.
 
 ## Overview
 

@@ -56,17 +56,15 @@ connections = api.get_profile_connections('1234asc12304')
 
 ## Documentation
 
-> Before using this project, please consult the [Terms and Conditions](#terms-and-conditions) and [Legal Notice](#legal).
-
 For a complete reference documentation, see the [documentation website](https://linkedin-api.readthedocs.io/).
 
 [Learn more](#overview) about how it works.
 
-## Commercial
+## Commercial Alternative
 
-> This is a paid advertisement
+> This is a sponsored section
 
-Scrape public LinkedIn profile data at scale with Proxycurl APIs.
+Scrape public LinkedIn profile data at scale with [Proxycurl APIs](https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-).
 
 - Scraping Public profiles are battle tested in court in HiQ VS LinkedIn case.
 - GDPR, CCPA, SOC2 compliant
@@ -78,9 +76,11 @@ Scrape public LinkedIn profile data at scale with Proxycurl APIs.
 
 Built for developers, by developers.
 
-> End of advertisement
+> End sponsored section
 
 ## Overview
+
+> Before using this project, please consult the [Terms and Conditions](#terms-and-conditions) and [Legal Notice](#legal).
 
 This project attempts to provide a simple Python interface for the Linkedin API.
 

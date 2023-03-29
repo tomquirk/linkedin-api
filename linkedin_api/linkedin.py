@@ -923,7 +923,8 @@ class Linkedin(object):
         if data["elements"] == []:
             return {}
 
-        item = data["elements"][0]
+#         Removed [0] from below
+        item = data["elements"] 
         item["id"] = get_id_from_urn(item["entityUrn"])
 
         return item

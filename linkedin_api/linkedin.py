@@ -923,15 +923,11 @@ class Linkedin(object):
 
         if data["elements"] == []:
             return {}
-
-        items=[]
-        for i in range(0, len(data["elements"]) ):
-            
-            item = data["elements"][i]
-            item["id"] = get_id_from_urn(item["entityUrn"])
-            items.append(item)
-
-        return items
+        
+        item = data["elements"][0]
+        item["id"] = get_id_from_urn(item["entityUrn"])
+        
+        return item
 
     def get_conversations(self):
         """Fetch list of conversations the user is in.

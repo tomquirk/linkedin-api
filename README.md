@@ -4,14 +4,13 @@
 
 <p align="center">
   <a href="https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-" target="_blank">
-    <img width="150px" src="./assets/logos/proxycurl.png" alt="proxycurl">
+    <img  height="45px" src="./assets/logos/proxycurl.png" alt="proxycurl">
   </a>
   <a href="https://iscraper.io/" target="_blank">
-    <img width="150px" src="./assets/logos/iscraper.png" alt="serpsbot">
+    <img height="45px" src="./assets/logos/iscraper.png" alt="serpsbot">
   </a>
-
   <a href="https://www.piloterr.com/?ref=tomquirk" target="_blank">
-    <img width="150px" src="./assets/logos/piloterr.png" alt="piloterr">
+    <img height="45px" src="./assets/logos/piloterr.png" alt="piloterr">
   </a>
 </p>
 
@@ -24,7 +23,6 @@
 Programmatically send messages, get jobs, and search profiles with a regular Linkedin user account.
 
 No "official" API access required - just use a valid Linkedin account!
-
 
 ## Installation
 

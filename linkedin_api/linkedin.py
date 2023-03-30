@@ -88,7 +88,7 @@ class Linkedin(object):
     def _fetch(self, uri, evade=default_evade, base_request=False, **kwargs):
         """GET request to Linkedin API"""
         evade()
-
+        print(f"{self.client.LINKEDIN_BASE_URL}{uri})
         url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
         return self.client.session.get(url, **kwargs)
 

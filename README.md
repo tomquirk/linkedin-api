@@ -1,4 +1,4 @@
-# linkedin_api
+# Linkedin API for Python
 
 <h3 align="center">Sponsors</h3>
 
@@ -18,25 +18,27 @@
 
 ---
 
-# Linkedin API for Python
-
 Programmatically send messages, get jobs, and search profiles with a regular Linkedin user account.
 
 No "official" API access required - just use a valid Linkedin account!
+
+**Caution**: This library is not officially supported by LinkedIn. Using it might violate LinkedIn's Terms of Service. Use it at your own risk.
 
 ## Installation
 
 > Python >= 3.6 required
 
-To install the package with the latest changes in this repo
+To install the linkedin_api package, use the following command:
 
 ```bash
 pip3 install git+https://github.com/tomquirk/linkedin-api.git
 ```
 
-### Example usage
+### Quick Start
 
 > See all methods on the [documentation website](https://linkedin-api.readthedocs.io/).
+
+Below is a basic example of how to use linkedin_api:
 
 ```python
 from linkedin_api import Linkedin
@@ -74,27 +76,17 @@ Built for developers, by developers.
 
 ## Documentation
 
-For a complete reference documentation, see the [documentation website](https://linkedin-api.readthedocs.io/).
+For comprehensive documentation, including available methods and parameters, visit the [documentation](https://linkedin-api.readthedocs.io/).
 
-[Learn more](#overview) about how it works.
+[Learn more](#how-it-works) about how it works.
 
-## Overview
+## Disclaimer
 
-> Before using this project, please consult the [Terms and Conditions](#terms-and-conditions) and [Legal Notice](#legal).
+This library is not endorsed or supported by LinkedIn. It is an unofficial library intended for educational purposes and personal use only. By using this library, you agree to not hold the author or contributors responsible for any consequences resulting from its usage.
 
-This project attempts to provide a simple Python interface for the Linkedin API.
+## Contributing
 
-> Do you mean the [legit Linkedin API](https://developer.linkedin.com/)?
-
-NO! To retrieve structured data, the [Linkedin Website](https://linkedin.com) uses a service they call **Voyager**. Voyager endpoints give us access to pretty much everything we could want from Linkedin: profiles, companies, connections, messages, etc. - anything that you can see on linkedin.com, we can get from Voyager.
-
-So specifically, this project aims to provide complete coverage for Voyager.
-
-[How do we do it?](#in-depth-overview)
-
-### How to contribute
-
-[Learn how to find endpoints](#to-find-endpoints)
+We welcome contributions! [Learn how to find endpoints](#to-find-endpoints)
 
 ## Development Setup
 
@@ -137,7 +129,21 @@ Please add more as you come across them.
 
 - Mileage may vary when searching general keywords like "software" using the standard `search` method. They've recently added some smarts around search whereby they group results by people, company, jobs etc. if the query is general enough. Try to use an entity-specific search method (i.e. search_people) where possible.
 
-## In-depth overview
+## How it works
+
+> Before using this project, please consult the [Terms and Conditions](#terms-and-conditions) and [Legal Notice](#legal).
+
+This project attempts to provide a simple Python interface for the Linkedin API.
+
+> Do you mean the [legit Linkedin API](https://developer.linkedin.com/)?
+
+NO! To retrieve structured data, the [Linkedin Website](https://linkedin.com) uses a service they call **Voyager**. Voyager endpoints give us access to pretty much everything we could want from Linkedin: profiles, companies, connections, messages, etc. - anything that you can see on linkedin.com, we can get from Voyager.
+
+This project aims to provide complete coverage for Voyager.
+
+[How does it work?](#in-depth-overview)
+
+### In-depth overview
 
 Voyager endpoints look like this:
 
@@ -208,28 +214,3 @@ List(v->PEOPLE)
 
 It could be possible to document (and implement a nice interface for) this query language - as we add more endpoints to this project, I'm sure it will become more clear if such a thing would be possible (and if it's worth it).
 
-## Terms and Conditions
-
-By using this project, you agree to the following Terms and Conditions. We reserve the right to block any user of this repository that does not meet these conditions.
-
-### Usage
-
-This project may not be used for any of the following:
-
-- Commercial use
-- Spam
-- Storage of any Personally Identifiable Information
-- Personal abuse (i.e. verbal abuse)
-
-## Legal
-
-This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by Linkedin or any of its affiliates or subsidiaries. This is an independent and unofficial API. Use at your own risk.
-
-This project violates Linkedin's User Agreement Section 8.2, and because of this, Linkedin may (and will) temporarily or permanently ban your account. We are not responsible for your account being banned.
-
-## Versioning Note
-
-**Tl;dr:** Don't use anything < v2.0.0a.
-
-Releases/tags for this package have not been kept up to date with changes and thus versions (like v1.0.0) are misleading and do not represent "stability".
-Eventually, v2.0.0 will be the "stable" release.

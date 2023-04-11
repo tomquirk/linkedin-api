@@ -3,7 +3,7 @@
 <h3 align="center">Sponsors</h3>
 
 <p align="center">
-  <a href="https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-" target="_blank">
+  <a href="https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-&utm_content=tom%20quirk" target="_blank">
     <img  height="45px" src="./assets/logos/proxycurl.png" alt="proxycurl">
   </a>
   <a href="https://iscraper.io/" target="_blank">
@@ -60,7 +60,7 @@ connections = api.get_profile_connections('1234asc12304')
 
 > This is a sponsored section
 
-Scrape public LinkedIn profile data at scale with [Proxycurl APIs](https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-).
+Scrape public LinkedIn profile data at scale with [Proxycurl APIs](https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-&utm_content=tom%20quirk).
 
 - Scraping Public profiles are battle tested in court in HiQ VS LinkedIn case.
 - GDPR, CCPA, SOC2 compliant

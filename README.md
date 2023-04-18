@@ -3,6 +3,9 @@
 <h3 align="center">Sponsors</h3>
 
 <p align="center">
+  <a href="https://lix-it.com/pages/linkedin-api?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_content=tomquirk" target="_blank">
+    <img height="45px" style="margin-right:15px" src="./assets/logos/lix.png" alt="Lix">
+  </a>
   <a href="https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-&utm_content=tom%20quirk" target="_blank">
     <img  height="45px" src="./assets/logos/proxycurl.png" alt="proxycurl">
   </a>

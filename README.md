@@ -4,16 +4,16 @@
 
 <p align="center">
   <a href="https://lix-it.com/pages/linkedin-api?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_content=tomquirk" target="_blank">
-    <img height="45px" style="margin-right:15px" src="./assets/logos/lix.png" alt="Lix">
+    <img height="45px" style="margin-right:15px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/lix.png" alt="Lix">
   </a>
   <a href="https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-&utm_content=tom%20quirk" target="_blank">
-    <img  height="45px" src="./assets/logos/proxycurl.png" alt="proxycurl">
+    <img  height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proxycurl.png" alt="proxycurl">
   </a>
   <a href="https://iscraper.io/" target="_blank">
-    <img height="45px" src="./assets/logos/iscraper.png" alt="serpsbot">
+    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/iscraper.png" alt="serpsbot">
   </a>
   <a href="https://www.piloterr.com/?ref=tomquirk" target="_blank">
-    <img height="45px" src="./assets/logos/piloterr.png" alt="piloterr">
+    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/piloterr.png" alt="piloterr">
   </a>
 </p>
 
@@ -216,4 +216,3 @@ List(v->PEOPLE)
 ```
 
 It could be possible to document (and implement a nice interface for) this query language - as we add more endpoints to this project, I'm sure it will become more clear if such a thing would be possible (and if it's worth it).
-

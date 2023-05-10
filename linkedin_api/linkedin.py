@@ -121,13 +121,11 @@ class Linkedin(object):
 
         # massage [profile] data
         profile = data["profile"]
-        print("Profile", profile)
+        # print("Profile", profile)
         if "miniProfile" in profile:
             
-            profile["profile_id"] = get_id_from_urn(profile["miniProfile"]["entityUrn"])
-            profile["profile_urn"] = profile["miniProfile"]["entityUrn"]
-            profile["member_urn"] = profile["miniProfile"]["objectUrn"]
-            profile["public_id"] = profile["miniProfile"]["publicIdentifier"]
+            profile["firstName"] = profile["miniProfile"]["firstName"]            
+            profile["lastName"] = profile["miniProfile"]["lastName"]
 
             del profile["miniProfile"]
 

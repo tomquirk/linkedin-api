@@ -80,10 +80,10 @@ class Linkedin(object):
             if cookies:
                 # If the cookies are expired, the API won't work anymore since
                 # `username` and `password` are not used at all in this case.
-                print("in LINKEDINPY")
+                # print("in LINKEDINPY")
                 self.client._set_session_cookies(cookies)
             else:
-                self.client.authenticate(username, password)
+                self.client.authenticate(username, password)                
 
     def _fetch(self, uri, evade=default_evade, base_request=False, **kwargs):
         """GET request to Linkedin API"""
@@ -91,6 +91,47 @@ class Linkedin(object):
         print(f"{self.client.LINKEDIN_BASE_URL}{uri}")
         url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
         return self.client.session.get(url, **kwargs)
+    
+    def get_profile_name(self, public_id=None, urn_id=None):
+        """Fetch data for a given LinkedIn profile.
+
+        :param public_id: LinkedIn public ID for a profile
+        :type public_id: str, optional
+        :param urn_id: LinkedIn URN ID for a profile
+        :type urn_id: str, optional
+
+        :return: Profile data
+        :rtype: dict
+        """
+        # NOTE this still works for now, but will probably eventually have to be converted to
+        # https://www.linkedin.com/voyager/api/identity/profiles/ACoAAAKT9JQBsH7LwKaE9Myay9WcX8OVGuDq9Uw
+        res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")
+  
+        try:
+            data = res.json()
+            # print(data)
+            # print(res.headers)
+        except:
+            data = res.headers
+            print("error headers: ", data)
+        
+        if data and "status" in data and data["status"] != 200:
+            self.logger.info("request failed: {}".format(data["message"]))
+            return {}
+
+        # massage [profile] data
+        profile = data["profile"]
+        print("Profile", profile)
+        if "miniProfile" in profile:
+            
+            profile["profile_id"] = get_id_from_urn(profile["miniProfile"]["entityUrn"])
+            profile["profile_urn"] = profile["miniProfile"]["entityUrn"]
+            profile["member_urn"] = profile["miniProfile"]["objectUrn"]
+            profile["public_id"] = profile["miniProfile"]["publicIdentifier"]
+
+            del profile["miniProfile"]
+
+        return profile 
 
     def _post(self, uri, evade=default_evade, base_request=False, **kwargs):
         """POST request to Linkedin API"""
@@ -623,9 +664,8 @@ class Linkedin(object):
   
         try:
             data = res.json()
-            print("yay")
-            print(data)
-            print(res.headers)
+            # print(data)
+            # print(res.headers)
         except:
             data = res.headers
             print("error headers: ", data)

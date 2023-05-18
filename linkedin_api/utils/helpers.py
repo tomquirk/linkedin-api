@@ -187,15 +187,11 @@ def parse_list_raw_posts(l_raw_posts, linkedin_base_url):
     for i in l_raw_posts:
         author_name = get_update_author_name(i)
         if author_name:
-            l_posts = append_update_post_field_to_posts_list(
-                i, l_posts, "author_name", author_name
-            )
+            l_posts = append_update_post_field_to_posts_list(i, l_posts, "author_name", author_name)
 
         author_profile = get_update_author_profile(i, linkedin_base_url)
         if author_profile:
-            l_posts = append_update_post_field_to_posts_list(
-                i, l_posts, "author_profile", author_profile
-            )
+            l_posts = append_update_post_field_to_posts_list(i, l_posts, "author_profile", author_profile)
 
         old = get_update_old(i)
         if old:
@@ -203,9 +199,7 @@ def parse_list_raw_posts(l_raw_posts, linkedin_base_url):
 
         content = get_update_content(i, linkedin_base_url)
         if content:
-            l_posts = append_update_post_field_to_posts_list(
-                i, l_posts, "content", content
-            )
+            l_posts = append_update_post_field_to_posts_list(i, l_posts, "content", content)
 
         url = get_update_url(i, linkedin_base_url)
         if url:
@@ -227,7 +221,7 @@ def get_list_posts_sorted_without_promoted(l_urns, l_posts):
     :rtype: list
     """
     l_posts_sorted_without_promoted = []
-    l_posts[:] = [d for d in l_posts if "Promoted" not in d.get("old")]
+    l_posts[:] = [d for d in l_posts if "Promoted" not in d.get("old", {})]
     for urn in l_urns:
         for post in l_posts:
             if urn in post["url"]:

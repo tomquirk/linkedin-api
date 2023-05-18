@@ -50,9 +50,7 @@ class Linkedin(object):
     _MAX_POST_COUNT = 100  # max seems to be 100 posts per page
     _MAX_UPDATE_COUNT = 100  # max seems to be 100
     _MAX_SEARCH_COUNT = 49  # max seems to be 49, and min seems to be 2
-    _MAX_REPEATED_REQUESTS = (
-        200  # VERY conservative max requests count to avoid rate-limit
-    )
+    _MAX_REPEATED_REQUESTS = 200  # VERY conservative max requests count to avoid rate-limit
 
     def __init__(
         self,
@@ -122,9 +120,7 @@ class Linkedin(object):
             profile_urn = f"urn:li:fsd_profile:{urn_id}"
         else:
             profile = self.get_profile(public_id=public_id)
-            profile_urn = profile["profile_urn"].replace(
-                "fs_miniProfile", "fsd_profile"
-            )
+            profile_urn = profile["profile_urn"].replace("fs_miniProfile", "fsd_profile")
         url_params["profileUrn"] = profile_urn
         url = f"/identity/profileUpdatesV2"
         res = self._fetch(url, params=url_params)
@@ -171,7 +167,7 @@ class Linkedin(object):
         while data and data["metadata"]["paginationToken"] != "":
             if len(data["elements"]) >= comment_count:
                 break
-            pagination_token = data["metadata"]["paginationToken"]
+            pagination_token = data.get("metadata", {}).get("paginationToken", {})
             url_params["start"] = url_params["start"] + self._MAX_POST_COUNT
             url_params["count"] = self._MAX_POST_COUNT
             url_params["paginationToken"] = pagination_token
@@ -518,13 +514,7 @@ class Linkedin(object):
             data = res.json()
 
             elements = data.get("included", [])
-            results.extend(
-                [
-                    i
-                    for i in elements
-                    if i["$type"] == "com.linkedin.voyager.jobs.JobPosting"
-                ]
-            )
+            results.extend([i for i in elements if i["$type"] == "com.linkedin.voyager.jobs.JobPosting"])
             # break the loop if we're done searching
             # NOTE: we could also check for the `total` returned in the response.
             # This is in data["data"]["paging"]["total"]
@@ -549,9 +539,7 @@ class Linkedin(object):
         :return: Contact data
         :rtype: dict
         """
-        res = self._fetch(
-            f"/identity/profiles/{public_id or urn_id}/profileContactInfo"
-        )
+        res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileContactInfo")
         data = res.json()
 
         contact_info = {
@@ -566,13 +554,9 @@ class Linkedin(object):
         websites = data.get("websites", [])
         for item in websites:
             if "com.linkedin.voyager.identity.profile.StandardWebsite" in item["type"]:
-                item["label"] = item["type"][
-                    "com.linkedin.voyager.identity.profile.StandardWebsite"
-                ]["category"]
+                item["label"] = item["type"]["com.linkedin.voyager.identity.profile.StandardWebsite"]["category"]
             elif "" in item["type"]:
-                item["label"] = item["type"][
-                    "com.linkedin.voyager.identity.profile.CustomWebsite"
-                ]["label"]
+                item["label"] = item["type"]["com.linkedin.voyager.identity.profile.CustomWebsite"]["label"]
 
             del item["type"]
 
@@ -593,9 +577,7 @@ class Linkedin(object):
         :rtype: list
         """
         params = {"count": 100, "start": 0}
-        res = self._fetch(
-            f"/identity/profiles/{public_id or urn_id}/skills", params=params
-        )
+        res = self._fetch(f"/identity/profiles/{public_id or urn_id}/skills", params=params)
         data = res.json()
 
         skills = data.get("elements", [])
@@ -628,17 +610,13 @@ class Linkedin(object):
         profile = data["profile"]
         if "miniProfile" in profile:
             if "picture" in profile["miniProfile"]:
-                profile["displayPictureUrl"] = profile["miniProfile"]["picture"][
-                    "com.linkedin.common.VectorImage"
-                ]["rootUrl"]
+                profile["displayPictureUrl"] = profile["miniProfile"]["picture"]["com.linkedin.common.VectorImage"][
+                    "rootUrl"
+                ]
 
-                images_data = profile["miniProfile"]["picture"][
-                    "com.linkedin.common.VectorImage"
-                ]["artifacts"]
+                images_data = profile["miniProfile"]["picture"]["com.linkedin.common.VectorImage"]["artifacts"]
                 for img in images_data:
-                    w, h, url_segment = itemgetter(
-                        "width", "height", "fileIdentifyingUrlPathSegment"
-                    )(img)
+                    w, h, url_segment = itemgetter("width", "height", "fileIdentifyingUrlPathSegment")(img)
                     profile[f"img_{w}_{h}"] = url_segment
 
             profile["profile_id"] = get_id_from_urn(profile["miniProfile"]["entityUrn"])
@@ -658,9 +636,7 @@ class Linkedin(object):
         for item in experience:
             if "company" in item and "miniCompany" in item["company"]:
                 if "logo" in item["company"]["miniCompany"]:
-                    logo = item["company"]["miniCompany"]["logo"].get(
-                        "com.linkedin.common.VectorImage"
-                    )
+                    logo = item["company"]["miniCompany"]["logo"].get("com.linkedin.common.VectorImage")
                     if logo:
                         item["companyLogoUrl"] = logo["rootUrl"]
                 del item["company"]["miniCompany"]
@@ -672,9 +648,7 @@ class Linkedin(object):
         for item in education:
             if "school" in item:
                 if "logo" in item["school"]:
-                    item["school"]["logoUrl"] = item["school"]["logo"][
-                        "com.linkedin.common.VectorImage"
-                    ]["rootUrl"]
+                    item["school"]["logoUrl"] = item["school"]["logo"]["com.linkedin.common.VectorImage"]["rootUrl"]
                     del item["school"]["logo"]
 
         profile["education"] = education
@@ -730,9 +704,7 @@ class Linkedin(object):
         """
         return self.search_people(connection_of=urn_id, network_depth="F")
 
-    def get_company_updates(
-        self, public_id=None, urn_id=None, max_results=None, results=None
-    ):
+    def get_company_updates(self, public_id=None, urn_id=None, max_results=None, results=None):
         """Fetch company updates (news activity) for a given LinkedIn company.
 
         :param public_id: LinkedIn public ID for a company
@@ -743,10 +715,10 @@ class Linkedin(object):
         :return: List of company update objects
         :rtype: list
         """
-        
+
         if results is None:
             results = []
-        
+
         params = {
             "companyUniversalName": {public_id or urn_id},
             "q": "companyFeedByUniversalName",
@@ -762,10 +734,7 @@ class Linkedin(object):
         if (
             len(data["elements"]) == 0
             or (max_results is not None and len(results) >= max_results)
-            or (
-                max_results is not None
-                and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS
-            )
+            or (max_results is not None and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS)
         ):
             return results
 
@@ -779,9 +748,7 @@ class Linkedin(object):
             max_results=max_results,
         )
 
-    def get_profile_updates(
-        self, public_id=None, urn_id=None, max_results=None, results=None
-    ):
+    def get_profile_updates(self, public_id=None, urn_id=None, max_results=None, results=None):
         """Fetch profile updates (newsfeed activity) for a given LinkedIn profile.
 
         :param public_id: LinkedIn public ID for a profile
@@ -792,10 +759,10 @@ class Linkedin(object):
         :return: List of profile update objects
         :rtype: list
         """
-        
+
         if results is None:
             results = []
-            
+
         params = {
             "profileId": {public_id or urn_id},
             "q": "memberShareFeed",
@@ -811,10 +778,7 @@ class Linkedin(object):
         if (
             len(data["elements"]) == 0
             or (max_results is not None and len(results) >= max_results)
-            or (
-                max_results is not None
-                and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS
-            )
+            or (max_results is not None and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS)
         ):
             return results
 
@@ -838,13 +802,9 @@ class Linkedin(object):
 
         data = res.json()
 
-        return data["elements"][0]["value"][
-            "com.linkedin.voyager.identity.me.wvmpOverview.WvmpViewersCard"
-        ]["insightCards"][0]["value"][
-            "com.linkedin.voyager.identity.me.wvmpOverview.WvmpSummaryInsightCard"
-        ][
-            "numViews"
-        ]
+        return data["elements"][0]["value"]["com.linkedin.voyager.identity.me.wvmpOverview.WvmpViewersCard"][
+            "insightCards"
+        ][0]["value"]["com.linkedin.voyager.identity.me.wvmpOverview.WvmpSummaryInsightCard"]["numViews"]
 
     def get_school(self, public_id):
         """Fetch data about a given LinkedIn school.
@@ -1019,9 +979,7 @@ class Linkedin(object):
         """
         payload = json.dumps({"patch": {"$set": {"read": True}}})
 
-        res = self._post(
-            f"/messaging/conversations/{conversation_urn_id}", data=payload
-        )
+        res = self._post(f"/messaging/conversations/{conversation_urn_id}", data=payload)
 
         return res.status_code != 200
 
@@ -1069,9 +1027,7 @@ class Linkedin(object):
         response_payload = res.json()
         return [element["invitation"] for element in response_payload["elements"]]
 
-    def reply_invitation(
-        self, invitation_entity_urn, invitation_shared_secret, action="accept"
-    ):
+    def reply_invitation(self, invitation_entity_urn, invitation_shared_secret, action="accept"):
         """Respond to a connection invitation. By default, accept the invitation.
 
         :param invitation_entity_urn: URN ID of the invitation
@@ -1122,9 +1078,7 @@ class Linkedin(object):
             return False
 
         if not profile_urn:
-            profile_urn_string = self.get_profile(public_id=profile_public_id)[
-                "profile_urn"
-            ]
+            profile_urn_string = self.get_profile(public_id=profile_public_id)["profile_urn"]
             # Returns string of the form 'urn:li:fs_miniProfile:ACoAACX1hoMBvWqTY21JGe0z91mnmjmLy9Wen4w'
             # We extract the last part of the string
             profile_urn = profile_urn_string.split(":")[-1]
@@ -1135,11 +1089,7 @@ class Linkedin(object):
             "message": message,
             "invitations": [],
             "excludeInvitations": [],
-            "invitee": {
-                "com.linkedin.voyager.growth.invitation.InviteeProfile": {
-                    "profileId": profile_urn
-                }
-            },
+            "invitee": {"com.linkedin.voyager.growth.invitation.InviteeProfile": {"profileId": profile_urn}},
         }
         res = self._post(
             "/growth/normInvitations",
@@ -1207,14 +1157,8 @@ class Linkedin(object):
             target_profile_member_urn_id = int(get_id_from_urn(profile["member_urn"]))
 
         if not network_distance:
-            profile_network_info = self.get_profile_network_info(
-                public_profile_id=target_profile_public_id
-            )
-            network_distance = int(
-                profile_network_info["distance"]
-                .get("value", "DISTANCE_2")
-                .split("_")[1]
-            )
+            profile_network_info = self.get_profile_network_info(public_profile_id=target_profile_public_id)
+            network_distance = int(profile_network_info["distance"].get("value", "DISTANCE_2").split("_")[1])
 
         viewer_privacy_setting = "F"
         me_member_id = me_profile["plainId"]
@@ -1336,9 +1280,7 @@ class Linkedin(object):
 
         return err
 
-    def _get_list_feed_posts_and_list_feed_urns(
-        self, limit=-1, offset=0, exclude_promoted_posts=True
-    ):
+    def _get_list_feed_posts_and_list_feed_urns(self, limit=-1, offset=0, exclude_promoted_posts=True):
         """Get a list of URNs from feed sorted by 'Recent' and a list of yet
         unsorted posts, each one of them containing a dict per post.
 
@@ -1367,7 +1309,6 @@ class Linkedin(object):
         l_urns = []
 
         while True:
-
             # when we're close to the limit, only fetch what we need to
             if limit > -1 and limit - len(l_urns) < count:
                 count = limit - len(l_urns)
@@ -1394,9 +1335,7 @@ class Linkedin(object):
             l_raw_posts = res.json().get("included", {})
             l_raw_urns = res.json().get("data", {}).get("*elements", [])
 
-            l_new_posts = parse_list_raw_posts(
-                l_raw_posts, self.client.LINKEDIN_BASE_URL
-            )
+            l_new_posts = parse_list_raw_posts(l_raw_posts, self.client.LINKEDIN_BASE_URL)
             l_posts.extend(l_new_posts)
 
             l_urns.extend(parse_list_raw_urns(l_raw_urns))
@@ -1427,9 +1366,7 @@ class Linkedin(object):
         :return: List of URNs
         :rtype: list
         """
-        l_posts, l_urns = self._get_list_feed_posts_and_list_feed_urns(
-            limit, offset, exclude_promoted_posts
-        )
+        l_posts, l_urns = self._get_list_feed_posts_and_list_feed_urns(limit, offset, exclude_promoted_posts)
         return get_list_posts_sorted_without_promoted(l_urns, l_posts)
 
     def get_job(self, job_id):

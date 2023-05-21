@@ -1453,3 +1453,24 @@ class Linkedin(object):
             return {}
 
         return data
+
+    def get_post_reactions(self, post_urn_id, limit=10, offset=0):
+        """Fetch reactions about a given post.
+        :param post_id: LinkedIn Post URN ID
+        :type job_id: str
+
+        :return: Reaction data
+        :rtype: dict
+        """
+        # NOTE: This is a GraphQL request, the parentheses in the query should not be URL encoded
+        params = f"variables=(count:{limit},start:{offset},threadUrn:urn%3Ali%3Aactivity%3A{post_urn_id})&queryId=voyagerSocialDashReactions.743960306e7ef6641fb6b745507936d6"
+
+        res = self._fetch("/graphql", params=params)
+
+        data = res.json()
+
+        if not data or  "errors" in data :
+            self.logger.info("request failed: {}".format(data))
+            return {}
+
+        return data

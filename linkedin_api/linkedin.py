@@ -1456,8 +1456,8 @@ class Linkedin(object):
 
     def get_post_reactions(self, post_urn_id, limit=10, offset=0):
         """Fetch reactions about a given post.
-        :param post_id: LinkedIn Post URN ID
-        :type job_id: str
+        :param post_urn_id: LinkedIn Post URN ID
+        :type post_urn_id: str
 
         :return: Reaction data
         :rtype: dict
@@ -1469,8 +1469,29 @@ class Linkedin(object):
 
         data = res.json()
 
-        if not data or  "errors" in data :
+        if not data or "errors" in data:
             self.logger.info("request failed: {}".format(data))
             return {}
 
         return data
+
+    def react_to_post(self, post_urn_id, reaction_type="LIKE"):
+        """React to a given post.
+        :param post_urn_id: LinkedIn Post URN ID
+        :type post_urn_id: str
+        :param reactionType: LinkedIn reaction type, defaults to "LIKE", can be "LIKE", "PRAISE", "APPRECIATION", "EMPATHY", "INTEREST", "ENTERTAINMENT"
+        :type reactionType: str
+
+        :return: Error state. If True, an error occured.
+        :rtype: boolean
+        """
+        params = {"threadUrn": f"urn:li:activity:{post_urn_id}"}
+        payload = {"reactionType": reaction_type}
+
+        res = self._post(
+            "/voyagerSocialDashReactions",
+            params=params,
+            data=json.dumps(payload),
+        )
+
+        return res.status_code != 201

@@ -1,7 +1,6 @@
 import os
 import sys
 import pytest
-from dotenv import load_dotenv
 
 from linkedin_api import Linkedin
 
@@ -292,3 +291,9 @@ def test_get_post_reactions(linkedin):
     reaction_data = linkedin.get_post_reactions(post_urn)
     # Assert that reaction_data['data']['socialDashReactionsByReactionType']['elements'] exists
     assert reaction_data["data"]["socialDashReactionsByReactionType"]["elements"]
+
+def test_react_to_post(linkedin):
+    post = linkedin.get_profile_posts("hubertchristophe", None, 1)[0]
+    post_urn = post["socialDetail"]["urn"].split(":")[-1]
+    res = linkedin.react_to_post(post_urn, "PRAISE")
+    assert res == False

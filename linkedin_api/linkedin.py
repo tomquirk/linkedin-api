@@ -1062,13 +1062,43 @@ class Linkedin(object):
             "/relationships/invitationViews",
             params=params,
         )
-
         if res.status_code != 200:
             return []
 
         response_payload = res.json()
         return [element["invitation"] for element in response_payload["elements"]]
 
+
+    def get_sent_invitations(self, start=0, limit=3):
+        """Fetch sent connection invitations for the currently logged in user.
+
+        :param start: How much to offset results by
+        :type start: int
+        :param limit: Maximum amount of invitations to return
+        :type limit: int
+
+        :return: List of invitation objects
+        :rtype: list
+        """
+        
+        params = {
+            "start": start,
+            "count": limit,
+            "invitationType" : "CONNECTION",
+            "q": "invitationType",
+        }
+
+        res = self._fetch(
+            "/relationships/sentInvitationViewsV2",
+            params=params,
+        )
+
+        if res.status_code != 200:
+            return []
+
+        response_payload = res.json()
+        return [element["invitation"] for element in response_payload["elements"]]
+    
     def reply_invitation(
         self, invitation_entity_urn, invitation_shared_secret, action="accept"
     ):

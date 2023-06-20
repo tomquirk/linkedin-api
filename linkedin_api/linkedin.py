@@ -95,6 +95,10 @@ class Linkedin(object):
         """Return client cookies"""
         return self.client.cookies
 
+    def _headers(self):
+        """Return client cookies"""
+        return self.client.REQUEST_HEADERS
+
     def _post(self, uri, evade=default_evade, base_request=False, **kwargs):
         """POST request to Linkedin API"""
         evade()

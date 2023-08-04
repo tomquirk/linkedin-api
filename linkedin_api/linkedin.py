@@ -316,7 +316,7 @@ class Linkedin(object):
         :param connection_of: Connection of LinkedIn user, given by profile URN ID
         :type connection_of: str, optional
 
-        :return: List of profiles (minimal data only)
+        :return: List of profiles (minimal data only: keys ["urn_id", "distance", "public_id", "tracking_id", "jobtitle", "location", "name"])
         :rtype: list
         """
         filters = ["resultType->PEOPLE"]

@@ -3,6 +3,9 @@
 <h3 align="center">Sponsors</h3>
 
 <p align="center">
+    <a href="https://prospeo.io/api/linkedin-email-finder" target="_blank">
+    <img height="45px" style="margin-right:15px" src="" alt="Lix">
+  </a>
   <a href="https://lix-it.com/pages/linkedin-api?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_content=tomquirk" target="_blank">
     <img height="45px" style="margin-right:15px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/lix.png" alt="Lix">
   </a>
@@ -76,6 +79,21 @@ Scrape public LinkedIn profile data at scale with [Proxycurl APIs](https://nubel
 Built for developers, by developers.
 
 > End sponsored section
+
+> This is a sponsored section
+
+Extract data and find verified emails in real-time with [Prospeo LinkedIn Email Finder API](https://prospeo.io/api/linkedin-email-finder).
+
+Submit a LinkedIn profile URL to our API and get:
+
+- Profile data extracted in real-time
+- Company data of the profile
+- Verified work email of the profile
+- Exclusive data points (gender, cleaned country code, time zone...)
+- One do-it-all request
+- Stable API, tested under high load
+
+Try it with 75 profiles. [Get your FREE API key now](https://prospeo.io/api/linkedin-email-finder).
 
 ## Documentation
 

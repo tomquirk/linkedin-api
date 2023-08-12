@@ -237,6 +237,6 @@ It could be possible to document (and implement a nice interface for) this query
 
 ### Releasing a new version
 
-1. Bump **version** in `__init__.py`
+1. Bump `__version__` in `__init__.py`
 1. `python3 setup.py sdist bdist_wheel`
 1. `python3 -m twine upload dist/*`

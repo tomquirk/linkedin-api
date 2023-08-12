@@ -95,6 +95,8 @@ Submit a LinkedIn profile URL to our API and get:
 
 Try it with 75 profiles. [Get your FREE API key now](https://prospeo.io/api/linkedin-email-finder).
 
+> End sponsored section
+
 ## Documentation
 
 For comprehensive documentation, including available methods and parameters, visit the [documentation](https://linkedin-api.readthedocs.io/).

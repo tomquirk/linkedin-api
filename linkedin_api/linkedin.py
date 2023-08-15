@@ -380,17 +380,26 @@ class Linkedin(object):
 
         return results
 
-    def search_companies(self, keywords=None, **kwargs):
+    def search_companies(self, keywords=None, regions=None,
+        industries=None,
+        **kwargs):
         """Perform a LinkedIn search for companies.
 
-        :param keywords: A list of search keywords (str)
-        :type keywords: list, optional
+        :param keywords: Keywords to search on
+        :type keywords: str, optional
+        :param regions: A list of geo URN IDs (str)
+        :type regions: list, optional
+        :param industries: A list of industry URN IDs (str)
+        :type industries: list, optional
 
-        :return: List of companies
+        :return: List of companies (minimal data only)
         :rtype: list
         """
         filters = ["resultType->COMPANIES"]
-
+        if regions:
+            filters.append(f'geoUrn->{"|".join(regions)}')
+        if industries:
+            filters.append(f'industry->{"|".join(industries)}')
         params = {
             "filters": "List({})".format(",".join(filters)),
             "queryContext": "List(spellCorrectionEnabled->true)",
@@ -615,6 +624,8 @@ class Linkedin(object):
         :return: Profile data
         :rtype: dict
         """
+        if public_id is None and urn_id is None:
+            return ValueError("Either public_id or urn_id must be provided")
         # NOTE this still works for now, but will probably eventually have to be converted to
         # https://www.linkedin.com/voyager/api/identity/profiles/ACoAAAKT9JQBsH7LwKaE9Myay9WcX8OVGuDq9Uw
         res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")
@@ -654,7 +665,16 @@ class Linkedin(object):
         del profile["showEducationOnProfileTopCard"]
 
         # massage [experience] data
-        experience = data["positionView"]["elements"]
+        if data['positionView']['paging']['count'] < data['positionView']['paging']['total']:
+            # if profile has "view more experience" button, fetch a separate positions endpoint.
+            pos_res = self._fetch(f"/identity/profiles/{public_id or urn_id}/positions")
+            pos_data = pos_res.json()
+            if pos_data and "status" in pos_data and pos_data["status"] != 200:
+                self.logger.info("request failed: {}".format(pos_data["message"]))
+                pos_data = {}
+            experience = pos_data.get("elements", [])
+        else:
+            experience = data["positionView"]["elements"]
         for item in experience:
             if "company" in item and "miniCompany" in item["company"]:
                 if "logo" in item["company"]["miniCompany"]:
@@ -717,6 +737,12 @@ class Linkedin(object):
             del item["entityUrn"]
         profile["projects"] = projects
 
+        # massage [skills] data
+        skills = data["skillView"]["elements"]
+        for item in skills:
+            del item["entityUrn"]
+        profile["skills"] = skills
+        
         return profile
 
     def get_profile_connections(self, urn_id):
@@ -873,7 +899,7 @@ class Linkedin(object):
 
         return school
 
-    def get_company(self, public_id):
+    def get_company(self, public_id=None, urn_id=None):
         """Fetch data about a given LinkedIn company.
 
         :param public_id: LinkedIn public ID for a company
@@ -885,7 +911,7 @@ class Linkedin(object):
         params = {
             "decorationId": "com.linkedin.voyager.deco.organization.web.WebFullCompanyMain-12",
             "q": "universalName",
-            "universalName": public_id,
+            "universalName": public_id or urn_id,
         }
 
         res = self._fetch(f"/organization/companies", params=params)

@@ -282,7 +282,7 @@ class Linkedin(object):
 
             self.logger.debug(f"results grew to {len(results)}")
 
-            return results
+        return results
 
     def search_people(
         self,

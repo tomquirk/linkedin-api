@@ -224,9 +224,17 @@ class Linkedin(object):
             }
             default_params.update(params)
 
+            keywords = (
+                f"keywords:{default_params['keywords']},"
+                if "keywords" in default_params
+                else ""
+            )
+
             res = self._fetch(
                 f"/graphql?variables=(start:{default_params['start']},origin:{default_params['origin']},"
-                f"query:(keywords:{default_params['keywords']},flagshipSearchIntent:SEARCH_SRP,"
+                f"query:("
+                f"{keywords}"
+                f"flagshipSearchIntent:SEARCH_SRP,"
                 f"queryParameters:{default_params['filters']},"
                 f"includeFiltersInResponse:false))&=&queryId=voyagerSearchDashClusters"
                 f".b0928897b71bd00a5a7291755dcd64f0"

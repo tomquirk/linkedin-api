@@ -426,7 +426,7 @@ class Linkedin(object):
         job_title=None,
         industries=None,
         location_name=None,
-        remote=False,
+        remote=None,
         listed_at=24 * 60 * 60,
         distance=None,
         limit=-1,
@@ -449,8 +449,8 @@ class Linkedin(object):
         :type industries: list, optional
         :param location_name: Name of the location to search within. Example: "Kyiv City, Ukraine"
         :type location_name: str, optional
-        :param remote: Whether to search only for remote jobs. Defaults to False.
-        :type remote: boolean, optional
+        :param remote: Filter for remote jobs, onsite or hybrid. onsite:"1", remote:"2", hybrid:"3"
+        :type remote: list, optional
         :param listed_at: maximum number of seconds passed since job posting. 86400 will filter job postings posted in last 24 hours.
         :type listed_at: int/str, optional. Default value is equal to 24 hours.
         :param distance: maximum distance from location in miles
@@ -466,53 +466,63 @@ class Linkedin(object):
         if limit is None:
             limit = -1
 
-        params = {}
+        query = {"origin":"JOB_SEARCH_PAGE_QUERY_EXPANSION"}
         if keywords:
-            params["keywords"] = keywords
-
-        filters = ["resultType->JOBS"]
-        if companies:
-            filters.append(f'company->{"|".join(companies)}')
-        if experience:
-            filters.append(f'experience->{"|".join(experience)}')
-        if job_type:
-            filters.append(f'jobType->{"|".join(job_type)}')
-        if job_title:
-            filters.append(f'title->{"|".join(job_title)}')
-        if industries:
-            filters.append(f'industry->{"|".join(industries)}')
+            query["keywords"] = keywords
         if location_name:
-            filters.append(f"locationFallback->{location_name}")
-        if remote:
-            filters.append(f"workRemoteAllowed->{remote}")
-        if distance:
-            filters.append(f"distance->{distance}")
-        filters.append(f"timePostedRange->r{listed_at}")
-        # add optional kwargs to a filter
-        for name, value in kwargs.items():
-            if type(value) in (list, tuple):
-                filters.append(f'{name}->{"|".join(value)}')
-            else:
-                filters.append(f"{name}->{value}")
+            query["locationFallback"] = location_name
 
+        # In selectedFilters()
+        query['selectedFilters'] = {}
+        if companies:
+            query['selectedFilters']['company'] = f"List({','.join(companies)})"
+        if experience:
+            query['selectedFilters']['experience'] = f"List({','.join(experience)})"
+        if job_type:
+            query['selectedFilters']['jobType'] = f"List({','.join(job_type)})"
+        if job_title:
+            query['selectedFilters']['title'] = f"List({','.join(job_title)})"
+        if industries:
+            query['selectedFilters']['industry'] = f"List({','.join(industries)})"
+        if distance:
+            query['selectedFilters']['distance'] = f"List({distance})"
+        if remote:
+            query['selectedFilters']['workplaceType'] = f"List({','.join(remote)})"
+
+        query['selectedFilters']['timePostedRange'] = f"List(r{listed_at})"
+        query["spellCorrectionEnabled"] = "true"
+
+        # Query structure:
+        # "(
+        #    origin:JOB_SEARCH_PAGE_QUERY_EXPANSION,
+        #    keywords:marketing%20manager,
+        #    locationFallback:germany,
+        #    selectedFilters:(
+        #        distance:List(25),
+        #        company:List(163253),
+        #        salaryBucketV2:List(5),
+        #        timePostedRange:List(r2592000),
+        #        workplaceType:List(1)
+        #    ),
+        #    spellCorrectionEnabled:true
+        #  )"
+
+        query = str(query).replace(" ","").replace("'","").replace("{","(").replace("}",")")
         results = []
         while True:
             # when we're close to the limit, only fetch what we need to
             if limit > -1 and limit - len(results) < count:
                 count = limit - len(results)
             default_params = {
-                "decorationId": "com.linkedin.voyager.deco.jserp.WebJobSearchHitLite-14",
+                "decorationId": "com.linkedin.voyager.dash.deco.jobs.search.JobSearchCardsCollection-174",
                 "count": count,
-                "filters": f"List({','.join(filters)})",
-                "origin": "JOB_SEARCH_RESULTS_PAGE",
-                "q": "jserpFilters",
+                "q": "jobSearch",
+                "query": query,
                 "start": len(results) + offset,
-                "queryContext": "List(primaryHitType->JOBS,spellCorrectionEnabled->true)",
             }
-            default_params.update(params)
 
             res = self._fetch(
-                f"/search/hits?{urlencode(default_params, safe='(),')}",
+                f"/voyagerJobsDashJobCards?{urlencode(default_params, safe='(),:')}",
                 headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
             )
             data = res.json()
@@ -522,7 +532,7 @@ class Linkedin(object):
                 [
                     i
                     for i in elements
-                    if i["$type"] == "com.linkedin.voyager.jobs.JobPosting"
+                    if i["$type"] == 'com.linkedin.voyager.dash.jobs.JobPosting'
                 ]
             )
             # break the loop if we're done searching

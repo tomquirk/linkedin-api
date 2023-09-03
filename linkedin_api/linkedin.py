@@ -468,9 +468,9 @@ class Linkedin(object):
 
         query = {"origin":"JOB_SEARCH_PAGE_QUERY_EXPANSION"}
         if keywords:
-            query["keywords"] = keywords.replace(" ","%20")
+            query["keywords"] = "KEYWORD_PLACEHOLDER"
         if location_name:
-            query["locationFallback"] = location_name.replace(" ","%20")
+            query["locationFallback"] = "LOCATION_PLACEHOLDER"
 
         # In selectedFilters()
         query['selectedFilters'] = {}
@@ -507,7 +507,12 @@ class Linkedin(object):
         #    spellCorrectionEnabled:true
         #  )"
 
-        query = str(query).replace(" ","").replace("'","").replace("{","(").replace("}",")")
+        query = str(query).replace(" ","") \
+                    .replace("'","") \
+                    .replace("KEYWORD_PLACEHOLDER", keywords or "") \
+                    .replace("LOCATION_PLACEHOLDER", location_name or "") \
+                    .replace("{","(") \
+                    .replace("}",")")
         results = []
         while True:
             # when we're close to the limit, only fetch what we need to
@@ -528,18 +533,17 @@ class Linkedin(object):
             data = res.json()
 
             elements = data.get("included", [])
-            results.extend(
-                [
-                    i
-                    for i in elements
-                    if i["$type"] == 'com.linkedin.voyager.dash.jobs.JobPosting'
-                ]
-            )
+            new_data = [
+                i
+                for i in elements
+                if i["$type"] == 'com.linkedin.voyager.dash.jobs.JobPosting'
+            ]
             # break the loop if we're done searching or no results returned
-            if not results:
+            if not new_data:
                 break
             # NOTE: we could also check for the `total` returned in the response.
             # This is in data["data"]["paging"]["total"]
+            results.extend(new_data)
             if (
                 (-1 < limit <= len(results))  # if our results exceed set limit
                 or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS

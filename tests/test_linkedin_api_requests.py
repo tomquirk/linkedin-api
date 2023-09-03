@@ -190,7 +190,7 @@ def test_search_jobs(linkedin):
     # remote -> onsite:"1", remote:"2", hybrid:"3"
     # listed_at -> large number 1000000 seconds
     jobs = linkedin.search_jobs(
-        keywords="software", 
+        keywords="software engineer", 
         location_name="San Francisco",
         companies=["1441","162479"], 
         experience=["1","2","3","4","5","6"],
@@ -206,7 +206,7 @@ def test_search_jobs(linkedin):
 
 def test_get_job(linkedin):
     jobs = linkedin.search_jobs(
-        keywords="software", 
+        keywords="software engineer", 
         limit=1
     )
     job_id = get_id_from_urn(jobs[0]["trackingUrn"])

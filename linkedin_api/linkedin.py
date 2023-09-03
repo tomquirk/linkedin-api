@@ -468,9 +468,9 @@ class Linkedin(object):
 
         query = {"origin":"JOB_SEARCH_PAGE_QUERY_EXPANSION"}
         if keywords:
-            query["keywords"] = keywords
+            query["keywords"] = keywords.replace(" ","%20")
         if location_name:
-            query["locationFallback"] = location_name
+            query["locationFallback"] = location_name.replace(" ","%20")
 
         # In selectedFilters()
         query['selectedFilters'] = {}
@@ -535,7 +535,9 @@ class Linkedin(object):
                     if i["$type"] == 'com.linkedin.voyager.dash.jobs.JobPosting'
                 ]
             )
-            # break the loop if we're done searching
+            # break the loop if we're done searching or no results returned
+            if not results:
+                break
             # NOTE: we could also check for the `total` returned in the response.
             # This is in data["data"]["paging"]["total"]
             if (

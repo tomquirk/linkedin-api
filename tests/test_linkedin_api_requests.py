@@ -204,6 +204,14 @@ def test_search_jobs(linkedin):
     )
     assert len(jobs)==10
 
+    # Test that no results doesn't return an infinite loop
+    jobs = linkedin.search_jobs(
+        keywords="blurp", 
+        location_name="antarctica"
+    )
+    assert len(jobs)==0
+
+
 def test_get_job(linkedin):
     jobs = linkedin.search_jobs(
         keywords="software engineer", 

@@ -427,6 +427,7 @@ class Linkedin(object):
         industries=None,
         location_name=None,
         remote=False,
+        easyApply=False,
         listed_at=24 * 60 * 60,
         distance=None,
         limit=-1,
@@ -450,6 +451,8 @@ class Linkedin(object):
         :param location_name: Name of the location to search within. Example: "Kyiv City, Ukraine"
         :type location_name: str, optional
         :param remote: Whether to search only for remote jobs. Defaults to False.
+        :type remote: boolean, optional
+        :param easyApply: Whether to search only for jobs with Easy Apply. Defaults to False.
         :type remote: boolean, optional
         :param listed_at: maximum number of seconds passed since job posting. 86400 will filter job postings posted in last 24 hours.
         :type listed_at: int/str, optional. Default value is equal to 24 hours.
@@ -485,6 +488,8 @@ class Linkedin(object):
             filters.append(f"locationFallback->{location_name}")
         if remote:
             filters.append(f"workRemoteAllowed->{remote}")
+        if easyApply:
+            filters.append(f"applyWithLinkedin->{easyApply}")
         if distance:
             filters.append(f"distance->{distance}")
         filters.append(f"timePostedRange->r{listed_at}")

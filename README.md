@@ -66,28 +66,20 @@ contact_info = api.get_profile_contact_info('billy-g')
 connections = api.get_profile_connections('1234asc12304')
 ```
 
-## Commercial Alternative
+## Commercial alternatives
 
 > This is a sponsored section
 
-Scrape public LinkedIn profile data at scale with [Proxycurl APIs](https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-&utm_content=tom%20quirk).
-
-- Scraping Public profiles are battle tested in court in HiQ VS LinkedIn case.
-- GDPR, CCPA, SOC2 compliant
-- High rate limit - 300 requests/minute
-- Fast - APIs respond in ~2s
-- Fresh data - 88% of data is scraped real-time, other 12% are not older than 29 days
-- High accuracy
-- Tons of data points returned per profile
-
-Built for developers, by developers.
-
-> End sponsored section
-
-> This is a sponsored section
+<h3>
+<a href="https://prospeo.io/api/linkedin-email-finder">
+Prospeo
+</a>
+</h3>
 
 Extract data and find verified emails in real-time with [Prospeo LinkedIn Email Finder API](https://prospeo.io/api/linkedin-email-finder).
 
+<details>
+  <summary>Learn more</summary>
 Submit a LinkedIn profile URL to our API and get:
 
 - Profile data extracted in real-time
@@ -98,6 +90,32 @@ Submit a LinkedIn profile URL to our API and get:
 - Stable API, tested under high load
 
 Try it with 75 profiles. [Get your FREE API key now](https://prospeo.io/api/linkedin-email-finder).
+
+</details>
+
+<h3>
+<a href="https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-&utm_content=tom%20quirk">
+Proxycurl
+</a>
+</h3>
+
+Scrape public LinkedIn profile data at scale with [Proxycurl APIs](https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-&utm_content=tom%20quirk).
+
+<details>
+  <summary>Learn more</summary>
+- Scraping Public profiles are battle tested in court in HiQ VS LinkedIn case.
+- GDPR, CCPA, SOC2 compliant
+- High rate limit - 300 requests/minute
+- Fast - APIs respond in ~2s
+- Fresh data - 88% of data is scraped real-time, other 12% are not older than 29 days
+- High accuracy
+- Tons of data points returned per profile
+
+Built for developers, by developers.
+
+Extract data and find verified emails in real-time with [Prospeo LinkedIn Email Finder API](https://prospeo.io/api/linkedin-email-finder).
+
+</details>
 
 > End sponsored section
 

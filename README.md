@@ -103,6 +103,7 @@ Scrape public LinkedIn profile data at scale with [Proxycurl APIs](https://nubel
 
 <details>
   <summary>Learn more</summary>
+  
 - Scraping Public profiles are battle tested in court in HiQ VS LinkedIn case.
 - GDPR, CCPA, SOC2 compliant
 - High rate limit - 300 requests/minute

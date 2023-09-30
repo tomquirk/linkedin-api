@@ -790,6 +790,8 @@ class Linkedin(object):
             del item["entityUrn"]
         profile["projects"] = projects
 
+        profile['urn_id'] = profile['entityUrn'].replace('urn:li:fs_profile:', '')
+
         return profile
 
     def get_profile_connections(self, urn_id):

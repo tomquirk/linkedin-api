@@ -2,23 +2,26 @@
 
 <h3 align="center">Sponsors</h3>
 
+<p align="center" style="margin-bottom:24px" >
+  <a href="https://prospeo.io/api/linkedin-email-finder" target="_blank">
+    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/prospeo.png" alt="Prospeo">
+  </a>
+</p>
+
 <p align="center">
-    <a href="https://prospeo.io/api/linkedin-email-finder" target="_blank">
-    <img height="45px" style="margin-right:15px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/prospeo.png" alt="Prospeo">
+  <a href="https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-&utm_content=tom%20quirk" target="_blank">
+    <img  height="35px" style="margin-right:24px"  src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proxycurl.png" alt="proxycurl">
   </a>
   <a href="https://lix-it.com/pages/linkedin-api?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_content=tomquirk" target="_blank">
-    <img height="45px" style="margin-right:15px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/lix.png" alt="Lix">
-  </a>
-  <a href="https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-&utm_content=tom%20quirk" target="_blank">
-    <img  height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proxycurl.png" alt="proxycurl">
+    <img height="35px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/lix.png" alt="Lix">
   </a>
   <a href="https://iscraper.io/" target="_blank">
-    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/iscraper.png" alt="serpsbot">
+    <img height="35px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/iscraper.png" alt="serpsbot">
   </a>
   <a href="https://www.piloterr.com/?ref=tomquirk" target="_blank">
-    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/piloterr.png" alt="piloterr">
+    <img height="35px"style="margin-right:24px"  src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/piloterr.png" alt="piloterr">
   </a>
-    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/enrich.png" alt="enrich">
+    <img height="35px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/enrich.png" alt="enrich">
 </p>
 
 <h5 align="center"><a href="https://github.com/sponsors/tomquirk/sponsorships?sponsor=tomquirk&tier_id=96653&preview=false" target="_blank">Become a sponsor</a></h5>
@@ -63,28 +66,20 @@ contact_info = api.get_profile_contact_info('billy-g')
 connections = api.get_profile_connections('1234asc12304')
 ```
 
-## Commercial Alternative
+## Commercial alternatives
 
 > This is a sponsored section
 
-Scrape public LinkedIn profile data at scale with [Proxycurl APIs](https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-&utm_content=tom%20quirk).
-
-- Scraping Public profiles are battle tested in court in HiQ VS LinkedIn case.
-- GDPR, CCPA, SOC2 compliant
-- High rate limit - 300 requests/minute
-- Fast - APIs respond in ~2s
-- Fresh data - 88% of data is scraped real-time, other 12% are not older than 29 days
-- High accuracy
-- Tons of data points returned per profile
-
-Built for developers, by developers.
-
-> End sponsored section
-
-> This is a sponsored section
+<h3>
+<a href="https://prospeo.io/api/linkedin-email-finder">
+Prospeo
+</a>
+</h3>
 
 Extract data and find verified emails in real-time with [Prospeo LinkedIn Email Finder API](https://prospeo.io/api/linkedin-email-finder).
 
+<details>
+  <summary>Learn more</summary>
 Submit a LinkedIn profile URL to our API and get:
 
 - Profile data extracted in real-time
@@ -95,6 +90,33 @@ Submit a LinkedIn profile URL to our API and get:
 - Stable API, tested under high load
 
 Try it with 75 profiles. [Get your FREE API key now](https://prospeo.io/api/linkedin-email-finder).
+
+</details>
+
+<h3>
+<a href="https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-&utm_content=tom%20quirk">
+Proxycurl
+</a>
+</h3>
+
+Scrape public LinkedIn profile data at scale with [Proxycurl APIs](https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-&utm_content=tom%20quirk).
+
+<details>
+  <summary>Learn more</summary>
+  
+- Scraping Public profiles are battle tested in court in HiQ VS LinkedIn case.
+- GDPR, CCPA, SOC2 compliant
+- High rate limit - 300 requests/minute
+- Fast - APIs respond in ~2s
+- Fresh data - 88% of data is scraped real-time, other 12% are not older than 29 days
+- High accuracy
+- Tons of data points returned per profile
+
+Built for developers, by developers.
+
+Extract data and find verified emails in real-time with [Prospeo LinkedIn Email Finder API](https://prospeo.io/api/linkedin-email-finder).
+
+</details>
 
 > End sponsored section
 

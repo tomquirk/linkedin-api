@@ -114,8 +114,6 @@ Scrape public LinkedIn profile data at scale with [Proxycurl APIs](https://nubel
 
 Built for developers, by developers.
 
-Extract data and find verified emails in real-time with [Prospeo LinkedIn Email Finder API](https://prospeo.io/api/linkedin-email-finder).
-
 </details>
 
 > End sponsored section

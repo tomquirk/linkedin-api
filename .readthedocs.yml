@@ -14,3 +14,4 @@ python:
            - requests
            - beautifulsoup4
            - lxml
+           - sphinx-rtd-theme

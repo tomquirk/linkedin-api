@@ -12,24 +12,24 @@ LinkedIn API for Python
 
    <p align="center" style="margin-bottom:24px" >
    <a href="https://prospeo.io/api/linkedin-email-finder" target="_blank">
-      <img height="45px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/prospeo.png" alt="Prospeo">
+      <img height="45px" style="margin-right:24px;height:45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/prospeo.png" alt="Prospeo">
    </a>
    <a href="https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-&utm_content=tom%20quirk" target="_blank">
-      <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proxycurl.png" alt="proxycurl">
+      <img height="45px" style="height:45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proxycurl.png" alt="proxycurl">
    </a>
    </p>
 
    <p align="center">
    <a href="https://lix-it.com/pages/linkedin-api?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_content=tomquirk" target="_blank">
-      <img height="35px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/lix.png" alt="Lix">
+      <img height="35px" style="margin-right:24px;height:45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/lix.png" alt="Lix">
    </a>
    <a href="https://iscraper.io/" target="_blank">
-      <img height="35px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/iscraper.png" alt="serpsbot">
+      <img height="35px" style="margin-right:24px;height:35px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/iscraper.png" alt="serpsbot">
    </a>
    <a href="https://www.piloterr.com/?ref=tomquirk" target="_blank">
-      <img height="35px"style="margin-right:24px"  src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/piloterr.png" alt="piloterr">
+      <img height="35px" style="margin-right:24px;height:35px"  src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/piloterr.png" alt="piloterr">
    </a>
-      <img height="35px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/enrich.png" alt="enrich">
+      <img height="35px" style="height:35px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/enrich.png" alt="enrich">
    </p>
 
    <h5 align="center"><a href="https://github.com/sponsors/tomquirk/sponsorships?sponsor=tomquirk&tier_id=96653&preview=false" target="_blank">Become a sponsor</a></h5>

@@ -44,6 +44,8 @@ To install the linkedin_api package, use the following command:
 pip3 install git+https://github.com/tomquirk/linkedin-api.git
 ```
 
+The package is also available on PyPI: https://pypi.org/project/linkedin-api/.
+
 ### Quick Start
 
 > See all methods on the [documentation website](https://linkedin-api.readthedocs.io/).

@@ -1222,7 +1222,7 @@ class Linkedin(object):
 
         if res.status_code == 201:
             return 'CREATED'
-        elif res.status_code == 400:
+        elif res.status_code == 400 and res.text == '{"data":{"code":"CANT_RESEND_YET","status":400},"included":[]}':
             return 'CONNECTED'
         else:
             return 'CONNECTION_FAILURE'

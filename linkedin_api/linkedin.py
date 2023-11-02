@@ -56,16 +56,16 @@ class Linkedin(object):
     )
 
     def __init__(
-        self,
-        username,
-        password,
-        *,
-        authenticate=True,
-        refresh_cookies=False,
-        debug=False,
-        proxies={},
-        cookies=None,
-        cookies_dir=None,
+            self,
+            username,
+            password,
+            *,
+            authenticate=True,
+            refresh_cookies=False,
+            debug=False,
+            proxies={},
+            cookies=None,
+            cookies_dir=None,
     ):
         """Constructor method"""
         self.client = Client(
@@ -247,23 +247,23 @@ class Linkedin(object):
                 return []
 
             if (
-                not data_clusters.get("_type", [])
-                == "com.linkedin.restli.common.CollectionResponse"
+                    not data_clusters.get("_type", [])
+                        == "com.linkedin.restli.common.CollectionResponse"
             ):
                 return []
 
             new_elements = []
             for it in data_clusters.get("elements", []):
                 if (
-                    not it.get("_type", [])
-                    == "com.linkedin.voyager.dash.search.SearchClusterViewModel"
+                        not it.get("_type", [])
+                            == "com.linkedin.voyager.dash.search.SearchClusterViewModel"
                 ):
                     continue
 
                 for el in it.get("items", []):
                     if (
-                        not el.get("_type", [])
-                        == "com.linkedin.voyager.dash.search.SearchItem"
+                            not el.get("_type", [])
+                                == "com.linkedin.voyager.dash.search.SearchItem"
                     ):
                         continue
 
@@ -271,8 +271,8 @@ class Linkedin(object):
                     if not e:
                         continue
                     if (
-                        not e.get("_type", [])
-                        == "com.linkedin.voyager.dash.search.EntityResultViewModel"
+                            not e.get("_type", [])
+                                == "com.linkedin.voyager.dash.search.EntityResultViewModel"
                     ):
                         continue
                     new_elements.append(e)
@@ -283,8 +283,8 @@ class Linkedin(object):
             # NOTE: we could also check for the `total` returned in the response.
             # This is in data["data"]["paging"]["total"]
             if (
-                (-1 < limit <= len(results))  # if our results exceed set limit
-                or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS
+                    (-1 < limit <= len(results))  # if our results exceed set limit
+                    or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS
             ) or len(new_elements) == 0:
                 break
 
@@ -293,30 +293,30 @@ class Linkedin(object):
         return results
 
     def search_people(
-        self,
-        keywords=None,
-        connection_of=None,
-        network_depths=None,
-        current_company=None,
-        past_companies=None,
-        nonprofit_interests=None,
-        profile_languages=None,
-        regions=None,
-        industries=None,
-        schools=None,
-        contact_interests=None,
-        service_categories=None,
-        include_private_profiles=False,  # profiles without a public id, "Linkedin Member"
-        # Keywords filter
-        keyword_first_name=None,
-        keyword_last_name=None,
-        # `keyword_title` and `title` are the same. We kept `title` for backward compatibility. Please only use one of them.
-        keyword_title=None,
-        keyword_company=None,
-        keyword_school=None,
-        network_depth=None,  # DEPRECATED - use network_depths
-        title=None,  # DEPRECATED - use keyword_title
-        **kwargs,
+            self,
+            keywords=None,
+            connection_of=None,
+            network_depths=None,
+            current_company=None,
+            past_companies=None,
+            nonprofit_interests=None,
+            profile_languages=None,
+            regions=None,
+            industries=None,
+            schools=None,
+            contact_interests=None,
+            service_categories=None,
+            include_private_profiles=False,  # profiles without a public id, "Linkedin Member"
+            # Keywords filter
+            keyword_first_name=None,
+            keyword_last_name=None,
+            # `keyword_title` and `title` are the same. We kept `title` for backward compatibility. Please only use one of them.
+            keyword_title=None,
+            keyword_company=None,
+            keyword_school=None,
+            network_depth=None,  # DEPRECATED - use network_depths
+            title=None,  # DEPRECATED - use keyword_title
+            **kwargs,
     ):
         """Perform a LinkedIn search for people.
 
@@ -415,11 +415,11 @@ class Linkedin(object):
         results = []
         for item in data:
             if (
-                not include_private_profiles
-                and (item.get("entityCustomTrackingInfo") or {}).get(
-                    "memberDistance", None
-                )
-                == "OUT_OF_NETWORK"
+                    not include_private_profiles
+                    and (item.get("entityCustomTrackingInfo") or {}).get(
+                "memberDistance", None
+            )
+                    == "OUT_OF_NETWORK"
             ):
                 continue
             results.append(
@@ -475,20 +475,20 @@ class Linkedin(object):
         return results
 
     def search_jobs(
-        self,
-        keywords=None,
-        companies=None,
-        experience=None,
-        job_type=None,
-        job_title=None,
-        industries=None,
-        location_name=None,
-        remote=None,
-        listed_at=24 * 60 * 60,
-        distance=None,
-        limit=-1,
-        offset=0,
-        **kwargs,
+            self,
+            keywords=None,
+            companies=None,
+            experience=None,
+            job_type=None,
+            job_title=None,
+            industries=None,
+            location_name=None,
+            remote=None,
+            listed_at=24 * 60 * 60,
+            distance=None,
+            limit=-1,
+            offset=0,
+            **kwargs,
     ):
         """Perform a LinkedIn search for jobs.
 
@@ -523,7 +523,7 @@ class Linkedin(object):
         if limit is None:
             limit = -1
 
-        query = {"origin":"JOB_SEARCH_PAGE_QUERY_EXPANSION"}
+        query = {"origin": "JOB_SEARCH_PAGE_QUERY_EXPANSION"}
         if keywords:
             query["keywords"] = "KEYWORD_PLACEHOLDER"
         if location_name:
@@ -564,12 +564,12 @@ class Linkedin(object):
         #    spellCorrectionEnabled:true
         #  )"
 
-        query = str(query).replace(" ","") \
-                    .replace("'","") \
-                    .replace("KEYWORD_PLACEHOLDER", keywords or "") \
-                    .replace("LOCATION_PLACEHOLDER", location_name or "") \
-                    .replace("{","(") \
-                    .replace("}",")")
+        query = str(query).replace(" ", "") \
+            .replace("'", "") \
+            .replace("KEYWORD_PLACEHOLDER", keywords or "") \
+            .replace("LOCATION_PLACEHOLDER", location_name or "") \
+            .replace("{", "(") \
+            .replace("}", ")")
         results = []
         while True:
             # when we're close to the limit, only fetch what we need to
@@ -602,8 +602,8 @@ class Linkedin(object):
             # This is in data["data"]["paging"]["total"]
             results.extend(new_data)
             if (
-                (-1 < limit <= len(results))  # if our results exceed set limit
-                or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS
+                    (-1 < limit <= len(results))  # if our results exceed set limit
+                    or len(results) / count >= Linkedin._MAX_REPEATED_REQUESTS
             ) or len(elements) == 0:
                 break
 
@@ -804,7 +804,7 @@ class Linkedin(object):
         return self.search_people(connection_of=urn_id, network_depth="F")
 
     def get_company_updates(
-        self, public_id=None, urn_id=None, max_results=None, results=None
+            self, public_id=None, urn_id=None, max_results=None, results=None
     ):
         """Fetch company updates (news activity) for a given LinkedIn company.
 
@@ -833,12 +833,12 @@ class Linkedin(object):
         data = res.json()
 
         if (
-            len(data["elements"]) == 0
-            or (max_results is not None and len(results) >= max_results)
-            or (
+                len(data["elements"]) == 0
+                or (max_results is not None and len(results) >= max_results)
+                or (
                 max_results is not None
                 and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS
-            )
+        )
         ):
             return results
 
@@ -853,7 +853,7 @@ class Linkedin(object):
         )
 
     def get_profile_updates(
-        self, public_id=None, urn_id=None, max_results=None, results=None
+            self, public_id=None, urn_id=None, max_results=None, results=None
     ):
         """Fetch profile updates (newsfeed activity) for a given LinkedIn profile.
 
@@ -882,12 +882,12 @@ class Linkedin(object):
         data = res.json()
 
         if (
-            len(data["elements"]) == 0
-            or (max_results is not None and len(results) >= max_results)
-            or (
+                len(data["elements"]) == 0
+                or (max_results is not None and len(results) >= max_results)
+                or (
                 max_results is not None
                 and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS
-            )
+        )
         ):
             return results
 
@@ -1143,7 +1143,7 @@ class Linkedin(object):
         return [element["invitation"] for element in response_payload["elements"]]
 
     def reply_invitation(
-        self, invitation_entity_urn, invitation_shared_secret, action="accept"
+            self, invitation_entity_urn, invitation_shared_secret, action="accept"
     ):
         """Respond to a connection invitation. By default, accept the invitation.
 
@@ -1220,7 +1220,12 @@ class Linkedin(object):
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
         )
 
-        return res.status_code != 201
+        if res.status_code == 201:
+            return 'CREATED'
+        elif res.status_code == 400:
+            return 'CONNECTED'
+        else:
+            return 'CONNECTION_FAILURE'
 
     def remove_connection(self, public_profile_id):
         """Remove a given profile as a connection.
@@ -1253,10 +1258,10 @@ class Linkedin(object):
         return res.status_code != 200
 
     def view_profile(
-        self,
-        target_profile_public_id,
-        target_profile_member_urn_id=None,
-        network_distance=None,
+            self,
+            target_profile_public_id,
+            target_profile_member_urn_id=None,
+            network_distance=None,
     ):
         """View a profile, notifying the user that you "viewed" their profile.
 
@@ -1410,7 +1415,7 @@ class Linkedin(object):
         return err
 
     def _get_list_feed_posts_and_list_feed_urns(
-        self, limit=-1, offset=0, exclude_promoted_posts=True
+            self, limit=-1, offset=0, exclude_promoted_posts=True
     ):
         """Get a list of URNs from feed sorted by 'Recent' and a list of yet
         unsorted posts, each one of them containing a dict per post.
@@ -1477,8 +1482,8 @@ class Linkedin(object):
             # NOTE: we could also check for the `total` returned in the response.
             # This is in data["data"]["paging"]["total"]
             if (
-                (limit > -1 and len(l_urns) >= limit)  # if our results exceed set limit
-                or len(l_urns) / count >= Linkedin._MAX_REPEATED_REQUESTS
+                    (limit > -1 and len(l_urns) >= limit)  # if our results exceed set limit
+                    or len(l_urns) / count >= Linkedin._MAX_REPEATED_REQUESTS
             ) or len(l_raw_urns) == 0:
                 break
 

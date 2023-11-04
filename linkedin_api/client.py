@@ -78,9 +78,12 @@ class Client(object):
 
     def _set_session_cookies(self, cookies):
         """
-        Set cookies of the current session and save them to a file named as the username.
+        Set cookies of the current session, but reuse the existing JSESSIONID if it's already set.
         """
-        self.session.cookies = cookies
+        existing_jsessionid = self.session.cookies.get("JSESSIONID", None)
+        if existing_jsessionid is None:
+            self.session.cookies = cookies
+        
         self.session.headers["csrf-token"] = self.session.cookies["JSESSIONID"].strip(
             '"'
         )

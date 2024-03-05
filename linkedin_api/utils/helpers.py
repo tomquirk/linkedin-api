@@ -1,5 +1,7 @@
+import re
 import random
 import base64
+from time import sleep
 
 
 def get_id_from_urn(urn):
@@ -257,3 +259,50 @@ def generate_trackingId():
     random_int_array = [random.randrange(256) for _ in range(16)]
     rand_byte_array = bytearray(random_int_array)
     return str(base64.b64encode(rand_byte_array))[2:-1]
+
+
+def get_random_delay_seconds(max_delay: float = 0.3, min_delay: float = 0):
+    return max(random.random() * max_delay, min_delay)
+
+
+def random_extra_large_delay():
+    sleep(get_random_delay_seconds(5, 2))
+
+
+def convert_camel_case_to_snake_case(camel_case_string: str) -> str:
+    return re.sub(r'(?<!^)(?=[A-Z])', '_', camel_case_string).lower()
+
+
+def convert_complex_data_to_normal_data(complex_data, skipped_key_set=set(['$anti_abuse_metadata'])):
+    data = {}
+
+    def recursively_process_complex_data(complex_data, base_attribute_name=''):
+        dict_like_data = {}
+        if isinstance(complex_data, dict):
+            dict_like_data = {**complex_data}
+        elif isinstance(complex_data, list):
+            for index, value in enumerate(complex_data):
+                dict_like_data[str(index)] = value
+
+        if len(dict_like_data.items()) == 0:
+            if base_attribute_name == '':
+                return
+            else:
+                data[base_attribute_name] = None
+
+        for index, (key, value) in enumerate(dict_like_data.items()):
+            if key in skipped_key_set:
+                continue
+
+            key = convert_camel_case_to_snake_case(key)
+
+            if isinstance(value, dict) or isinstance(value, list):
+                recursively_process_complex_data(
+                    value, key if base_attribute_name == '' else base_attribute_name + '_' + key)
+            else:
+                data[key if base_attribute_name ==
+                     '' else base_attribute_name + '_' + key] = value
+
+    recursively_process_complex_data(complex_data)
+
+    return data

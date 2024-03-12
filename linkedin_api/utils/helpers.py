@@ -199,7 +199,8 @@ def parse_list_raw_posts(l_raw_posts, linkedin_base_url):
 
         old = get_update_old(i)
         if old:
-            l_posts = append_update_post_field_to_posts_list(i, l_posts, "old", old)
+            l_posts = append_update_post_field_to_posts_list(
+                i, l_posts, "old", old)
 
         content = get_update_content(i, linkedin_base_url)
         if content:
@@ -209,7 +210,8 @@ def parse_list_raw_posts(l_raw_posts, linkedin_base_url):
 
         url = get_update_url(i, linkedin_base_url)
         if url:
-            l_posts = append_update_post_field_to_posts_list(i, l_posts, "url", url)
+            l_posts = append_update_post_field_to_posts_list(
+                i, l_posts, "url", url)
 
     return l_posts
 
@@ -237,7 +239,7 @@ def get_list_posts_sorted_without_promoted(l_urns, l_posts):
     return l_posts_sorted_without_promoted
 
 
-def generate_trackingId_as_charString():
+def generate_tracking_id_as_char_string():
     """Generates and returns a random trackingId
 
     :return: Random trackingId string
@@ -248,7 +250,7 @@ def generate_trackingId_as_charString():
     return "".join([chr(i) for i in rand_byte_array])
 
 
-def generate_trackingId():
+def generate_tracking_id():
     """Generates and returns a random trackingId
 
     :return: Random trackingId string

@@ -21,3 +21,10 @@ build
 .DS_Store
 .idea/
 venv/
+
+# Cookies
+.linkedin_api
+
+# Output
+output
+/*.json

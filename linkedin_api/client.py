@@ -67,13 +67,15 @@ class Client(object):
         """
         Return a new set of session cookies as given by Linkedin.
         """
-        self.logger.debug("Requesting new cookies.")
-
+        # Retrieve the session cookies
         res = requests.get(
             f"{Client.LINKEDIN_BASE_URL}/uas/authenticate",
             headers=Client.AUTH_REQUEST_HEADERS,
             proxies=self.proxies,
         )
+        self.logger.debug(
+            f"Retrieved session cookies with status {res.status_code} and response {res.text}")
+
         return res.cookies
 
     def _set_session_cookies(self, cookies):
@@ -89,8 +91,8 @@ class Client(object):
     def cookies(self):
         return self.session.cookies
 
-    def authenticate(self, username, password):
-        if self._use_cookie_cache:
+    def authenticate(self, username, password, force_refresh=False):
+        if self._use_cookie_cache and not force_refresh:
             self.logger.debug("Attempting to use cached cookies")
             cookies = self._cookie_repository.get(username)
             if cookies:
@@ -114,6 +116,12 @@ class Client(object):
             headers=Client.AUTH_REQUEST_HEADERS,
             proxies=self.proxies,
         )
+        self.logger.debug(
+            f"Retrieved metadata with status {res.status_code}")
+
+        if res.status_code != 200:
+            raise Exception(
+                f"Metadata fetching failed with status {res.status_code}")
 
         soup = BeautifulSoup(res.text, "lxml")
 
@@ -124,14 +132,16 @@ class Client(object):
             clientApplicationInstanceRaw = (
                 clientApplicationInstanceRaw.attrs.get("content") or {}
             )
-            clientApplicationInstance = json.loads(clientApplicationInstanceRaw)
+            clientApplicationInstance = json.loads(
+                clientApplicationInstanceRaw)
             self.metadata["clientApplicationInstance"] = clientApplicationInstance
 
         clientPageInstanceIdRaw = soup.find(
             "meta", attrs={"name": "clientPageInstanceId"}
         )
         if clientPageInstanceIdRaw:
-            clientPageInstanceId = clientPageInstanceIdRaw.attrs.get("content") or {}
+            clientPageInstanceId = clientPageInstanceIdRaw.attrs.get("content") or {
+            }
             self.metadata["clientPageInstanceId"] = clientPageInstanceId
 
     def _do_authentication_request(self, username, password):
@@ -140,6 +150,8 @@ class Client(object):
 
         Return a session object that is authenticated.
         """
+        self.logger.debug("Requesting new cookies")
+
         self._set_session_cookies(self._request_session_cookies())
 
         payload = {
@@ -148,6 +160,7 @@ class Client(object):
             "JSESSIONID": self.session.cookies["JSESSIONID"],
         }
 
+        # Retrieve the persistent cookies
         res = requests.post(
             f"{Client.LINKEDIN_BASE_URL}/uas/authenticate",
             data=payload,
@@ -155,6 +168,9 @@ class Client(object):
             headers=Client.AUTH_REQUEST_HEADERS,
             proxies=self.proxies,
         )
+
+        self.logger.debug(
+            f"Retrieved persistent cookies with status {res.status_code} and response {res.text}")
 
         data = res.json()
 

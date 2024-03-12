@@ -1,7 +1,10 @@
+import logging
 import os
 import pickle
 import time
 import linkedin_api.settings as settings
+
+logger = logging.getLogger(__name__)
 
 
 class Error(Exception):
@@ -22,6 +25,7 @@ class CookieRepository(object):
     """
 
     def __init__(self, cookies_dir=settings.COOKIE_PATH):
+        self.logger = logger
         self.cookies_dir = cookies_dir or settings.COOKIE_PATH
 
     def save(self, cookies, username):
@@ -30,9 +34,9 @@ class CookieRepository(object):
         with open(cookiejar_filepath, "wb") as f:
             pickle.dump(cookies, f)
 
-    def get(self, username):
+    def get(self, username, verbose=False):
         cookies = self._load_cookies_from_cache(username)
-        if cookies and not CookieRepository._is_token_still_valid(cookies):
+        if cookies and not self._is_token_still_valid(cookies, verbose=verbose):
             raise LinkedinSessionExpired
 
         return cookies
@@ -56,11 +60,16 @@ class CookieRepository(object):
         except FileNotFoundError:
             return None
 
-    @staticmethod
-    def _is_token_still_valid(cookiejar):
+    def _is_token_still_valid(self, cookiejar, verbose=False):
         _now = time.time()
         for cookie in cookiejar:
+            # As of 2024/03/12, the cookie expiry time is not accurate
+            # In practice, it will be expired within one day
             if cookie.name == "JSESSIONID" and cookie.value:
+                if verbose:
+                    self.logger.debug(
+                        f"Cookies JSESSIONID expires at {cookie.expires} while the current time is {_now}")
+
                 if cookie.expires and cookie.expires > _now:
                     return True
                 break

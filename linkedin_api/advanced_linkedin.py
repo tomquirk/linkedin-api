@@ -1,6 +1,7 @@
 import json
 import re
 from linkedin_api import Linkedin
+from linkedin_api.utils.header import get_csrf_token_header, get_x_li_track_header
 from linkedin_api.utils.helpers import generate_tracking_id
 from linkedin_api.utils.response import APIResponse, encode_api_response, get_api_response_log
 from linkedin_api.utils.parsers import parse_profile_data
@@ -141,7 +142,8 @@ class AdvancedLinkedin(Linkedin):
                         self.logger.debug(
                             f"Retrieved user IDs from mini profile: {id_dict}")
 
-                    return encode_api_response(api_name=api_name, status=data['status'], data=id_dict, user_id=public_id or hash_id or temp_hash_id)
+                    return encode_api_response(api_name=api_name, status=data['status'], data=id_dict,
+                                               user_id=public_id or hash_id or temp_hash_id, error=error_dict)
                 else:
                     error_dict['mini_profile'] = data
 
@@ -184,7 +186,8 @@ class AdvancedLinkedin(Linkedin):
                         self.logger.debug(
                             f"Retrieved user IDs from profile: {id_dict}")
 
-                    return encode_api_response(api_name=api_name, status=data['status'], data=id_dict, user_id=public_id or hash_id or temp_hash_id)
+                    return encode_api_response(api_name=api_name, status=data['status'], data=id_dict,
+                                               user_id=public_id or hash_id or temp_hash_id, error=error_dict)
                 else:
                     error_dict['profile'] = data
 
@@ -262,7 +265,8 @@ class AdvancedLinkedin(Linkedin):
                         self.logger.debug(
                             f"Retrieved user IDs from profile HTML: {id_dict}")
 
-                    return encode_api_response(api_name=api_name, status=data['status'], data=id_dict, user_id=public_id or hash_id or temp_hash_id)
+                    return encode_api_response(api_name=api_name, status=data['status'], data=id_dict,
+                                               user_id=public_id or hash_id or temp_hash_id, error=error_dict)
                 else:
                     error_dict['profile_html'] = data
 
@@ -341,7 +345,9 @@ class AdvancedLinkedin(Linkedin):
                     get_api_response_log(
                         api_name=api_name, response=res, user_id=hash_id))
             else:
-                if res.status_code == 401:
+                if res.status_code == 400 and 'CANT_RESEND_YET' in res.text:
+                    notes = 'Already sent the connection request'
+                elif res.status_code == 401:
                     notes = 'Cookies are expired'
 
                 return encode_api_response(api_name=api_name, response=res, user_id=hash_id, notes=notes)
@@ -349,6 +355,7 @@ class AdvancedLinkedin(Linkedin):
         return encode_api_response(api_name=api_name, response=res, user_id=hash_id, notes=notes)
 
     def add_connection_v3(self, public_id=None, hash_id=None, temp_hash_id=None, message="",
+                          timezone=None, display_width=None, display_height=None,
                           raise_exception=False, verbose=True):
         api_name = 'connection request v3 API'
         notes = None
@@ -379,10 +386,26 @@ class AdvancedLinkedin(Linkedin):
             "customMessage": message
         }
 
+        # Add "csrf-token" header
+        headers = {
+            **get_csrf_token_header(self.client.session.cookies)
+        }
+
+        # Add "x-li-track" header
+        if timezone and display_width and display_height:
+            headers = {
+                **headers,
+                **get_x_li_track_header(
+                    timezone=timezone, display_width=display_width, display_height=display_height)
+            }
+
+        if verbose:
+            self.logger.debug(f"Prepared custom headers {headers}")
+
         res = self._post(
             "/voyagerRelationshipsDashMemberRelationships?action=verifyQuotaAndCreateV2&decorationId=com.linkedin.voyager.dash.deco.relationships.InvitationCreationResultWithInvitee-2",
             data=json.dumps(payload),
-            headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+            headers=headers
         )
 
         if verbose:
@@ -394,7 +417,9 @@ class AdvancedLinkedin(Linkedin):
                 raise Exception(get_api_response_log(
                     api_name=api_name, response=res, user_id=hash_id))
             else:
-                if res.status_code == 401:
+                if res.status_code == 400 and 'CANT_RESEND_YET' in res.text:
+                    notes = 'Already sent the connection request'
+                elif res.status_code == 401:
                     notes = 'Cookies are expired'
 
                 return encode_api_response(api_name=api_name, response=res, user_id=hash_id, notes=notes)

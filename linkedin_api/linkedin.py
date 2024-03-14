@@ -92,6 +92,14 @@ class Linkedin(object):
         url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
         return self.client.session.get(url, **kwargs)
 
+    def _cookies(self):
+        """Return client cookies"""
+        return self.client.cookies
+
+    def _headers(self):
+        """Return client cookies"""
+        return self.client.REQUEST_HEADERS
+
     def _post(self, uri, evade=default_evade, base_request=False, **kwargs):
         """POST request to Linkedin API"""
         evade()

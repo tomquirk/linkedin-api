@@ -34,6 +34,12 @@ No "official" API access required - just use a valid Linkedin account!
 To install the linkedin_api package, use the following command:
 
 ```bash
+pip install linkedin-api
+```
+
+Or, for bleading edge:
+
+```bash
 pip install git+https://github.com/tomquirk/linkedin-api.git
 ```
 

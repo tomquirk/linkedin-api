@@ -364,6 +364,8 @@ class Linkedin(object):
         :type keyword_school: str, optional
         :param connection_of: Connection of LinkedIn user, given by profile URN ID
         :type connection_of: str, optional
+        :param limit: Maximum length of the returned list, defaults to -1 (no limit)
+        :type limit: int, optional
 
         :return: List of profiles (minimal data only)
         :rtype: list

@@ -789,7 +789,13 @@ class Linkedin(object):
         for item in projects:
             del item["entityUrn"]
         profile["projects"] = projects
-
+        
+        # massage [skills] data
+        skills = data["skillView"]["elements"]
+        for item in skills:
+            del item["entityUrn"]
+        profile["skills"] = skills
+        
         profile['urn_id'] = profile['entityUrn'].replace('urn:li:fs_profile:', '')
 
         return profile
@@ -1170,7 +1176,7 @@ class Linkedin(object):
         )
 
         res = self._post(
-            f"{self.client.API_BASE_URL}/relationships/invitations/{invitation_id}",
+            f"/relationships/invitations/{invitation_id}",
             params=params,
             data=payload,
         )

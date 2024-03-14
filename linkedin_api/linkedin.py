@@ -230,6 +230,7 @@ class Linkedin(object):
                 "q": "all",
                 "start": len(results) + offset,
                 "queryContext": "List(spellCorrectionEnabled->true,relatedSearchesEnabled->true,kcardTypes->PROFILE|COMPANY)",
+                "includeWebMetadata": "true",
             }
             default_params.update(params)
 
@@ -245,7 +246,7 @@ class Linkedin(object):
                 f"{keywords}"
                 f"flagshipSearchIntent:SEARCH_SRP,"
                 f"queryParameters:{default_params['filters']},"
-                f"includeFiltersInResponse:false))&=&queryId=voyagerSearchDashClusters"
+                f"includeFiltersInResponse:false))&queryId=voyagerSearchDashClusters"
                 f".b0928897b71bd00a5a7291755dcd64f0"
             )
             data = res.json()

@@ -1174,7 +1174,7 @@ class Linkedin(object):
         )
 
         res = self._post(
-            f"{self.client.API_BASE_URL}/relationships/invitations/{invitation_id}",
+            f"/relationships/invitations/{invitation_id}",
             params=params,
             data=payload,
         )

@@ -12,9 +12,6 @@
 </p>
 
 <p align="center">
-  <a href="https://lix-it.com/pages/linkedin-api?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_content=tomquirk" target="_blank">
-    <img height="35px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/lix.png" alt="Lix">
-  </a>
   <a href="https://iscraper.io/" target="_blank">
     <img height="35px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/iscraper.png" alt="serpsbot">
   </a>
@@ -37,14 +34,14 @@ No "official" API access required - just use a valid Linkedin account!
 To install the linkedin_api package, use the following command:
 
 ```bash
-pip3 install git+https://github.com/tomquirk/linkedin-api.git
+pip install git+https://github.com/tomquirk/linkedin-api.git
 ```
 
 ### Quick Start
 
 > See all methods on the [documentation website](https://linkedin-api.readthedocs.io/).
 
-Below is a basic example of how to use linkedin_api:
+The following snippet demonstrates a few basic linkedin_api use cases:
 
 ```python
 from linkedin_api import Linkedin

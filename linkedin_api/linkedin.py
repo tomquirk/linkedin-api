@@ -789,7 +789,6 @@ class Linkedin(object):
         for item in projects:
             del item["entityUrn"]
         profile["projects"] = projects
-        
         # massage [skills] data
         skills = data["skillView"]["elements"]
         for item in skills:

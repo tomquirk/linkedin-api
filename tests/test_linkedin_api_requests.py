@@ -182,7 +182,7 @@ def test_search_jobs(linkedin):
     # test all filters for correct syntax
     # location_name -> "san francisco"
     # companies -> google="1441" or apple="162479"
-    # experience ->"1", "2", "3", "4", "5" and "6" (internship, entry level, associate, mid-senior level, director and executive, respectively) 
+    # experience ->"1", "2", "3", "4", "5" and "6" (internship, entry level, associate, mid-senior level, director and executive, respectively)
     # job_type -> "F", "C", "P", "T", "I", "V", "O" (full-time, contract, part-time, temporary, internship, volunteer and "other", respectively)
     # job_title -> software_eng="9",cloud_eng="30006"
     # industries -> computer_hardware="24", it_technology="6"
@@ -190,33 +190,27 @@ def test_search_jobs(linkedin):
     # remote -> onsite:"1", remote:"2", hybrid:"3"
     # listed_at -> large number 1000000 seconds
     jobs = linkedin.search_jobs(
-        keywords="software engineer", 
+        keywords="software engineer",
         location_name="San Francisco",
-        companies=["1441","162479"], 
-        experience=["1","2","3","4","5","6"],
-        job_type=["F","C","P","T","I","V","O"],
-        job_title=["9","30006"],
-        industries=["24","6"],
+        companies=["1441", "162479"],
+        experience=["1", "2", "3", "4", "5", "6"],
+        job_type=["F", "C", "P", "T", "I", "V", "O"],
+        job_title=["9", "30006"],
+        industries=["24", "6"],
         distance=1000,
-        remote=["1","2","3"],
+        remote=["1", "2", "3"],
         listed_at=1000000,
-        limit=10
+        limit=10,
     )
-    assert len(jobs)==10
+    assert len(jobs) == 10
 
     # Test that no results doesn't return an infinite loop
-    jobs = linkedin.search_jobs(
-        keywords="blurp", 
-        location_name="antarctica"
-    )
-    assert len(jobs)==0
+    jobs = linkedin.search_jobs(keywords="blurp", location_name="antarctica")
+    assert len(jobs) == 0
 
 
 def test_get_job(linkedin):
-    jobs = linkedin.search_jobs(
-        keywords="software engineer", 
-        limit=1
-    )
+    jobs = linkedin.search_jobs(keywords="software engineer", limit=1)
     job_id = get_id_from_urn(jobs[0]["trackingUrn"])
     job_info = linkedin.get_job(job_id)
     assert job_info

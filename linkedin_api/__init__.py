@@ -1,6 +1,7 @@
 """
     linkedin-api
 """
+
 from .linkedin import Linkedin
 
 __title__ = "linkedin_api"

@@ -14,5 +14,7 @@ if credentials:
     )
     connections = linkedin.get_profile_connections(profile["profile_id"])
     # send a message
-    linkedin.send_message(recipients=[
-                          profile["profile_id"]], message="Hello, Hola, Namaste, Hii, Bonjour, Guten Tag")
+    linkedin.send_message(
+        recipients=[profile["profile_id"]],
+        message="Hello, Hola, Namaste, Hii, Bonjour, Guten Tag",
+    )

@@ -1,6 +1,7 @@
 """
 Provides linkedin api-related code
 """
+
 import base64
 import json
 import logging
@@ -533,30 +534,30 @@ class Linkedin(object):
         if limit is None:
             limit = -1
 
-        query = {"origin":"JOB_SEARCH_PAGE_QUERY_EXPANSION"}
+        query = {"origin": "JOB_SEARCH_PAGE_QUERY_EXPANSION"}
         if keywords:
             query["keywords"] = "KEYWORD_PLACEHOLDER"
         if location_name:
             query["locationFallback"] = "LOCATION_PLACEHOLDER"
 
         # In selectedFilters()
-        query['selectedFilters'] = {}
+        query["selectedFilters"] = {}
         if companies:
-            query['selectedFilters']['company'] = f"List({','.join(companies)})"
+            query["selectedFilters"]["company"] = f"List({','.join(companies)})"
         if experience:
-            query['selectedFilters']['experience'] = f"List({','.join(experience)})"
+            query["selectedFilters"]["experience"] = f"List({','.join(experience)})"
         if job_type:
-            query['selectedFilters']['jobType'] = f"List({','.join(job_type)})"
+            query["selectedFilters"]["jobType"] = f"List({','.join(job_type)})"
         if job_title:
-            query['selectedFilters']['title'] = f"List({','.join(job_title)})"
+            query["selectedFilters"]["title"] = f"List({','.join(job_title)})"
         if industries:
-            query['selectedFilters']['industry'] = f"List({','.join(industries)})"
+            query["selectedFilters"]["industry"] = f"List({','.join(industries)})"
         if distance:
-            query['selectedFilters']['distance'] = f"List({distance})"
+            query["selectedFilters"]["distance"] = f"List({distance})"
         if remote:
-            query['selectedFilters']['workplaceType'] = f"List({','.join(remote)})"
+            query["selectedFilters"]["workplaceType"] = f"List({','.join(remote)})"
 
-        query['selectedFilters']['timePostedRange'] = f"List(r{listed_at})"
+        query["selectedFilters"]["timePostedRange"] = f"List(r{listed_at})"
         query["spellCorrectionEnabled"] = "true"
 
         # Query structure:
@@ -574,12 +575,15 @@ class Linkedin(object):
         #    spellCorrectionEnabled:true
         #  )"
 
-        query = str(query).replace(" ","") \
-                    .replace("'","") \
-                    .replace("KEYWORD_PLACEHOLDER", keywords or "") \
-                    .replace("LOCATION_PLACEHOLDER", location_name or "") \
-                    .replace("{","(") \
-                    .replace("}",")")
+        query = (
+            str(query)
+            .replace(" ", "")
+            .replace("'", "")
+            .replace("KEYWORD_PLACEHOLDER", keywords or "")
+            .replace("LOCATION_PLACEHOLDER", location_name or "")
+            .replace("{", "(")
+            .replace("}", ")")
+        )
         results = []
         while True:
             # when we're close to the limit, only fetch what we need to
@@ -603,7 +607,7 @@ class Linkedin(object):
             new_data = [
                 i
                 for i in elements
-                if i["$type"] == 'com.linkedin.voyager.dash.jobs.JobPosting'
+                if i["$type"] == "com.linkedin.voyager.dash.jobs.JobPosting"
             ]
             # break the loop if we're done searching or no results returned
             if not new_data:
@@ -804,8 +808,8 @@ class Linkedin(object):
         for item in skills:
             del item["entityUrn"]
         profile["skills"] = skills
-        
-        profile['urn_id'] = profile['entityUrn'].replace('urn:li:fs_profile:', '')
+
+        profile["urn_id"] = profile["entityUrn"].replace("urn:li:fs_profile:", "")
 
         return profile
 

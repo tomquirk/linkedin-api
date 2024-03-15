@@ -2,26 +2,19 @@
 Provides linkedin api-related code
 """
 
-import base64
 import json
 import logging
 import random
 import uuid
 from operator import itemgetter
-from time import sleep, time
-from urllib.parse import quote, urlencode
+from time import sleep
+from urllib.parse import urlencode
 
 from linkedin_api.client import Client
 from linkedin_api.utils.helpers import (
-    append_update_post_field_to_posts_list,
     get_id_from_urn,
     get_urn_from_raw_update,
     get_list_posts_sorted_without_promoted,
-    get_update_author_name,
-    get_update_author_profile,
-    get_update_content,
-    get_update_old,
-    get_update_url,
     parse_list_raw_posts,
     parse_list_raw_urns,
     generate_trackingId,

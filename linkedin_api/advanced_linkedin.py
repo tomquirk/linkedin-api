@@ -1,18 +1,52 @@
+from datetime import datetime
 import json
+from random import random
 import re
+import time
 from linkedin_api import Linkedin
+from linkedin_api.utils.function import retry
 from linkedin_api.utils.header import get_csrf_token_header, get_x_li_track_header
 from linkedin_api.utils.helpers import generate_tracking_id
-from linkedin_api.utils.response import APIResponse, encode_api_response, get_api_response_log
+from linkedin_api.utils.response import APIResponse, encode_api_response, get_api_response_log, validate_retryable_response_factory
 from linkedin_api.utils.parsers import parse_profile_data
 
 
 class AdvancedLinkedin(Linkedin):
-    def authenticate(self, force_refresh=True):
+    def authenticate(self, force_refresh=True, delay=random() * 0.5 + 0.5):
+        if not self.username:
+            raise Exception(f"Unknow username {self.username}")
+
+        if not self.password:
+            raise Exception(f"Unknow password {self.password}")
+
         self.client.authenticate(
             self.username, self.password, force_refresh=force_refresh)
 
-    def get_mini_profile(self, public_id=None, hash_id=None, temp_hash_id=None,  decorationIndex='21', raise_exception=False, verbose=True):
+        if delay:
+            time.sleep(delay)
+
+    def backup_cookies(self):
+        if not self.username:
+            raise Exception(f"Unknow username {self.username}")
+
+        # Load cookies from the local file
+        cookies = self.client._cookie_repository._load_cookies_from_cache(
+            self.username)
+
+        # Save cookies into the local file
+        self.client._cookie_repository.save(
+            cookies=cookies, username=self.username, raw_time_suffix=datetime.now())
+
+    @retry(
+        on_retry_prepare_method_name_in_class='authenticate',
+        validate_retryable_response=validate_retryable_response_factory([
+                                                                        401, 403]),
+    )
+    def get_mini_profile(self, public_id=None, hash_id=None, temp_hash_id=None,
+                         decorationIndex='21', raise_exception=False, verbose=True,
+                         # Placeholder for enabling retry toggle
+                         # To enable retry, you must specify "enable_retry=True" when calling the method
+                         enable_retry=False, retry_limit=1, verbose_on_retry=False):
         api_name = 'mini profile API'
         notes = None
 
@@ -42,7 +76,16 @@ class AdvancedLinkedin(Linkedin):
 
         return encode_api_response(api_name=api_name, response=res, user_id=public_id or hash_id or temp_hash_id)
 
-    def get_profile_v2(self, public_id=None, hash_id=None, temp_hash_id=None, raise_exception=False, return_raw_data=False, verbose=True):
+    @retry(
+        on_retry_prepare_method_name_in_class='authenticate',
+        validate_retryable_response=validate_retryable_response_factory([
+                                                                        401, 403, 999]),
+    )
+    def get_profile_v2(self, public_id=None, hash_id=None, temp_hash_id=None,
+                       raise_exception=False, return_raw_data=False, verbose=True,
+                       # Placeholder for enabling retry toggle
+                       # To enable retry, you must specify "enable_retry=True" when calling the method
+                       enable_retry=False, retry_limit=1, verbose_on_retry=False):
         api_name = 'profile v2 API'
         notes = None
 
@@ -79,7 +122,15 @@ class AdvancedLinkedin(Linkedin):
         final_data = data if return_raw_data else parse_profile_data(data)
         return encode_api_response(api_name=api_name, response=res, user_id=public_id or hash_id or temp_hash_id, data=final_data)
 
-    def get_profile_html(self, public_id=None, hash_id=None, temp_hash_id=None, raise_exception=False, verbose=True):
+    @retry(
+        on_retry_prepare_method_name_in_class='authenticate',
+        validate_retryable_response=validate_retryable_response_factory([999]),
+    )
+    def get_profile_html(self, public_id=None, hash_id=None, temp_hash_id=None,
+                         raise_exception=False, verbose=True,
+                         # Placeholder for enabling retry toggle
+                         # To enable retry, you must specify "enable_retry=True" when calling the method
+                         enable_retry=False, retry_limit=1, verbose_on_retry=False):
         api_name = 'profile HTML API'
         notes = None
 
@@ -102,8 +153,16 @@ class AdvancedLinkedin(Linkedin):
 
         return encode_api_response(api_name=api_name, response=res, user_id=public_id or hash_id or temp_hash_id)
 
-    def get_user_ids(self, public_id=None, hash_id=None, temp_hash_id=None, raise_exception=False, verbose=True,
-                     enable_mini_profile_fetch=True, enable_profile_fetch=True, enable_profile_html_fetch=True) -> APIResponse:
+    @retry(
+        on_retry_prepare_method_name_in_class='authenticate',
+        validate_retryable_response=validate_retryable_response_factory([503]),
+    )
+    def get_user_ids(self, public_id=None, hash_id=None, temp_hash_id=None,
+                     raise_exception=False, verbose=True,
+                     enable_mini_profile_fetch=True, enable_profile_fetch=True, enable_profile_html_fetch=True,
+                     # Placeholder for enabling retry toggle
+                     # To enable retry, you must specify "enable_retry=True" when calling the method
+                     enable_retry=False, retry_limit=1, verbose_on_retry=False) -> APIResponse:
         api_name = 'user IDs retrieval API'
         error_dict = {
             'mini_profile': None,
@@ -292,8 +351,16 @@ class AdvancedLinkedin(Linkedin):
 
             return encode_api_response(api_name=api_name, status=503, data=error_dict, user_id=public_id or hash_id or temp_hash_id)
 
+    @retry(
+        on_retry_prepare_method_name_in_class='authenticate',
+        validate_retryable_response=validate_retryable_response_factory([
+                                                                        401, 424]),
+    )
     def add_connection_v2(self, public_id=None, hash_id=None, temp_hash_id=None, message="",
-                          raise_exception=False, enable_public_id_sending=False, verbose=True):
+                          raise_exception=False, enable_public_id_sending=False, verbose=True,
+                          # Placeholder for enabling retry toggle
+                          # To enable retry, you must specify "enable_retry=True" when calling the method
+                          enable_retry=False, retry_limit=1, verbose_on_retry=False):
         api_name = 'connection request v2 API'
         notes = None
 
@@ -354,9 +421,17 @@ class AdvancedLinkedin(Linkedin):
 
         return encode_api_response(api_name=api_name, response=res, user_id=hash_id, notes=notes)
 
+    @retry(
+        on_retry_prepare_method_name_in_class='authenticate',
+        validate_retryable_response=validate_retryable_response_factory([
+                                                                        401, 424]),
+    )
     def add_connection_v3(self, public_id=None, hash_id=None, temp_hash_id=None, message="",
                           timezone=None, display_width=None, display_height=None,
-                          raise_exception=False, verbose=True):
+                          raise_exception=False, verbose=True,
+                          # Placeholder for enabling retry toggle
+                          # To enable retry, you must specify "enable_retry=True" when calling the method
+                          enable_retry=False, retry_limit=1, verbose_on_retry=False):
         api_name = 'connection request v3 API'
         notes = None
 

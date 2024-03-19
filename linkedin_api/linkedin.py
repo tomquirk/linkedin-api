@@ -77,6 +77,8 @@ class Linkedin(object):
         cookies=None,
         cookies_dir=DEFAULT_LINKEDIN_COOKIES_DIR,
     ):
+        self.request_count = 0
+
         if (proxies is None or proxies == {}) and proxy_ip is not None and proxy_port is not None:
             proxies = {'https': get_proxy_url(
                 proxy_ip, proxy_port, proxy_username, proxy_password)}
@@ -105,6 +107,7 @@ class Linkedin(object):
     def _fetch(self, uri, evade=default_evade, base_request=False, **kwargs):
         """GET request to Linkedin API"""
         evade()
+        self.request_count += 1
 
         url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
         return self.client.session.get(url, **kwargs)
@@ -112,6 +115,7 @@ class Linkedin(object):
     def _post(self, uri, evade=default_evade, base_request=False, **kwargs):
         """POST request to Linkedin API"""
         evade()
+        self.request_count += 1
 
         url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
         return self.client.session.post(url, **kwargs)

@@ -114,3 +114,13 @@ def encode_api_response(message: str | None = None,
         result['notes'] = notes
 
     return result
+
+
+def validate_retryable_response_factory(invalid_response_status_codes):
+    def validate_response(response: APIResponse):
+        try:
+            return response['status'] in invalid_response_status_codes
+        except:
+            return False
+
+    return validate_response

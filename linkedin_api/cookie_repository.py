@@ -1,8 +1,10 @@
+from datetime import datetime
 import logging
 import os
 import pickle
 import time
 import linkedin_api.settings as settings
+from linkedin_api.utils.time import get_time_string
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +30,17 @@ class CookieRepository(object):
         self.logger = logger
         self.cookies_dir = cookies_dir or settings.COOKIE_PATH
 
-    def save(self, cookies, username):
+    def _save(self, cookies, username, raw_time_suffix=None):
         self._ensure_cookies_dir()
-        cookiejar_filepath = self._get_cookies_filepath(username)
+        cookiejar_filepath = self._get_cookies_filepath(
+            username, raw_time_suffix)
+        with open(cookiejar_filepath, "wb") as f:
+            pickle.dump(cookies, f)
+
+    def save(self, cookies, username, raw_time_suffix=None):
+        self._ensure_cookies_dir()
+        cookiejar_filepath = self._get_cookies_filepath(
+            username, raw_time_suffix)
         with open(cookiejar_filepath, "wb") as f:
             pickle.dump(cookies, f)
 
@@ -45,14 +55,15 @@ class CookieRepository(object):
         if not os.path.exists(self.cookies_dir):
             os.makedirs(self.cookies_dir)
 
-    def _get_cookies_filepath(self, username):
+    def _get_cookies_filepath(self, username, raw_time_suffix=None):
         """
         Return the absolute path of the cookiejar for a given username
         """
-        return "{}{}.jr".format(self.cookies_dir, username)
+        return f"{self.cookies_dir}{username}-{get_time_string(raw_time_suffix, separator='_')}.jr" if raw_time_suffix else f"{self.cookies_dir}{username}.jr"
 
-    def _load_cookies_from_cache(self, username):
-        cookiejar_filepath = self._get_cookies_filepath(username)
+    def _load_cookies_from_cache(self, username, raw_time_suffix=None):
+        cookiejar_filepath = self._get_cookies_filepath(
+            username, raw_time_suffix)
         try:
             with open(cookiejar_filepath, "rb") as f:
                 cookies = pickle.load(f)

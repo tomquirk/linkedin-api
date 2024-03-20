@@ -1546,3 +1546,45 @@ class Linkedin(object):
             return {}
 
         return data
+
+    def get_post_reactions(self, post_urn_id, limit=10, offset=0):
+        """Fetch reactions about a given post.
+        :param post_urn_id: LinkedIn Post URN ID
+        :type post_urn_id: str
+
+        :return: Reaction data
+        :rtype: dict
+        """
+        # NOTE: This is a GraphQL request, the parentheses in the query should not be URL encoded
+        params = f"variables=(count:{limit},start:{offset},threadUrn:urn%3Ali%3Aactivity%3A{post_urn_id})&queryId=voyagerSocialDashReactions.743960306e7ef6641fb6b745507936d6"
+
+        res = self._fetch("/graphql", params=params)
+
+        data = res.json()
+
+        if not data or "errors" in data:
+            self.logger.info("request failed: {}".format(data))
+            return {}
+
+        return data
+
+    def react_to_post(self, post_urn_id, reaction_type="LIKE"):
+        """React to a given post.
+        :param post_urn_id: LinkedIn Post URN ID
+        :type post_urn_id: str
+        :param reactionType: LinkedIn reaction type, defaults to "LIKE", can be "LIKE", "PRAISE", "APPRECIATION", "EMPATHY", "INTEREST", "ENTERTAINMENT"
+        :type reactionType: str
+
+        :return: Error state. If True, an error occured.
+        :rtype: boolean
+        """
+        params = {"threadUrn": f"urn:li:activity:{post_urn_id}"}
+        payload = {"reactionType": reaction_type}
+
+        res = self._post(
+            "/voyagerSocialDashReactions",
+            params=params,
+            data=json.dumps(payload),
+        )
+
+        return res.status_code != 201

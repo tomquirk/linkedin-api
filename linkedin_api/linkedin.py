@@ -108,6 +108,23 @@ class Linkedin(object):
         url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
         return self.client.session.post(url, **kwargs)
 
+    def logout(self):
+        """Logs out of the current session"""
+        url_params = {
+            "q": "takeoverFlow",
+            "takeoverFlow": "SIGN_OUT",
+        }
+        url = f"/takeovers"
+        res = self._fetch(url, params=url_params)
+        data = res.json()
+        if data and "status" in data and data["status"] != 200:
+            self.logger.info("request failed: {}".format(data["status"]))
+            return {}
+        if data and "status" in data and data["status"] == 200:
+            return True
+        else:
+            return False
+
     def get_profile_posts(self, public_id=None, urn_id=None, post_count=10):
         """
         get_profile_posts: Get profile posts

@@ -2,26 +2,19 @@
 Provides linkedin api-related code
 """
 
-import base64
 import json
 import logging
 import random
 import uuid
 from operator import itemgetter
-from time import sleep, time
-from urllib.parse import quote, urlencode
+from time import sleep
+from urllib.parse import urlencode
 
 from linkedin_api.client import Client
 from linkedin_api.utils.helpers import (
-    append_update_post_field_to_posts_list,
     get_id_from_urn,
     get_urn_from_raw_update,
     get_list_posts_sorted_without_promoted,
-    get_update_author_name,
-    get_update_author_profile,
-    get_update_content,
-    get_update_old,
-    get_update_url,
     parse_list_raw_posts,
     parse_list_raw_urns,
     generate_trackingId,
@@ -230,6 +223,7 @@ class Linkedin(object):
                 "q": "all",
                 "start": len(results) + offset,
                 "queryContext": "List(spellCorrectionEnabled->true,relatedSearchesEnabled->true,kcardTypes->PROFILE|COMPANY)",
+                "includeWebMetadata": "true",
             }
             default_params.update(params)
 
@@ -245,7 +239,7 @@ class Linkedin(object):
                 f"{keywords}"
                 f"flagshipSearchIntent:SEARCH_SRP,"
                 f"queryParameters:{default_params['filters']},"
-                f"includeFiltersInResponse:false))&=&queryId=voyagerSearchDashClusters"
+                f"includeFiltersInResponse:false))&queryId=voyagerSearchDashClusters"
                 f".b0928897b71bd00a5a7291755dcd64f0"
             )
             data = res.json()
@@ -1272,84 +1266,6 @@ class Linkedin(object):
         )
 
         return res.status_code != 200
-
-    def view_profile(
-        self,
-        target_profile_public_id,
-        target_profile_member_urn_id=None,
-        network_distance=None,
-    ):
-        """View a profile, notifying the user that you "viewed" their profile.
-
-        Provide [target_profile_member_urn_id] and [network_distance] to save 2 network requests and
-        speed up the execution of this function.
-
-        :param target_profile_public_id: public ID of a LinkedIn profile
-        :type target_profile_public_id: str
-        :param network_distance: How many degrees of separation exist e.g. 2
-        :type network_distance: int, optional
-        :param target_profile_member_urn_id: member URN id for target profile
-        :type target_profile_member_urn_id: str, optional
-
-        :return: Error state. True if error occurred
-        :rtype: boolean
-        """
-        me_profile = self.get_user_profile()
-
-        if not target_profile_member_urn_id:
-            profile = self.get_profile(public_id=target_profile_public_id)
-            target_profile_member_urn_id = int(get_id_from_urn(profile["member_urn"]))
-
-        if not network_distance:
-            profile_network_info = self.get_profile_network_info(
-                public_profile_id=target_profile_public_id
-            )
-            network_distance = int(
-                profile_network_info["distance"]
-                .get("value", "DISTANCE_2")
-                .split("_")[1]
-            )
-
-        viewer_privacy_setting = "F"
-        me_member_id = me_profile["plainId"]
-
-        client_application_instance = self.client.metadata["clientApplicationInstance"]
-
-        eventBody = {
-            "viewerPrivacySetting": viewer_privacy_setting,
-            "networkDistance": network_distance,
-            "vieweeMemberUrn": f"urn:li:member:{target_profile_member_urn_id}",
-            "profileTrackingId": self.client.metadata["clientPageInstanceId"],
-            "entityView": {
-                "viewType": "profile-view",
-                "viewerId": me_member_id,
-                "targetId": target_profile_member_urn_id,
-            },
-            "header": {
-                "pageInstance": {
-                    "pageUrn": "urn:li:page:d_flagship3_profile_view_base",
-                    "trackingId": self.client.metadata["clientPageInstanceId"],
-                },
-                "time": int(time()),
-                "version": client_application_instance["version"],
-                "clientApplicationInstance": client_application_instance,
-            },
-            "requestHeader": {
-                "interfaceLocale": "en_US",
-                "pageKey": "d_flagship3_profile_view_base",
-                "path": f"/in/{target_profile_member_urn_id}/",
-                "referer": "https://www.linkedin.com/feed/",
-            },
-        }
-
-        return self.track(
-            eventBody,
-            {
-                "appId": "com.linkedin.flagship3.d_web",
-                "eventName": "ProfileViewEvent",
-                "topicName": "ProfileViewEvent",
-            },
-        )
 
     def get_profile_privacy_settings(self, public_profile_id):
         """Fetch privacy settings for a given LinkedIn profile.

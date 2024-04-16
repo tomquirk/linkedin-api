@@ -214,7 +214,10 @@ class AdvancedLinkedin(Linkedin):
                     self.logger.error(e)
 
                 if not error_dict['mini_profile']:
-                    error_dict['mini_profile'] = str(e)
+                    error_dict['mini_profile'] = {
+                        'data': {"code": None},
+                        'status': 407 if "proxy" in str(e) else 503
+                    }
 
         if enable_profile_fetch:
             # Second attempt to retrieve user IDs from the profile
@@ -258,7 +261,10 @@ class AdvancedLinkedin(Linkedin):
                     self.logger.error(e)
 
                 if not error_dict['profile']:
-                    error_dict['profile'] = str(e)
+                    error_dict['profile'] = {
+                        'data': {"code": None},
+                        'status': 407 if "proxy" in str(e) else 503
+                    }
 
         if enable_profile_html_fetch:
             # Third attempt to retrieve user IDs from the HTML

@@ -101,6 +101,9 @@ class Linkedin(object):
                 # If the cookies are expired, the API won't work anymore since
                 # `username` and `password` are not used at all in this case.
                 self.client._set_session_cookies(cookies)
+
+                # Verify if the cookies and proxy are still valid
+                self.client._fetch_metadata()
             else:
                 self.client.authenticate(username, password)
 

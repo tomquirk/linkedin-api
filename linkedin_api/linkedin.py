@@ -1462,3 +1462,24 @@ class Linkedin(object):
             return {}
 
         return data
+
+    def get_job_skills(self, job_id):
+        """Fetch skills associated with a given job.
+        :param job_id: LinkedIn job ID
+        :type job_id: str
+
+        :return: Job skills
+        :rtype: dict
+        """
+        params = {
+            "decorationId": "com.linkedin.voyager.dash.deco.assessments.FullJobSkillMatchInsight-17",
+        }
+        # https://www.linkedin.com/voyager/api/voyagerAssessmentsDashJobSkillMatchInsight/urn%3Ali%3Afsd_jobSkillMatchInsight%3A3894460323?decorationId=com.linkedin.voyager.dash.deco.assessments.FullJobSkillMatchInsight-17
+        res = self._fetch(f"/voyagerAssessmentsDashJobSkillMatchInsight/urn%3Ali%3Afsd_jobSkillMatchInsight%3A{job_id}", params=params)
+        data = res.json()
+
+        if data and "status" in data and data["status"] != 200:
+            self.logger.info("request failed: {}".format(data.get("message")))
+            return {}
+
+        return data

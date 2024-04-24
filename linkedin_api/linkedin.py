@@ -488,6 +488,7 @@ class Linkedin(object):
         job_title=None,
         industries=None,
         location_name=None,
+        location_geo_id=None,
         remote=None,
         listed_at=24 * 60 * 60,
         distance=None,
@@ -511,6 +512,8 @@ class Linkedin(object):
         :type industries: list, optional
         :param location_name: Name of the location to search within. Example: "Kyiv City, Ukraine"
         :type location_name: str, optional
+        :param location_geo_id: Geo ID of the location to search within.
+        :type location_geo_id: str, optional
         :param remote: Filter for remote jobs, onsite or hybrid. onsite:"1", remote:"2", hybrid:"3"
         :type remote: list, optional
         :param listed_at: maximum number of seconds passed since job posting. 86400 will filter job postings posted in last 24 hours.
@@ -533,6 +536,8 @@ class Linkedin(object):
             query["keywords"] = "KEYWORD_PLACEHOLDER"
         if location_name:
             query["locationFallback"] = "LOCATION_PLACEHOLDER"
+        if location_geo_id:
+            query["locationUnion"] = f"(geoId:{location_geo_id})"
 
         # In selectedFilters()
         query["selectedFilters"] = {}
@@ -559,6 +564,7 @@ class Linkedin(object):
         #    origin:JOB_SEARCH_PAGE_QUERY_EXPANSION,
         #    keywords:marketing%20manager,
         #    locationFallback:germany,
+        #    locationUnion:(geoId:90009706),
         #    selectedFilters:(
         #        distance:List(25),
         #        company:List(163253),

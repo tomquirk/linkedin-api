@@ -1,6 +1,7 @@
 """
     linkedin-api
 """
+
 from .linkedin import Linkedin
 from .advanced_linkedin import AdvancedLinkedin
 

@@ -40,10 +40,8 @@ class Client(object):
 
     # Settings for authenticating with Linkedin
     AUTH_REQUEST_HEADERS = {
-        "X-Li-User-Agent": "LIAuthLibrary:3.2.4 \
-                            com.linkedin.LinkedIn:8.8.1 \
-                            iPhone:8.3",
-        "User-Agent": "LinkedIn/8.8.1 CFNetwork/711.3.18 Darwin/14.0.0",
+        "X-Li-User-Agent": "LIAuthLibrary:0.0.3 com.linkedin.android:4.1.881 Asus_ASUS_Z01QD:android_9",
+        "User-Agent": "ANDROID OS",
         "X-User-Language": "en",
         "X-User-Locale": "en_US",
         "Accept-Language": "en-us",

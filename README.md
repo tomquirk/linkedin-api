@@ -9,12 +9,12 @@
   <a href="https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-&utm_content=tom%20quirk" target="_blank">
     <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proxycurl.png" alt="proxycurl">
   </a>
+  <a href="https://lix-it.com/pages/linkedin-api?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_content=tomquirk" target="_blank">
+    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/lix.png" alt="Lix">
+  </a>
 </p>
 
 <p align="center">
-  <a href="https://lix-it.com/pages/linkedin-api?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_content=tomquirk" target="_blank">
-    <img height="35px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/lix.png" alt="Lix">
-  </a>
   <a href="https://iscraper.io/" target="_blank">
     <img height="35px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/iscraper.png" alt="serpsbot">
   </a>
@@ -24,7 +24,7 @@
 
 ---
 
-Programmatically send messages, get jobs, and search profiles with a regular Linkedin user account.
+Programmatically search profiles, send messages, and find jobs. All with a regular Linkedin user account.
 
 No "official" API access required - just use a valid Linkedin account!
 
@@ -37,14 +37,20 @@ No "official" API access required - just use a valid Linkedin account!
 To install the linkedin_api package, use the following command:
 
 ```bash
-pip3 install git+https://github.com/tomquirk/linkedin-api.git
+pip install linkedin-api
+```
+
+Or, for bleading edge:
+
+```bash
+pip install git+https://github.com/tomquirk/linkedin-api.git
 ```
 
 ### Quick Start
 
 > See all methods on the [documentation website](https://linkedin-api.readthedocs.io/).
 
-Below is a basic example of how to use linkedin_api:
+The following snippet demonstrates a few basic linkedin_api use cases:
 
 ```python
 from linkedin_api import Linkedin
@@ -126,30 +132,30 @@ This library is not endorsed or supported by LinkedIn. It is an unofficial libra
 
 ## Contributing
 
-We welcome contributions! [Learn how to find endpoints](#to-find-endpoints)
+We welcome contributions! [Learn how to find endpoints](#find-new-endpoint).
 
-## Development Setup
+## Development
 
 ### Dependencies
 
 - Python 3.7
 - A valid Linkedin user account (don't use your personal account, if possible)
-- `pipenv` (optional)
+- [`pipenv`](https://pipenv.pypa.io/en/latest/) (optional)
 
 ### Development installation
 
 1. Create a `.env` config file. An example is provided in `.env.example` - you include at least all of the settings set there.
-2. Using pipenv...
+2. Install dependencies with `pipenv`:
 
    ```bash
    pipenv install --dev
    pipenv shell
    ```
 
-### Running tests
+### Run tests
 
 ```bash
-python -m pytest tests
+pipenv run test
 ```
 
 ### Troubleshooting
@@ -171,8 +177,6 @@ Please add more as you come across them.
 
 ## How it works
 
-> Before using this project, please consult the [Terms and Conditions](#terms-and-conditions) and [Legal Notice](#legal).
-
 This project attempts to provide a simple Python interface for the Linkedin API.
 
 > Do you mean the [legit Linkedin API](https://developer.linkedin.com/)?
@@ -181,9 +185,9 @@ NO! To retrieve structured data, the [Linkedin Website](https://linkedin.com) us
 
 This project aims to provide complete coverage for Voyager.
 
-[How does it work?](#in-depth-overview)
+[How does it work?](#deep-dive)
 
-### In-depth overview
+### Deep dive
 
 Voyager endpoints look like this:
 
@@ -203,15 +207,15 @@ They are authenticated with a simple cookie, which we send with every request, a
 
 To get a cookie, we POST a given username and password (of a valid Linkedin user account) to `https://www.linkedin.com/uas/authenticate`.
 
-### To find endpoints
+### Find new endpoints
 
 We're looking at the Linkedin website and we spot some data we want. What now?
 
-The most reliable method to find the relevant endpoint is to:
+The following describes the most reliable method to find relevant endpoints:
 
 1. `view source`
-2. `command-f`/search the page for some keyword in the data. This will exist inside of a `<code>` tag.
-3. Scroll down to the **next adjacent element** which will be another `<code>` tag, probably with an `id` that looks something like
+1. `command-f`/search the page for some keyword in the data. This will exist inside of a `<code>` tag.
+1. Scroll down to the **next adjacent element** which will be another `<code>` tag, probably with an `id` that looks something like
 
    ```html
    <code style="display: none" id="datalet-bpr-guid-3900675">
@@ -219,13 +223,13 @@ The most reliable method to find the relevant endpoint is to:
    </code>
    ```
 
-4. The value of `request` is the url! 🤘
+The value of `request` is the url! 🤘
 
 You can also use the `network` tab in you browsers developer tools, but you will encounter mixed results.
 
 ### How Clients query Voyager
 
-linkedin.com queries data using the [Rest-li Protocol](https://linkedin.github.io/rest.li/spec/protocol). Rest-li is an internal query language/syntax where clients (like linkedin.com) to specify what data they want (similar to the GraphQL concept).
+linkedin.com uses the [Rest-li Protocol](https://linkedin.github.io/rest.li/spec/protocol) for querying data. Rest-li is an internal query language/syntax where clients (like linkedin.com) specify what data they want. It's conceptually similar to the GraphQL.
 
 Here's an example of making a request for an organisation's `name` and `groups` (the Linkedin groups it manages):
 
@@ -233,7 +237,7 @@ Here's an example of making a request for an organisation's `name` and `groups` 
 /voyager/api/organization/companies?decoration=(name,groups*~(entityUrn,largeLogo,groupName,memberCount,websiteUrl,url))&q=universalName&universalName=linkedin
 ```
 
-The "querying" happens in the `decoration` parameter, which looks like
+The "querying" happens in the `decoration` parameter, which looks like the following:
 
 ```text
 (
@@ -242,7 +246,7 @@ The "querying" happens in the `decoration` parameter, which looks like
 )
 ```
 
-So here, we request an organisation name, and a list of groups, where for each group we want `largeLogo`, `groupName`, etc.
+Here, we request an organisation name and a list of groups, where for each group we want `largeLogo`, `groupName`, and so on.
 
 Different endpoints use different parameters (and perhaps even different syntaxes) to specify these queries. Notice that the above query had a parameter `q` whose value was `universalName`; the query was then specified with the `decoration` parameter.
 
@@ -254,8 +258,8 @@ List(v->PEOPLE)
 
 It could be possible to document (and implement a nice interface for) this query language - as we add more endpoints to this project, I'm sure it will become more clear if such a thing would be possible (and if it's worth it).
 
-### Releasing a new version
+### Release a new version
 
 1. Bump `__version__` in `__init__.py`
-1. `python3 setup.py sdist bdist_wheel`
-1. `python3 -m twine upload dist/*`
+1. `pipenv run build`
+1. `pipenv run publish`

@@ -45,6 +45,7 @@ class Linkedin(object):
     _MAX_POST_COUNT = 100  # max seems to be 100 posts per page
     _MAX_UPDATE_COUNT = 100  # max seems to be 100
     _MAX_SEARCH_COUNT = 49  # max seems to be 49, and min seems to be 2
+    _MAX_COMMENT_COUNT = 10  # max seems to be 10
     _MAX_REPEATED_REQUESTS = (
         200  # VERY conservative max requests count to avoid rate-limit
     )
@@ -192,6 +193,36 @@ class Linkedin(object):
             data["elements"] = data["elements"] + res.json()["elements"]
             data["paging"] = res.json()["paging"]
         return data["elements"]
+
+    def get_company_update_comments(self, post_urn: str):
+        """Retrieves the comments for a particular company update post on LinkedIn.
+
+        :param post_urn: The social urn of the post.
+            This can be found in the post object in:
+            ['value']['com.linkedin.voyager.feed.render.UpdateV2']['socialDetail']['urn'].
+            Example: 'urn:li:ugcPost:7194063302728052737'
+        :type post_urn: dict
+
+        :return: A list of comments for the given company update post
+        :rtype: list
+        """
+        count = Linkedin._MAX_COMMENT_COUNT
+        urn_number = post_urn.split(":")[-1]
+        urn_fmt = f"urn%3Ali%3AugcPost%3A{urn_number}%2C"
+        res = self._fetch(
+            f"/graphql?"
+            f"variables="
+            f"(count:{count},"
+            f"numReplies:1,"
+            f"socialDetailUrn:urn%3Ali%3Afsd_socialDetail%3A%28{urn_fmt}{urn_fmt}"
+            f"urn%3Ali%3AhighlightedReply%3A-%29,sortOrder:RELEVANCE,start:0)"
+            f"&queryId=voyagerSocialDashComments.ba89617ccc7931dd5c84205083b0bfb8"
+        )
+        data = res.json()
+        if ('data' not in data or 'socialDashCommentsBySocialDetail' not in data['data'] or
+                'elements' not in data['data']['socialDashCommentsBySocialDetail']):
+            return []
+        return data['data']['socialDashCommentsBySocialDetail']['elements']
 
     def search(self, params, limit=-1, offset=0):
         """Perform a LinkedIn search.

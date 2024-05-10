@@ -1527,7 +1527,11 @@ class Linkedin(object):
         for job_id in job_ids:
             job_id = str(job_id)
 
-            _job = job_elements[job_id]
+            _job = job_elements.get(job_id)
+            if not _job:
+                jobs[job_id] = None
+                continue
+
             _company = company_elements[
                 get_id_from_urn(_job["companyDetails"]["jobCompany"]["*company"])
             ]

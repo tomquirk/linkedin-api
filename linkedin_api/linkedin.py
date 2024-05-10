@@ -1469,6 +1469,80 @@ class Linkedin(object):
 
         return data
 
+    def get_jobs_batch(self, job_ids: list[str | int]):
+
+        job_urns = ",".join(
+            [
+                f"urn%3Ali%3Afsd_jobPostingCard%3A%28{job_id}%2CJOB_DETAILS%29"
+                for job_id in job_ids
+            ]
+        )
+
+        resposne = self._fetch(
+            (
+                f"/graphql?variables=(jobCardPrefetchQuery:(prefetchJobPostingCardUrns:List({job_urns}),jobUseCase:"
+                f"JOB_DETAILS))&queryId=voyagerJobsDashJobCards.74f467f2afbc186a3f779091d8a7a8b8"
+            ),
+            headers={
+                "accept": "application/vnd.linkedin.normalized+json+2.1",
+            },
+        )
+
+        data = resposne.json()
+
+        if data and "status" in data and data["status"] != 200:
+            self.logger.info("request failed: {}".format(data.get("message")))
+            return {}
+
+        elements = data.get("included", [])
+
+        job_elements = {
+            get_id_from_urn(job["entityUrn"]): job
+            for job in [
+                i
+                for i in elements
+                if i["$type"] == "com.linkedin.voyager.dash.jobs.JobPosting"
+            ]
+        }
+
+        company_elements = {
+            get_id_from_urn(comp["entityUrn"]): comp
+            for comp in [
+                i
+                for i in elements
+                if i["$type"] == "com.linkedin.voyager.dash.organization.Company"
+            ]
+        }
+
+        location_elements = {
+            get_id_from_urn(loc["entityUrn"]): loc
+            for loc in [
+                i
+                for i in elements
+                if i["$type"] == "com.linkedin.voyager.dash.common.Geo"
+            ]
+        }
+
+        jobs = {}
+        for job_id in job_ids:
+            job_id = str(job_id)
+
+            _job = job_elements[job_id]
+            _company = company_elements[
+                get_id_from_urn(_job["companyDetails"]["jobCompany"]["*company"])
+            ]
+            _location = location_elements[get_id_from_urn(_job["*location"])]
+
+            del _job["companyDetails"]
+            del _job["*location"]
+
+            _job["company"] = _company
+            _job["location"] = _location
+
+            jobs[job_id] = _job
+
+        return jobs
+
     def get_job_skills(self, job_id):
         """Fetch skills associated with a given job.
         :param job_id: LinkedIn job ID
@@ -1481,7 +1555,10 @@ class Linkedin(object):
             "decorationId": "com.linkedin.voyager.dash.deco.assessments.FullJobSkillMatchInsight-17",
         }
         # https://www.linkedin.com/voyager/api/voyagerAssessmentsDashJobSkillMatchInsight/urn%3Ali%3Afsd_jobSkillMatchInsight%3A3894460323?decorationId=com.linkedin.voyager.dash.deco.assessments.FullJobSkillMatchInsight-17
-        res = self._fetch(f"/voyagerAssessmentsDashJobSkillMatchInsight/urn%3Ali%3Afsd_jobSkillMatchInsight%3A{job_id}", params=params)
+        res = self._fetch(
+            f"/voyagerAssessmentsDashJobSkillMatchInsight/urn%3Ali%3Afsd_jobSkillMatchInsight%3A{job_id}",
+            params=params,
+        )
         data = res.json()
 
         if data and "status" in data and data["status"] != 200:

@@ -1532,9 +1532,13 @@ class Linkedin(object):
                 jobs[job_id] = None
                 continue
 
-            _company = company_elements[
-                get_id_from_urn(_job["companyDetails"]["jobCompany"]["*company"])
-            ]
+            _company_urn = _job["companyDetails"]["jobCompany"].get("*company")
+            _company = None
+            if _company_urn:
+                _company = company_elements[
+                    get_id_from_urn(_company_urn)
+                ]
+
             _location = location_elements[get_id_from_urn(_job["*location"])]
 
             del _job["companyDetails"]

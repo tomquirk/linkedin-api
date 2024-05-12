@@ -5,6 +5,7 @@ Provides linkedin api-related code
 import json
 import logging
 import random
+import re
 import uuid
 from operator import itemgetter
 from time import sleep
@@ -1505,6 +1506,15 @@ class Linkedin(object):
             ]
         }
 
+        job_card_elements = {
+            get_id_from_urn(card["preDashNormalizedJobPostingUrn"]): card
+            for card in [
+                i
+                for i in elements
+                if i["$type"] == "com.linkedin.voyager.dash.jobs.JobPostingCard"
+            ]
+        }
+
         company_elements = {
             get_id_from_urn(comp["entityUrn"]): comp
             for comp in [
@@ -1538,6 +1548,12 @@ class Linkedin(object):
                 _company = company_elements[
                     get_id_from_urn(_company_urn)
                 ]
+                _company["universalName"] = None
+
+                _company_un = job_card_elements[job_id].get("logo", {}).get("actionTarget", "")
+                _company_un = re.search("company/(.+)/", _company_un)
+                if _company_un:
+                     _company["universalName"] = _company_un.group(1)
 
             _location = location_elements[get_id_from_urn(_job["*location"])]
 

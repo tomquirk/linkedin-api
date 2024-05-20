@@ -135,7 +135,7 @@ class AdvancedLinkedin(Linkedin):
         notes = None
 
         url = f'https://www.linkedin.com/in/{public_id or hash_id or temp_hash_id}/'
-        res = self.client.session.get(url)
+        res = self._fetch(url)
 
         if verbose:
             self.logger.debug(get_api_response_log(
@@ -214,7 +214,9 @@ class AdvancedLinkedin(Linkedin):
                     self.logger.error(e)
 
                 if not error_dict['mini_profile']:
-                    error_dict['mini_profile'] = str(e)
+                    error_dict['mini_profile'] = encode_api_response(
+                        api_name='mini profile API', status=500, data=str(e),
+                        user_id=public_id or hash_id or temp_hash_id)
 
         if enable_profile_fetch:
             # Second attempt to retrieve user IDs from the profile
@@ -258,7 +260,9 @@ class AdvancedLinkedin(Linkedin):
                     self.logger.error(e)
 
                 if not error_dict['profile']:
-                    error_dict['profile'] = str(e)
+                    error_dict['profile'] = encode_api_response(
+                        api_name='profile v2 API', status=500, data=str(e),
+                        user_id=public_id or hash_id or temp_hash_id)
 
         if enable_profile_html_fetch:
             # Third attempt to retrieve user IDs from the HTML
@@ -337,7 +341,9 @@ class AdvancedLinkedin(Linkedin):
                     self.logger.error(e)
 
                 if not error_dict['profile_html']:
-                    error_dict['profile_html'] = str(e)
+                    error_dict['profile_html'] = encode_api_response(
+                        api_name='profile HTML API', status=500, data=str(e),
+                        user_id=public_id or hash_id or temp_hash_id)
 
         if raise_exception:
             # Does not add "error_dict" into the log as it's too long

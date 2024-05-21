@@ -9,6 +9,7 @@ import uuid
 from operator import itemgetter
 from time import sleep
 from urllib.parse import urlencode
+import requests
 
 from linkedin_api.client import Client
 from linkedin_api.utils.helpers import (
@@ -103,11 +104,26 @@ class Linkedin(object):
 
     def _fetch(self, uri, evade=default_evade, base_request=False, **kwargs):
         """GET request to Linkedin API"""
-        evade()
-        self.request_count += 1
+        try:
+            evade()
+            self.request_count += 1
 
-        url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
-        return self.client.session.get(url, **kwargs)
+            url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
+            return self.client.session.get(url, **kwargs)
+        except Exception as e:
+            response = requests.models.Response()
+
+            if isinstance(e, requests.exceptions.ProxyError):
+                response.status_code = 407
+                response._content = b'{"message":"Proxy is not available","status": 407}'
+                response.headers['Content-Type'] = 'application/json'
+            else:
+                response.status_code = 500
+                error_message = f'{{"message": "Unknown error", "status": 500, "error": "{str(e)}"}}'
+                response._content = error_message.encode('utf-8')
+                response.headers['Content-Type'] = 'application/json'
+
+            return response
 
     def _cookies(self):
         """Return client cookies"""

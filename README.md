@@ -2,6 +2,26 @@
 
 <h3 align="center">Sponsors</h3>
 
+<svg fill="none" viewBox="0 0 600 300" width="600" height="300" xmlns="http://www.w3.org/2000/svg">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      <style>
+        .container {
+          display: flex;
+          width: 100%;
+          height: 300px;
+          background-color: black;
+          color: white;
+        }
+      </style>
+
+      <div class="container">
+        <h1>Hi there, test 👋</h1>
+      </div>
+    </div>
+  </foreignObject>
+</svg>
+
 <p align="center" style="margin-bottom:24px" >
   <a href="https://prospeo.io/api/linkedin-email-finder" target="_blank">
     <img height="45px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/prospeo.png" alt="Prospeo">

@@ -12,6 +12,9 @@
   <a href="https://lix-it.com/pages/linkedin-api?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_content=tomquirk" target="_blank">
     <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/lix.png" alt="Lix">
   </a>
+    <a href="https://www.unipile.com/communication-api/messaging-api/linkedin-api/?utm_campaign=git%20tom%20quirk" target="_blank">
+    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/unipile.png" alt="Unipile">
+  </a>
 </p>
 
 <p align="center">
@@ -118,7 +121,29 @@ Built for developers, by developers.
 
 </details>
 
+<h3>
+<a href="https://www.unipile.com/communication-api/messaging-api/linkedin-api/?utm_campaign=git%20tom%20quirk">
+Unipile
+</a>
+</h3>
+
+Full [LinkedIn API](https://www.unipile.com/communication-api/messaging-api/linkedin-api/?utm_campaign=git%20tom%20quirk): Connect Classic/Sales Navigator/Recruiter, synchronize real-time messaging, enrich data and build outreach sequences…
+
+<details>
+  <summary>Learn more</summary>
+  
+- Easily connect your users in the cloud with our white-label authentication (captcha solving, in-app validation, OTP, 2FA).
+- Real-time webhook for each message received, read status, invitation accepted, and more.
+- Data extraction: get profile, get company, get post, extract search results from Classic + Sales Navigator + Recruiter
+- Outreach sequences: send invitations, InMail, messages, and comment on posts…
+
+Test [all the features](https://www.unipile.com/communication-api/messaging-api/linkedin-api/?utm_campaign=git%20tom%20quirk) with our 7-day free trial.
+
+</details>
+
 > End sponsored section
+
+
 
 ## Documentation
 

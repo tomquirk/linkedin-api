@@ -13,7 +13,7 @@
     <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/lix.png" alt="Lix">
   </a>
     <a href="https://www.unipile.com/communication-api/messaging-api/linkedin-api/?utm_campaign=git%20tom%20quirk" target="_blank">
-    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/unipile.png" alt="Unipile">
+    <img height="90px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/unipile.png" alt="Unipile">
   </a>
 </p>
 

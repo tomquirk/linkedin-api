@@ -2,33 +2,18 @@
 
 <h3 align="center">Sponsors</h3>
 
-<svg width="600" height="150" xmlns="http://www.w3.org/2000/svg">
-  <a x="0" y="25"  href="https://example.com/link1" target="_blank">
-    <image  width="100" height="100" href="https://via.placeholder.com/100" />
-  </a>
-
-  <!-- Second image with link -->
-  <a x="150" y="25" href="https://example.com/link2" target="_blank">
-    <image  width="100" height="100" href="https://via.placeholder.com/100" />
-  </a>
-
-</svg>
-
-
-
-
 <p align="center" style="margin-bottom:24px" >
   <a href="https://prospeo.io/api/linkedin-email-finder" target="_blank">
     <img height="45px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/prospeo.png" alt="Prospeo">
   </a>
   <a href="https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-&utm_content=tom%20quirk" target="_blank">
-    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proxycurl.png" alt="proxycurl">
+    <img height="45px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proxycurl.png" alt="proxycurl">
   </a>
-  <a href="https://lix-it.com/pages/linkedin-api?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_content=tomquirk" target="_blank">
+  <a href="https://lix-it.com/pages/linkedin-api?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_content=tomquirk" style="margin-right:24px" target="_blank">
     <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/lix.png" alt="Lix">
   </a>
     <a href="https://www.unipile.com/communication-api/messaging-api/linkedin-api/?utm_campaign=git%20tom%20quirk" target="_blank">
-    <img height="90px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/unipile.png" alt="Unipile">
+    <img  height="70px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/unipile.png" alt="Unipile">
   </a>
 </p>
 
@@ -157,8 +142,6 @@ Test [all the features](https://www.unipile.com/communication-api/messaging-api/
 </details>
 
 > End sponsored section
-
-
 
 ## Documentation
 

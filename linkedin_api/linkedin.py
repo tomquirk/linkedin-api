@@ -9,7 +9,7 @@ import uuid
 from operator import itemgetter
 from time import sleep
 from urllib.parse import urlencode
-from typing import Dict, Union, Optional, List
+from typing import Dict, Union, Optional, List, Literal
 
 from linkedin_api.client import Client
 from linkedin_api.utils.helpers import (
@@ -489,12 +489,35 @@ class Linkedin(object):
         self,
         keywords: Optional[str] = None,
         companies: Optional[List[str]] = None,
-        experience: Optional[List[str]] = None,
-        job_type: Optional[List[str]] = None,
+        experience: Optional[
+            List[
+                Union[
+                    Literal["1"],
+                    Literal["2"],
+                    Literal["3"],
+                    Literal["4"],
+                    Literal["5"],
+                    Literal["6"],
+                ]
+            ]
+        ] = None,
+        job_type: Optional[
+            List[
+                Union[
+                    Literal["F"],
+                    Literal["C"],
+                    Literal["P"],
+                    Literal["T"],
+                    Literal["I"],
+                    Literal["V"],
+                    Literal["O"],
+                ]
+            ]
+        ] = None,
         job_title: Optional[List[str]] = None,
         industries: Optional[List[str]] = None,
         location_name: Optional[str] = None,
-        remote: Optional[List[str]] = None,
+        remote: Optional[List[Union[Literal["1"], Literal["2"], Literal["3"]]]] = None,
         listed_at=24 * 60 * 60,
         distance: Optional[int] = None,
         limit=-1,

@@ -305,7 +305,9 @@ class Linkedin(object):
         self,
         keywords: Optional[str] = None,
         connection_of: Optional[str] = None,
-        network_depths: Optional[List[str]] = None,
+        network_depths: Optional[
+            List[Union[Literal["F"], Literal["S"], Literal["O"]]]
+        ] = None,
         current_company: Optional[List[str]] = None,
         past_companies: Optional[List[str]] = None,
         nonprofit_interests: Optional[List[str]] = None,
@@ -323,7 +325,9 @@ class Linkedin(object):
         keyword_title: Optional[str] = None,
         keyword_company: Optional[str] = None,
         keyword_school: Optional[str] = None,
-        network_depth: Optional[str] = None,  # DEPRECATED - use network_depths
+        network_depth: Optional[
+            Union[Literal["F"], Literal["S"], Literal["O"]]
+        ] = None,  # DEPRECATED - use network_depths
         title: Optional[str] = None,  # DEPRECATED - use keyword_title
         **kwargs,
     ) -> List[Dict]:

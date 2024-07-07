@@ -26,9 +26,9 @@ class Client(object):
     REQUEST_HEADERS = {
         "user-agent": " ".join(
             [
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5)",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64)", 
                 "AppleWebKit/537.36 (KHTML, like Gecko)",
-                "Chrome/83.0.4103.116 Safari/537.36",
+                "Chrome/111.0.0.0 Safari/537.36",
             ]
         ),
         # "accept": "application/vnd.linkedin.normalized+json+2.1",
@@ -58,7 +58,7 @@ class Client(object):
         self.metadata = {}
         self._use_cookie_cache = not refresh_cookies
         self._cookie_repository = CookieRepository(cookies_dir=cookies_dir)
-
+       
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
 
     def _request_session_cookies(self):
@@ -72,16 +72,22 @@ class Client(object):
             headers=Client.AUTH_REQUEST_HEADERS,
             proxies=self.proxies,
         )
+        
         return res.cookies
 
     def _set_session_cookies(self, cookies):
         """
         Set cookies of the current session and save them to a file named as the username.
         """
-        self.session.cookies = cookies
+        self.session.cookies = cookies 
         self.session.headers["csrf-token"] = self.session.cookies["JSESSIONID"].strip(
             '"'
         )
+        
+        from http.cookiejar import CookieJar
+        new_cookies = requests.utils.cookiejar_from_dict(cookies, CookieJar())    
+        
+        self.session.cookies = new_cookies
 
     @property
     def cookies(self):
@@ -91,7 +97,7 @@ class Client(object):
         if self._use_cookie_cache:
             self.logger.debug("Attempting to use cached cookies")
             cookies = self._cookie_repository.get(username)
-            if cookies:
+            if cookies:    
                 self.logger.debug("Using cached cookies")
                 self._set_session_cookies(cookies)
                 self._fetch_metadata()
@@ -143,9 +149,9 @@ class Client(object):
         payload = {
             "session_key": username,
             "session_password": password,
-            "JSESSIONID": self.session.cookies["JSESSIONID"],
+            "JSESSIONID": self.session.cookies["JSESSIONID"]
         }
-
+    
         res = requests.post(
             f"{Client.LINKEDIN_BASE_URL}/uas/authenticate",
             data=payload,

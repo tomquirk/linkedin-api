@@ -51,8 +51,8 @@ class Linkedin(object):
 
     def __init__(
         self,
-        username,
-        password,
+        username=None,
+        password=None,
         *,
         authenticate=True,
         refresh_cookies=False,
@@ -75,16 +75,56 @@ class Linkedin(object):
             if cookies:
                 # If the cookies are expired, the API won't work anymore since
                 # `username` and `password` are not used at all in this case.
+                # print("in LINKEDINPY")
                 self.client._set_session_cookies(cookies)
             else:
-                self.client.authenticate(username, password)
+                self.client.authenticate(username, password)                
 
     def _fetch(self, uri, evade=default_evade, base_request=False, **kwargs):
         """GET request to Linkedin API"""
         evade()
-
+        print(f"{self.client.LINKEDIN_BASE_URL}{uri}")
         url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
         return self.client.session.get(url, **kwargs)
+    
+    def get_profile_name(self, public_id=None, urn_id=None):
+        """Fetch data for a given LinkedIn profile.
+
+        :param public_id: LinkedIn public ID for a profile
+        :type public_id: str, optional
+        :param urn_id: LinkedIn URN ID for a profile
+        :type urn_id: str, optional
+
+        :return: Profile data
+        :rtype: dict
+        """
+        # NOTE this still works for now, but will probably eventually have to be converted to
+        # https://www.linkedin.com/voyager/api/identity/profiles/ACoAAAKT9JQBsH7LwKaE9Myay9WcX8OVGuDq9Uw
+        res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")
+  
+        try:
+            data = res.json()
+            # print(data)
+            # print(res.headers)
+        except:
+            data = res.headers
+            print("error headers: ", data)
+        
+        if data and "status" in data and data["status"] != 200:
+            self.logger.info("request failed: {}".format(data["message"]))
+            return {}
+
+        # massage [profile] data
+        profile = data["profile"]
+        # print("Profile", profile)
+        if "miniProfile" in profile:
+            
+            profile["firstName"] = profile["miniProfile"]["firstName"]            
+            profile["lastName"] = profile["miniProfile"]["lastName"]
+
+            del profile["miniProfile"]
+
+        return profile 
 
     def _cookies(self):
         """Return client cookies"""
@@ -242,6 +282,7 @@ class Linkedin(object):
                 f"includeFiltersInResponse:false))&queryId=voyagerSearchDashClusters"
                 f".b0928897b71bd00a5a7291755dcd64f0"
             )
+            print(res, res.status_code)
             data = res.json()
 
             data_clusters = data.get("data", []).get("searchDashClustersByAll", [])
@@ -699,8 +740,15 @@ class Linkedin(object):
         # NOTE this still works for now, but will probably eventually have to be converted to
         # https://www.linkedin.com/voyager/api/identity/profiles/ACoAAAKT9JQBsH7LwKaE9Myay9WcX8OVGuDq9Uw
         res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")
-
-        data = res.json()
+  
+        try:
+            data = res.json()
+            # print(data)
+            # print(res.headers)
+        except:
+            data = res.headers
+            print("error headers: ", data)
+        
         if data and "status" in data and data["status"] != 200:
             self.logger.info("request failed: {}".format(data["message"]))
             return {}
@@ -1005,13 +1053,14 @@ class Linkedin(object):
         )
 
         data = res.json()
+        print("get_conversation_details data: ", data)
 
         if data["elements"] == []:
             return {}
-
+        
         item = data["elements"][0]
         item["id"] = get_id_from_urn(item["entityUrn"])
-
+        
         return item
 
     def get_conversations(self):

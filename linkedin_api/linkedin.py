@@ -2,19 +2,28 @@
 Provides linkedin api-related code
 """
 
+import base64
 import json
 import logging
 import random
 import uuid
+import os
+import mimetypes
 from operator import itemgetter
-from time import sleep
-from urllib.parse import urlencode
+from time import sleep, time
+from urllib.parse import quote, urlencode
 
 from linkedin_api.client import Client
 from linkedin_api.utils.helpers import (
+    append_update_post_field_to_posts_list,
     get_id_from_urn,
     get_urn_from_raw_update,
     get_list_posts_sorted_without_promoted,
+    get_update_author_name,
+    get_update_author_profile,
+    get_update_content,
+    get_update_old,
+    get_update_url,
     parse_list_raw_posts,
     parse_list_raw_urns,
     generate_trackingId,
@@ -51,8 +60,8 @@ class Linkedin(object):
 
     def __init__(
         self,
-        username,
-        password,
+        username=None,
+        password=None,
         *,
         authenticate=True,
         refresh_cookies=False,
@@ -100,6 +109,7 @@ class Linkedin(object):
 
         url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
         return self.client.session.post(url, **kwargs)
+
 
     def get_profile_posts(self, public_id=None, urn_id=None, post_count=10):
         """
@@ -243,6 +253,7 @@ class Linkedin(object):
                 f".b0928897b71bd00a5a7291755dcd64f0"
             )
             data = res.json()
+            print(data)
 
             data_clusters = data.get("data", []).get("searchDashClustersByAll", [])
 
@@ -1039,7 +1050,7 @@ class Linkedin(object):
 
         return res.json()
 
-    def send_message(self, message_body, conversation_urn_id=None, recipients=None):
+    def send_message(self, message_body, conversation_urn_id=None, recipients=None, attachments=None):
         """Send a message to a given conversation.
 
         :param message_body: Message text to send
@@ -1048,8 +1059,10 @@ class Linkedin(object):
         :type conversation_urn_id: str, optional
         :param recipients: List of profile urn id's
         :type recipients: list, optional
+        :param attachments: List of file paths to attachments
+        :type attachments: list, optional
 
-        :return: Error state. If True, an error occured.
+        :return: Error state. If True, an error occurred.
         :rtype: boolean
         """
         params = {"action": "create"}
@@ -1075,6 +1088,12 @@ class Linkedin(object):
             "dedupeByClientGeneratedToken": False,
         }
 
+        if attachments:
+            for attachment_path in attachments:
+                attachment = self._upload_attachment(attachment_path)
+                if attachment:
+                    message_event["eventCreate"]["value"]["com.linkedin.voyager.messaging.create.MessageCreate"]["attachments"].append(attachment)        
+
         if conversation_urn_id and not recipients:
             res = self._post(
                 f"/messaging/conversations/{conversation_urn_id}/events",
@@ -1095,6 +1114,50 @@ class Linkedin(object):
             )
 
         return res.status_code != 201
+
+    def _upload_attachment(self, file_path):
+        """Upload an attachment to LinkedIn.
+
+        :param file_path: Path to the file to upload
+        :type file_path: str
+
+        :return: Asset URN of the uploaded attachment
+        :rtype: str
+        """
+        file_size = os.path.getsize(file_path)
+        file_name = os.path.basename(file_path)
+        upload_metadata = {
+            "mediaUploadType": "MESSAGING_FILE_ATTACHMENT",
+            "fileSize": file_size,
+            "filename": file_name,
+        }
+        res = self._post(
+            "/voyagerVideoDashMediaUploadMetadata",
+            params={"action": "upload"},
+            data=json.dumps(upload_metadata),
+        )
+        if res.status_code == 200:
+            upload_data = res.json()["value"]
+            asset_urn = upload_data["urn"]
+            upload_url = upload_data["singleUploadUrl"]
+            
+            with open(file_path, "rb") as file:
+                file_data = file.read()
+            
+            content_type = mimetypes.guess_type(file_path)[0]
+            headers = {"Content-Type": content_type}
+            
+            res = self.client.session.put(upload_url, headers=headers, data=file_data)
+            if res.status_code == 201:
+                attachment = {
+                    "id": asset_urn,
+                    "name": file_name,
+                    "byteSize": file_size,
+                    "mediaType": content_type,
+                }
+                return attachment
+        return None
+
 
     def mark_conversation_as_seen(self, conversation_urn_id):
         """Send 'seen' to a given conversation.
@@ -1266,6 +1329,84 @@ class Linkedin(object):
         )
 
         return res.status_code != 200
+
+    def view_profile(
+        self,
+        target_profile_public_id,
+        target_profile_member_urn_id=None,
+        network_distance=None,
+    ):
+        """View a profile, notifying the user that you "viewed" their profile.
+
+        Provide [target_profile_member_urn_id] and [network_distance] to save 2 network requests and
+        speed up the execution of this function.
+
+        :param target_profile_public_id: public ID of a LinkedIn profile
+        :type target_profile_public_id: str
+        :param network_distance: How many degrees of separation exist e.g. 2
+        :type network_distance: int, optional
+        :param target_profile_member_urn_id: member URN id for target profile
+        :type target_profile_member_urn_id: str, optional
+
+        :return: Error state. True if error occurred
+        :rtype: boolean
+        """
+        me_profile = self.get_user_profile()
+
+        if not target_profile_member_urn_id:
+            profile = self.get_profile(public_id=target_profile_public_id)
+            target_profile_member_urn_id = int(get_id_from_urn(profile["member_urn"]))
+
+        if not network_distance:
+            profile_network_info = self.get_profile_network_info(
+                public_profile_id=target_profile_public_id
+            )
+            network_distance = int(
+                profile_network_info["distance"]
+                .get("value", "DISTANCE_2")
+                .split("_")[1]
+            )
+
+        viewer_privacy_setting = "F"
+        me_member_id = me_profile["plainId"]
+
+        client_application_instance = self.client.metadata["clientApplicationInstance"]
+
+        eventBody = {
+            "viewerPrivacySetting": viewer_privacy_setting,
+            "networkDistance": network_distance,
+            "vieweeMemberUrn": f"urn:li:member:{target_profile_member_urn_id}",
+            "profileTrackingId": self.client.metadata["clientPageInstanceId"],
+            "entityView": {
+                "viewType": "profile-view",
+                "viewerId": me_member_id,
+                "targetId": target_profile_member_urn_id,
+            },
+            "header": {
+                "pageInstance": {
+                    "pageUrn": "urn:li:page:d_flagship3_profile_view_base",
+                    "trackingId": self.client.metadata["clientPageInstanceId"],
+                },
+                "time": int(time()),
+                "version": client_application_instance["version"],
+                "clientApplicationInstance": client_application_instance,
+            },
+            "requestHeader": {
+                "interfaceLocale": "en_US",
+                "pageKey": "d_flagship3_profile_view_base",
+                "path": f"/in/{target_profile_member_urn_id}/",
+                "referer": "https://www.linkedin.com/feed/",
+            },
+        }
+
+        return self.track(
+            eventBody,
+            {
+                "appId": "com.linkedin.flagship3.d_web",
+                "eventName": "ProfileViewEvent",
+                "topicName": "ProfileViewEvent",
+            },
+        )
 
     def get_profile_privacy_settings(self, public_profile_id):
         """Fetch privacy settings for a given LinkedIn profile.

@@ -1,7 +1,8 @@
 import requests
 import logging
 from linkedin_api.cookie_repository import CookieRepository
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
+from requests.cookies import RequestsCookieJar
 import json
 
 logger = logging.getLogger(__name__)
@@ -48,7 +49,7 @@ class Client(object):
     }
 
     def __init__(
-        self, *, debug=False, refresh_cookies=False, proxies={}, cookies_dir=None
+        self, *, debug=False, refresh_cookies=False, proxies={}, cookies_dir: str = ""
     ):
         self.session = requests.session()
         self.session.proxies.update(proxies)
@@ -74,7 +75,7 @@ class Client(object):
         )
         return res.cookies
 
-    def _set_session_cookies(self, cookies):
+    def _set_session_cookies(self, cookies: RequestsCookieJar):
         """
         Set cookies of the current session and save them to a file named as the username.
         """
@@ -87,7 +88,7 @@ class Client(object):
     def cookies(self):
         return self.session.cookies
 
-    def authenticate(self, username, password):
+    def authenticate(self, username: str, password: str):
         if self._use_cookie_cache:
             self.logger.debug("Attempting to use cached cookies")
             cookies = self._cookie_repository.get(username)
@@ -118,9 +119,11 @@ class Client(object):
         clientApplicationInstanceRaw = soup.find(
             "meta", attrs={"name": "applicationInstance"}
         )
-        if clientApplicationInstanceRaw:
-            clientApplicationInstanceRaw = (
-                clientApplicationInstanceRaw.attrs.get("content") or {}
+        if clientApplicationInstanceRaw and isinstance(
+            clientApplicationInstanceRaw, Tag
+        ):
+            clientApplicationInstanceRaw = clientApplicationInstanceRaw.attrs.get(
+                "content", {}
             )
             clientApplicationInstance = json.loads(clientApplicationInstanceRaw)
             self.metadata["clientApplicationInstance"] = clientApplicationInstance
@@ -128,11 +131,11 @@ class Client(object):
         clientPageInstanceIdRaw = soup.find(
             "meta", attrs={"name": "clientPageInstanceId"}
         )
-        if clientPageInstanceIdRaw:
-            clientPageInstanceId = clientPageInstanceIdRaw.attrs.get("content") or {}
+        if clientPageInstanceIdRaw and isinstance(clientPageInstanceIdRaw, Tag):
+            clientPageInstanceId = clientPageInstanceIdRaw.attrs.get("content", {})
             self.metadata["clientPageInstanceId"] = clientPageInstanceId
 
-    def _do_authentication_request(self, username, password):
+    def _do_authentication_request(self, username: str, password: str):
         """
         Authenticate with Linkedin.
 

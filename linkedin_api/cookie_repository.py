@@ -1,19 +1,10 @@
 import os
 import pickle
 import time
-import linkedin_api.settings as settings
+import linkedin_api.utils.settings as settings
+from linkedin_api.utils.errors import LinkedinSessionExpired
 from requests.cookies import RequestsCookieJar
 from typing import Optional
-
-
-class Error(Exception):
-    """Base class for other exceptions"""
-
-    pass
-
-
-class LinkedinSessionExpired(Error):
-    pass
 
 
 class CookieRepository(object):

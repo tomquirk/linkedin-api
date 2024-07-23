@@ -3,18 +3,10 @@ import logging
 from linkedin_api.cookie_repository import CookieRepository
 from bs4 import BeautifulSoup, Tag
 from requests.cookies import RequestsCookieJar
+from linkedin_api.utils.errors import ChallengeException, UnauthorizedException
 import json
 
 logger = logging.getLogger(__name__)
-
-
-class ChallengeException(Exception):
-    pass
-
-
-class UnauthorizedException(Exception):
-    pass
-
 
 class Client(object):
     """

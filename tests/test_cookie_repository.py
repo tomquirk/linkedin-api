@@ -4,10 +4,8 @@ import pytest
 import requests
 from datetime import datetime
 
-from linkedin_api.cookie_repository import (
-    CookieRepository,
-    LinkedinSessionExpired,
-)
+from linkedin_api.cookie_repository import CookieRepository
+from linkedin_api.utils.errors import LinkedinSessionExpired
 
 
 def mock_cookies(date=datetime.strptime("2050-05-04", "%Y-%m-%d")):

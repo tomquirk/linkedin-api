@@ -224,7 +224,7 @@ class Linkedin(object):
             return []
         return data['data']['socialDashCommentsBySocialDetail']['elements']
 
-    def search(self, params, limit=-1, offset=0):
+    def search(self, params: Dict, limit=-1, offset=0) -> List:
         """Perform a LinkedIn search.
 
         :param params: Search parameters (see code)

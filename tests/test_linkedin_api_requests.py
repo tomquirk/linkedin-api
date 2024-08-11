@@ -115,6 +115,17 @@ def test_get_company(linkedin):
     assert company["name"] == "LinkedIn"
 
 
+def test_follow_company(linkedin):
+    company = linkedin.get_company("linkedin")
+    assert company
+    assert company["name"] == "LinkedIn"
+    assert company["followingInfo"]
+    assert "following" in company["followingInfo"]
+    assert "dashFollowingStateUrn" in company["followingInfo"]
+    done = linkedin.follow_company(company["followingInfo"]["dashFollowingStateUrn"], not company["followingInfo"]["following"])
+    assert done is True
+
+
 def test_search(linkedin):
     results = linkedin.search(
         {"keywords": "software"},

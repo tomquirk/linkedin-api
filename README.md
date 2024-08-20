@@ -6,7 +6,7 @@
   <a href="https://bit.ly/3SWnB63" target="_blank">
     <img height="45px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/prospeo.png" alt="Prospeo">
   </a>
-  <a href="https://bit.ly/3X8DQ2p" target="_blank">
+  <a href="https://bit.ly/3SRximo" target="_blank">
     <img height="45px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proxycurl.png" alt="proxycurl">
   </a>
   <a href="https://bit.ly/3Mbksvd" style="margin-right:24px" target="_blank">

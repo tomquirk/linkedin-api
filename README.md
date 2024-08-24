@@ -12,8 +12,11 @@
   <a href="https://bit.ly/3Mbksvd" style="margin-right:24px" target="_blank">
     <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/lix.png" alt="Lix">
   </a>
-    <a href="https://bit.ly/3WOIMrX" target="_blank">
+  <a href="https://bit.ly/3WOIMrX" target="_blank">
     <img  height="70px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/unipile.png" alt="Unipile">
+  </a>
+  <a href="https://bit.ly/4fUyE9J" target="_blank">
+    <img  height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/scrapin.png" alt="Scrapin">
   </a>
 </p>
 
@@ -135,6 +138,28 @@ Test [all the features](https://www.unipile.com/communication-api/messaging-api/
 
 </details>
 
+<h3>
+<a href="https://bit.ly/4fUyE9J">
+ScrapIn
+</a>
+</h3>
+
+Scrape Any Data from LinkedIn, without limit with ScrapIn API (link below on "ScrapIn API").
+
+<details>
+  <summary>Learn more</summary>
+  
+- Real time data (no-cache)
+- Built for SaaS developers
+- GDPR, CCPA, SOC2 compliant
+- Interactive API documentation
+- A highly stable API, backed by over 4 years of experience in data provisioning, with the added reliability of two additional data provider brands owned by the company behind ScrapIn.
+
+Try it for free. [Get your API key now](https://bit.ly/4fUyE9J) 
+
+
+</details>
+
 > End sponsored section
 
 ## Documentation
@@ -149,7 +174,7 @@ This library is not endorsed or supported by LinkedIn. It is an unofficial libra
 
 ## Contributing
 
-We welcome contributions! [Learn how to find endpoints](#find-new-endpoint).
+We welcome contributions! [Learn how to find endpoints](#find-new-endpoints).
 
 ## Development
 

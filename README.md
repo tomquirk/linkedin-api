@@ -144,7 +144,7 @@ ScrapIn
 </a>
 </h3>
 
-Scrape Any Data from LinkedIn, without limit with ScrapIn API (link below on "ScrapIn API").
+Scrape Any Data from LinkedIn, without limit with [ScrapIn API](https://bit.ly/4fUyE9J).
 
 <details>
   <summary>Learn more</summary>

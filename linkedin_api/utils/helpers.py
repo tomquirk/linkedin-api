@@ -234,7 +234,7 @@ def get_list_posts_sorted_without_promoted(
     :rtype: list
     """
     l_posts_sorted_without_promoted = []
-    l_posts[:] = [d for d in l_posts if "Promoted" not in d.get("old", "")]
+    l_posts[:] = [d for d in l_posts if d and "Promoted" not in d.get("old", "")]
     for urn in l_urns:
         for post in l_posts:
             if urn in post["url"]:

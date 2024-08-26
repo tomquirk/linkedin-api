@@ -1,4 +1,9 @@
-def get_id_from_urn(urn):
+import random
+import base64
+from typing import Dict, List
+
+
+def get_id_from_urn(urn: str):
     """
     Return the ID of a given Linkedin URN.
 
@@ -7,7 +12,7 @@ def get_id_from_urn(urn):
     return urn.split(":")[3]
 
 
-def get_urn_from_raw_update(raw_string):
+def get_urn_from_raw_update(raw_string: str) -> str:
     """
     Return the URN of a raw group update
 
@@ -17,7 +22,7 @@ def get_urn_from_raw_update(raw_string):
     return raw_string.split("(")[1].split(",")[0]
 
 
-def get_update_author_name(d_included):
+def get_update_author_name(d_included: Dict) -> str:
     """Parse a dict and returns, if present, the post author name
 
     :param d_included: a dict, as returned by res.json().get("included", {})
@@ -34,7 +39,7 @@ def get_update_author_name(d_included):
         return "None"
 
 
-def get_update_old(d_included):
+def get_update_old(d_included: Dict) -> str:
     """Parse a dict and returns, if present, the post old string
 
     :param d_included: a dict, as returned by res.json().get("included", {})
@@ -51,7 +56,7 @@ def get_update_old(d_included):
         return "None"
 
 
-def get_update_content(d_included, base_url):
+def get_update_content(d_included: Dict, base_url: str) -> str:
     """Parse a dict and returns, if present, the post content
 
     :param d_included: a dict, as returned by res.json().get("included", {})
@@ -78,7 +83,7 @@ def get_update_content(d_included, base_url):
             return "None"
 
 
-def get_update_author_profile(d_included, base_url):
+def get_update_author_profile(d_included: Dict, base_url: str) -> str:
     """Parse a dict and returns, if present, the URL corresponding the profile
 
     :param d_included: a dict, as returned by res.json().get("included", {})
@@ -89,6 +94,7 @@ def get_update_author_profile(d_included, base_url):
     :return: URL with either company or member profile
     :rtype: str
     """
+    urn: str = ""
     try:
         urn = d_included["actor"]["urn"]
     except KeyError:
@@ -101,9 +107,10 @@ def get_update_author_profile(d_included, base_url):
             return f"{base_url}/company/{urn_id}"
         elif "member" in urn:
             return f"{base_url}/in/{urn_id}"
+    return urn
 
 
-def get_update_url(d_included, base_url):
+def get_update_url(d_included: Dict, base_url: str) -> str:
     """Parse a dict and returns, if present, the post URL
 
     :param d_included: a dict, as returned by res.json().get("included", {})
@@ -124,7 +131,9 @@ def get_update_url(d_included, base_url):
         return f"{base_url}/feed/update/{urn}"
 
 
-def append_update_post_field_to_posts_list(d_included, l_posts, post_key, post_value):
+def append_update_post_field_to_posts_list(
+    d_included: Dict, l_posts: List, post_key: str, post_value: str
+) -> List[Dict]:
     """Parse a dict and returns, if present, the desired value. Finally it
     updates an already existing dict in the list or add a new dict to it
 
@@ -152,7 +161,7 @@ def append_update_post_field_to_posts_list(d_included, l_posts, post_key, post_v
     return l_posts
 
 
-def parse_list_raw_urns(l_raw_urns):
+def parse_list_raw_urns(l_raw_urns: List[str]) -> List[str]:
     """Iterates a list containing posts URNS and retrieves list of URNs
 
     :param l_raw_urns: List containing posts URNs
@@ -167,7 +176,7 @@ def parse_list_raw_urns(l_raw_urns):
     return l_urns
 
 
-def parse_list_raw_posts(l_raw_posts, linkedin_base_url):
+def parse_list_raw_posts(l_raw_posts: List[Dict], linkedin_base_url: str) -> List[Dict]:
     """Iterates a unsorted list containing post fields and assemble a
     list of dicts, each one of them contains a post
 
@@ -210,7 +219,9 @@ def parse_list_raw_posts(l_raw_posts, linkedin_base_url):
     return l_posts
 
 
-def get_list_posts_sorted_without_promoted(l_urns, l_posts):
+def get_list_posts_sorted_without_promoted(
+    l_urns: List[str], l_posts: List[Dict]
+) -> List[Dict]:
     """Iterates l_urns and looks for corresponding dicts in l_posts matching 'url' key.
     If found, removes this dict from l_posts and appends it to the returned list of posts
 
@@ -223,11 +234,33 @@ def get_list_posts_sorted_without_promoted(l_urns, l_posts):
     :rtype: list
     """
     l_posts_sorted_without_promoted = []
-    l_posts[:] = [d for d in l_posts if "Promoted" not in d.get("old")]
+    l_posts[:] = [d for d in l_posts if "Promoted" not in d.get("old", "")]
     for urn in l_urns:
         for post in l_posts:
             if urn in post["url"]:
                 l_posts_sorted_without_promoted.append(post)
-                l_posts[:] = [d for d in l_posts if urn not in d.get("url")]
+                l_posts[:] = [d for d in l_posts if urn not in d.get("url", "")]
                 break
     return l_posts_sorted_without_promoted
+
+
+def generate_trackingId_as_charString() -> str:
+    """Generates and returns a random trackingId
+
+    :return: Random trackingId string
+    :rtype: str
+    """
+    random_int_array = [random.randrange(256) for _ in range(16)]
+    rand_byte_array = bytearray(random_int_array)
+    return "".join([chr(i) for i in rand_byte_array])
+
+
+def generate_trackingId() -> str:
+    """Generates and returns a random trackingId
+
+    :return: Random trackingId string
+    :rtype: str
+    """
+    random_int_array = [random.randrange(256) for _ in range(16)]
+    rand_byte_array = bytearray(random_int_array)
+    return str(base64.b64encode(rand_byte_array))[2:-1]

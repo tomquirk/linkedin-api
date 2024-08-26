@@ -1,39 +1,56 @@
-# linkedin_api
+# Linkedin API for Python
 
 <h3 align="center">Sponsors</h3>
 
-<p align="center">
-  <a href="https://iscraper.io/" target="_blank">
-    <img width="150px" src="https://iscraper.io/static/front/images/logo-dark.png" alt="serpsbot">
+<p align="center" style="margin-bottom:24px" >
+  <a href="https://bit.ly/3SWnB63" target="_blank">
+    <img height="45px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/prospeo.png" alt="Prospeo">
+  </a>
+  <a href="https://bit.ly/3SRximo" target="_blank">
+    <img height="45px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proxycurl.png" alt="proxycurl">
+  </a>
+  <a href="https://bit.ly/3Mbksvd" style="margin-right:24px" target="_blank">
+    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/lix.png" alt="Lix">
+  </a>
+  <a href="https://bit.ly/3WOIMrX" target="_blank">
+    <img  height="70px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/unipile.png" alt="Unipile">
+  </a>
+  <a href="https://bit.ly/4fUyE9J" target="_blank">
+    <img  height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/scrapin.png" alt="Scrapin">
   </a>
 </p>
 
-<h5 align="center"><a href="https://github.com/sponsors/tomquirk/sponsorships?sponsor=tomquirk&tier_id=96653&preview=false" target="_blank">Become a sponsor</a></h5>
+<h5 align="center"><a href="https://bit.ly/4cCjbIq" target="_blank">Become a sponsor</a></h5>
 
 ---
 
-👨‍💼 Linkedin API for Python
+Programmatically search profiles, send messages, and find jobs. All with a regular Linkedin user account.
 
-[![Build Status](https://travis-ci.com/tomquirk/linkedin-api.svg?branch=master)](https://travis-ci.com/tomquirk/linkedin-api)
-[![Documentation Status](https://readthedocs.org/projects/linkedin-api/badge/?version=latest)](https://linkedin-api.readthedocs.io/en/latest/?badge=latest)
+No "official" API access required - just use a valid Linkedin account!
 
-> No "official" API access required - just use a valid Linkedin account!
-
-Programmatically send messages, get jobs, search profiles and more, all with a regular Linkedin user account!
-
-Before using this project, please consult the [Terms and Conditions](#terms-and-conditions) and [Legal Notice](#legal).
+**Caution**: This library is not officially supported by LinkedIn. Using it might violate LinkedIn's Terms of Service. Use it at your own risk.
 
 ## Installation
 
-> ⚠️ Python >= 3.6 required
+> Python >= 3.6 required
+
+To install the linkedin_api package, use the following command:
 
 ```bash
-pip3 install linkedin-api~=2.0.0a
+pip install linkedin-api
 ```
 
-> [Why v2.0.0a?](#versioning-note)
+Or, for bleading edge:
 
-### Example usage
+```bash
+pip install git+https://github.com/tomquirk/linkedin-api.git
+```
+
+### Quick Start
+
+> See all methods on the [documentation website](https://linkedin-api.readthedocs.io/).
+
+The following snippet demonstrates a few basic linkedin_api use cases:
 
 ```python
 from linkedin_api import Linkedin
@@ -51,48 +68,136 @@ contact_info = api.get_profile_contact_info('billy-g')
 connections = api.get_profile_connections('1234asc12304')
 ```
 
+## Commercial alternatives
+
+> This is a sponsored section
+
+<h3>
+<a href="https://prospeo.io/api/linkedin-email-finder">
+Prospeo
+</a>
+</h3>
+
+Extract data and find verified emails in real-time with [Prospeo LinkedIn Email Finder API](https://prospeo.io/api/linkedin-email-finder).
+
+<details>
+  <summary>Learn more</summary>
+Submit a LinkedIn profile URL to our API and get:
+
+- Profile data extracted in real-time
+- Company data of the profile
+- Verified work email of the profile
+- Exclusive data points (gender, cleaned country code, time zone...)
+- One do-it-all request
+- Stable API, tested under high load
+
+Try it with 75 profiles. [Get your FREE API key now](https://prospeo.io/api/linkedin-email-finder).
+
+</details>
+
+<h3>
+<a href="https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-&utm_content=tom%20quirk">
+Proxycurl
+</a>
+</h3>
+
+Scrape public LinkedIn profile data at scale with [Proxycurl APIs](https://nubela.co/proxycurl/?utm_campaign=influencer%20marketing&utm_source=github&utm_medium=social&utm_term=-&utm_content=tom%20quirk).
+
+<details>
+  <summary>Learn more</summary>
+  
+- Scraping Public profiles are battle tested in court in HiQ VS LinkedIn case.
+- GDPR, CCPA, SOC2 compliant
+- High rate limit - 300 requests/minute
+- Fast - APIs respond in ~2s
+- Fresh data - 88% of data is scraped real-time, other 12% are not older than 29 days
+- High accuracy
+- Tons of data points returned per profile
+
+Built for developers, by developers.
+
+</details>
+
+<h3>
+<a href="https://www.unipile.com/communication-api/messaging-api/linkedin-api/?utm_campaign=git%20tom%20quirk">
+Unipile
+</a>
+</h3>
+
+Full [LinkedIn API](https://www.unipile.com/communication-api/messaging-api/linkedin-api/?utm_campaign=git%20tom%20quirk): Connect Classic/Sales Navigator/Recruiter, synchronize real-time messaging, enrich data and build outreach sequences…
+
+<details>
+  <summary>Learn more</summary>
+  
+- Easily connect your users in the cloud with our white-label authentication (captcha solving, in-app validation, OTP, 2FA).
+- Real-time webhook for each message received, read status, invitation accepted, and more.
+- Data extraction: get profile, get company, get post, extract search results from Classic + Sales Navigator + Recruiter
+- Outreach sequences: send invitations, InMail, messages, and comment on posts…
+
+Test [all the features](https://www.unipile.com/communication-api/messaging-api/linkedin-api/?utm_campaign=git%20tom%20quirk) with our 7-day free trial.
+
+</details>
+
+<h3>
+<a href="https://bit.ly/4fUyE9J">
+ScrapIn
+</a>
+</h3>
+
+Scrape Any Data from LinkedIn, without limit with [ScrapIn API](https://bit.ly/4fUyE9J).
+
+<details>
+  <summary>Learn more</summary>
+  
+- Real time data (no-cache)
+- Built for SaaS developers
+- GDPR, CCPA, SOC2 compliant
+- Interactive API documentation
+- A highly stable API, backed by over 4 years of experience in data provisioning, with the added reliability of two additional data provider brands owned by the company behind ScrapIn.
+
+Try it for free. [Get your API key now](https://bit.ly/4fUyE9J) 
+
+
+</details>
+
+> End sponsored section
+
 ## Documentation
 
-For a complete reference documentation, see the [documentation website](https://linkedin-api.readthedocs.io/).
+For comprehensive documentation, including available methods and parameters, visit the [documentation](https://linkedin-api.readthedocs.io/).
 
-## Overview
+[Learn more](#how-it-works) about how it works.
 
-This project attempts to provide a simple Python interface for the Linkedin API.
+## Disclaimer
 
-> Do you mean the [legit Linkedin API](https://developer.linkedin.com/)?
+This library is not endorsed or supported by LinkedIn. It is an unofficial library intended for educational purposes and personal use only. By using this library, you agree to not hold the author or contributors responsible for any consequences resulting from its usage.
 
-NO! To retrieve structured data, the [Linkedin Website](https://linkedin.com) uses a service they call **Voyager**. Voyager endpoints give us access to pretty much everything we could want from Linkedin: profiles, companies, connections, messages, etc. - anything that you can see on linkedin.com, we can get from Voyager.
+## Contributing
 
-So specifically, this project aims to provide complete coverage for Voyager.
+We welcome contributions! [Learn how to find endpoints](#find-new-endpoints).
 
-[How do we do it?](#in-depth-overview)
-
-### How to contribute
-
-[Learn how to find endpoints](#to-find-endpoints)
-
-## Development Setup
+## Development
 
 ### Dependencies
 
 - Python 3.7
 - A valid Linkedin user account (don't use your personal account, if possible)
-- `pipenv` (optional)
+- [`pipenv`](https://pipenv.pypa.io/en/latest/) (optional)
 
 ### Development installation
 
 1. Create a `.env` config file. An example is provided in `.env.example` - you include at least all of the settings set there.
-2. Using pipenv...
+2. Install dependencies with `pipenv`:
 
    ```bash
    pipenv install --dev
    pipenv shell
    ```
 
-### Running tests
+### Run tests
 
 ```bash
-python -m pytest tests
+pipenv run test
 ```
 
 ### Troubleshooting
@@ -112,7 +217,19 @@ Please add more as you come across them.
 
 - Mileage may vary when searching general keywords like "software" using the standard `search` method. They've recently added some smarts around search whereby they group results by people, company, jobs etc. if the query is general enough. Try to use an entity-specific search method (i.e. search_people) where possible.
 
-## In-depth overview
+## How it works
+
+This project attempts to provide a simple Python interface for the Linkedin API.
+
+> Do you mean the [legit Linkedin API](https://developer.linkedin.com/)?
+
+NO! To retrieve structured data, the [Linkedin Website](https://linkedin.com) uses a service they call **Voyager**. Voyager endpoints give us access to pretty much everything we could want from Linkedin: profiles, companies, connections, messages, etc. - anything that you can see on linkedin.com, we can get from Voyager.
+
+This project aims to provide complete coverage for Voyager.
+
+[How does it work?](#deep-dive)
+
+### Deep dive
 
 Voyager endpoints look like this:
 
@@ -132,15 +249,15 @@ They are authenticated with a simple cookie, which we send with every request, a
 
 To get a cookie, we POST a given username and password (of a valid Linkedin user account) to `https://www.linkedin.com/uas/authenticate`.
 
-### To find endpoints
+### Find new endpoints
 
 We're looking at the Linkedin website and we spot some data we want. What now?
 
-The most reliable method to find the relevant endpoint is to:
+The following describes the most reliable method to find relevant endpoints:
 
 1. `view source`
-2. `command-f`/search the page for some keyword in the data. This will exist inside of a `<code>` tag.
-3. Scroll down to the **next adjacent element** which will be another `<code>` tag, probably with an `id` that looks something like
+1. `command-f`/search the page for some keyword in the data. This will exist inside of a `<code>` tag.
+1. Scroll down to the **next adjacent element** which will be another `<code>` tag, probably with an `id` that looks something like
 
    ```html
    <code style="display: none" id="datalet-bpr-guid-3900675">
@@ -148,13 +265,13 @@ The most reliable method to find the relevant endpoint is to:
    </code>
    ```
 
-4. The value of `request` is the url! 🤘
+The value of `request` is the url! 🤘
 
 You can also use the `network` tab in you browsers developer tools, but you will encounter mixed results.
 
 ### How Clients query Voyager
 
-Linkedin seems to have developed an internal query language/syntax where Clients (i.e. front-ends like linkedin.com) to specify what data they want (similar to the GraphQL concept). **If anyone knows what this is, I'd love to know!**.
+linkedin.com uses the [Rest-li Protocol](https://linkedin.github.io/rest.li/spec/protocol) for querying data. Rest-li is an internal query language/syntax where clients (like linkedin.com) specify what data they want. It's conceptually similar to the GraphQL.
 
 Here's an example of making a request for an organisation's `name` and `groups` (the Linkedin groups it manages):
 
@@ -162,7 +279,7 @@ Here's an example of making a request for an organisation's `name` and `groups` 
 /voyager/api/organization/companies?decoration=(name,groups*~(entityUrn,largeLogo,groupName,memberCount,websiteUrl,url))&q=universalName&universalName=linkedin
 ```
 
-The "querying" happens in the `decoration` parameter, which looks like
+The "querying" happens in the `decoration` parameter, which looks like the following:
 
 ```text
 (
@@ -171,7 +288,7 @@ The "querying" happens in the `decoration` parameter, which looks like
 )
 ```
 
-So here, we request an organisation name, and a list of groups, where for each group we want `largeLogo`, `groupName`, etc.
+Here, we request an organisation name and a list of groups, where for each group we want `largeLogo`, `groupName`, and so on.
 
 Different endpoints use different parameters (and perhaps even different syntaxes) to specify these queries. Notice that the above query had a parameter `q` whose value was `universalName`; the query was then specified with the `decoration` parameter.
 
@@ -183,28 +300,8 @@ List(v->PEOPLE)
 
 It could be possible to document (and implement a nice interface for) this query language - as we add more endpoints to this project, I'm sure it will become more clear if such a thing would be possible (and if it's worth it).
 
-## Terms and Conditions
+### Release a new version
 
-By using this project, you agree to the following Terms and Conditions. We reserve the right to block any user of this repository that does not meet these conditions.
-
-### Usage
-
-This project may not be used for any of the following:
-
-- Commercial use
-- Spam
-- Storage of any Personally Identifiable Information
-- Personal abuse (i.e. verbal abuse)
-
-## Legal
-
-This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by Linkedin or any of its affiliates or subsidiaries. This is an independent and unofficial API. Use at your own risk.
-
-This project violates Linkedin's User Agreement Section 8.2, and because of this, Linkedin may (and will) temporarily or permanently ban your account. We are not responsible for your account being banned.
-
-## Versioning Note
-
-**Tl;dr:** Don't use anything < v2.0.0a.
-
-Releases/tags for this package have not been kept up to date with changes and thus versions (like v1.0.0) are misleading and do not represent "stability".
-Eventually, v2.0.0 will be the "stable" release.
+1. Bump `__version__` in `__init__.py`
+1. `pipenv run build`
+1. `pipenv run publish`

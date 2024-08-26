@@ -1,16 +1,13 @@
-version: 2
+version: "2"
 
-sphinx:
-  builder: html
-  configuration: docs/source/conf.py
-  fail_on_warning: true
+build:
+  os: "ubuntu-22.04"
+  tools:
+    python: "3.10"
 
 python:
-   version: 3.7
-   install:
-      - method: pip
-        path: .
-        extra_requirements:
-           - requests
-           - beautifulsoup4
-           - lxml
+  install:
+    - requirements: docs/requirements.txt
+
+sphinx:
+  configuration: docs/source/conf.py

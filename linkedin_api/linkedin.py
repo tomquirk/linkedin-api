@@ -1036,6 +1036,25 @@ class Linkedin(object):
 
         return company
 
+    def follow_company(self, following_state_urn, following = True):
+        """Follow a company from its ID.
+
+        :param following_state_urn: LinkedIn State URN to append to URL to follow the company
+        :type following_state_urn: str
+        :param following: The following state to set. True by default for following the company
+        :type following: bool, optional
+
+        :return: Error state. If True, an error occured.
+        :rtype: boolean
+        """
+        payload = json.dumps({"patch": {"$set": {"following": following}}})
+
+        res = self._post(
+            f"/feed/dash/followingStates/{following_state_urn}", data=payload
+        )
+
+        return res.status_code != 200
+
     def get_conversation_details(self, profile_urn_id):
         """Fetch conversation (message thread) details for a given LinkedIn profile.
 

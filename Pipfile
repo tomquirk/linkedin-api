@@ -1,21 +1,23 @@
 [[source]]
-name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
-
-[dev-packages]
-black = "*"
-pytest = "*"
-sphinx = "*"
-sphinx-rtd-theme = "*"
+name = "pypi"
 
 [packages]
 requests = "*"
 beautifulsoup4 = "*"
 lxml = "*"
 
-[requires]
-python_version = "3.7"
+[dev-packages]
+black = "*"
+pytest = "*"
+sphinx = "*"
+sphinx-rtd-theme = "*"
+setuptools = "*"
+wheel = "*"
+twine = "*"
 
-[pipenv]
-allow_prereleases = true
+[scripts]
+test = "python -m pytest tests"
+build = "python setup.py sdist bdist_wheel"
+publish = "python -m twine upload dist/*"

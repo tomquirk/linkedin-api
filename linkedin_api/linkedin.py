@@ -848,16 +848,19 @@ class Linkedin(object):
 
         return profile
 
-    def get_profile_connections(self, urn_id: str) -> List:
-        """Fetch first-degree connections for a given LinkedIn profile.
+    def get_profile_connections(self, urn_id: str, network_depth: Optional[str] = "F") -> List:
+        """Fetch connections for a given LinkedIn profile. Defaults to first-degree connections.
 
         :param urn_id: LinkedIn URN ID for a profile
+        :type urn_id: str
+
+        :param network_depth: degree of connection for a given Linkedin profile. "F" for first, "S" for second, "O" for other.
         :type urn_id: str
 
         :return: List of search results
         :rtype: list
         """
-        return self.search_people(connection_of=urn_id, network_depth="F")
+        return self.search_people(connection_of=urn_id, network_depth=network_depth)
 
     def get_company_updates(
         self,

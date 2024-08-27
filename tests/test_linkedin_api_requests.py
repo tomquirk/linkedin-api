@@ -115,6 +115,17 @@ def test_get_company(linkedin):
     assert company["name"] == "LinkedIn"
 
 
+def test_follow_company(linkedin):
+    company = linkedin.get_company("linkedin")
+    assert company
+    assert company["name"] == "LinkedIn"
+    assert company["followingInfo"]
+    assert "following" in company["followingInfo"]
+    assert "dashFollowingStateUrn" in company["followingInfo"]
+    done = linkedin.follow_company(company["followingInfo"]["dashFollowingStateUrn"], not company["followingInfo"]["following"])
+    assert done is True
+
+
 def test_search(linkedin):
     results = linkedin.search(
         {"keywords": "software"},
@@ -322,3 +333,8 @@ def test_get_feed_posts_posts_keys(linkedin):
 def test_get_feed_posts_urns_contains_no_duplicated(linkedin):
     l_posts, l_urns = linkedin._get_list_feed_posts_and_list_feed_urns(101)
     assert len(set([x for x in l_urns if l_urns.count(x) > 1])) == 0
+
+
+def test_get_social_reactions(linkedin):
+    results = linkedin.get_social_reactions("urn:li:activity:7234094294368665600")
+    assert results

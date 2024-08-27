@@ -1535,6 +1535,52 @@ class Linkedin(object):
 
         return data
 
+    def get_social_reactions(self, urn_id, max_results=None, results=None):
+        """Fetch social reactions for a given LinkedIn post.
+
+        :param urn_id: LinkedIn URN ID for a post
+        :type urn_id: str
+        :param max_results: Maximum results to return
+        :type max_results: int, optional
+
+        :return: List of social reactions
+        :rtype: list
+        """
+
+        if results is None:
+            results = []
+
+        params = {
+            "decorationId": "com.linkedin.voyager.dash.deco.social.ReactionsByTypeWithProfileActions-13",
+            "count": 10,
+            "q": "reactionType",
+            "start": len(results),
+            "threadUrn": urn_id,
+        }
+
+        res = self._fetch("/voyagerSocialDashReactions", params=params)
+
+        data = res.json()
+
+        if (
+            len(data["elements"]) == 0
+            or (max_results is not None and len(results) >= max_results)
+            or (
+                max_results is not None
+                and len(results) / max_results >= Linkedin._MAX_REPEATED_REQUESTS
+            )
+        ):
+            return results
+
+        results.extend(data["elements"])
+        self.logger.debug(f"results grew: {len(results)}")
+
+        return self.get_social_reactions(
+            urn_id=urn_id,
+            results=results,
+            max_results=max_results,
+        )
+
     def get_job_skills(self, job_id: str) -> Dict:
         """Fetch skills associated with a given job.
         :param job_id: LinkedIn job ID

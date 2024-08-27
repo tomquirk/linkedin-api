@@ -122,7 +122,10 @@ def test_follow_company(linkedin):
     assert company["followingInfo"]
     assert "following" in company["followingInfo"]
     assert "dashFollowingStateUrn" in company["followingInfo"]
-    done = linkedin.follow_company(company["followingInfo"]["dashFollowingStateUrn"], not company["followingInfo"]["following"])
+    done = linkedin.follow_company(
+        company["followingInfo"]["dashFollowingStateUrn"],
+        not company["followingInfo"]["following"],
+    )
     assert done is True
 
 
@@ -335,6 +338,13 @@ def test_get_feed_posts_urns_contains_no_duplicated(linkedin):
     assert len(set([x for x in l_urns if l_urns.count(x) > 1])) == 0
 
 
-def test_get_social_reactions(linkedin):
-    results = linkedin.get_social_reactions("urn:li:activity:7234094294368665600")
+def test_get_post_reactions(linkedin):
+    results = linkedin.get_spoast_reactions("urn:li:activity:7234094294368665600")
     assert results
+
+
+def test_react_to_post(linkedin):
+    post = linkedin.get_profile_posts("hubertchristophe", None, 1)[0]
+    post_urn = post["socialDetail"]["urn"].split(":")[-1]
+    res = linkedin.react_to_post(post_urn, "PRAISE")
+    assert res == False

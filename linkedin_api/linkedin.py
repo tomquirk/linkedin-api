@@ -848,7 +848,9 @@ class Linkedin(object):
 
         return profile
 
-    def get_profile_connections(self, urn_id: str, network_depth: Optional[str] = "F") -> List:
+    def get_profile_connections(
+        self, urn_id: str, network_depth: Optional[str] = "F"
+    ) -> List:
         """Fetch connections for a given LinkedIn profile. Defaults to first-degree connections.
 
         :param urn_id: LinkedIn URN ID for a profile
@@ -1036,7 +1038,7 @@ class Linkedin(object):
 
         return company
 
-    def follow_company(self, following_state_urn, following = True):
+    def follow_company(self, following_state_urn, following=True):
         """Follow a company from its ID.
 
         :param following_state_urn: LinkedIn State URN to append to URL to follow the company
@@ -1534,8 +1536,9 @@ class Linkedin(object):
             return {}
 
         return data
+    
 
-    def get_social_reactions(self, urn_id, max_results=None, results=None):
+    def get_post_reactions(self, urn_id, max_results=None, results=None):
         """Fetch social reactions for a given LinkedIn post.
 
         :param urn_id: LinkedIn URN ID for a post
@@ -1545,6 +1548,8 @@ class Linkedin(object):
 
         :return: List of social reactions
         :rtype: list
+
+        # Note: This may need to be updated to GraphQL in the future, see https://github.com/tomquirk/linkedin-api/pull/309
         """
 
         if results is None:
@@ -1580,6 +1585,27 @@ class Linkedin(object):
             results=results,
             max_results=max_results,
         )
+
+    def react_to_post(self, post_urn_id, reaction_type="LIKE"):
+        """React to a given post.
+        :param post_urn_id: LinkedIn Post URN ID
+        :type post_urn_id: str
+        :param reactionType: LinkedIn reaction type, defaults to "LIKE", can be "LIKE", "PRAISE", "APPRECIATION", "EMPATHY", "INTEREST", "ENTERTAINMENT"
+        :type reactionType: str
+
+        :return: Error state. If True, an error occured.
+        :rtype: boolean
+        """
+        params = {"threadUrn": f"urn:li:activity:{post_urn_id}"}
+        payload = {"reactionType": reaction_type}
+
+        res = self._post(
+            "/voyagerSocialDashReactions",
+            params=params,
+            data=json.dumps(payload),
+        )
+
+        return res.status_code != 201
 
     def get_job_skills(self, job_id: str) -> Dict:
         """Fetch skills associated with a given job.

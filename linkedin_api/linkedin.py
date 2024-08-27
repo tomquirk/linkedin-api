@@ -250,7 +250,7 @@ class Linkedin(object):
             )
             data = res.json()
 
-            data_clusters = data.get("data", []).get("searchDashClustersByAll", [])
+            data_clusters = data.get("data", {}).get("searchDashClustersByAll", [])
 
             if not data_clusters:
                 return []
@@ -276,7 +276,7 @@ class Linkedin(object):
                     ):
                         continue
 
-                    e = el.get("item", []).get("entityResult", [])
+                    e = el.get("item", {}).get("entityResult", [])
                     if not e:
                         continue
                     if (

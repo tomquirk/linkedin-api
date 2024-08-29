@@ -174,14 +174,16 @@ Access high-quality, real-time LinkedIn data at scale with [iScraper API](https:
 <details>
 
 <summary>Learn more</summary>
-  - Real-time LinkedIn data scraping with unmatched accuracy
-  - Hosted datasets with powerful Lucene search access
-  - Designed for enterprise and corporate-level applications
-  - Handles millions of scrapes per month, ensuring unlimited scalability
-  - Trusted by top enterprises for mission-critical data needs
-  - Interactive API documentation built on OpenAPI 3 specs for seamless integration
-  - Backed by over 10 years of experience in real-time data provisioning
-  - Lowest price guarantee for high volume use
+
+- Real-time LinkedIn data scraping with unmatched accuracy
+- Hosted datasets with powerful Lucene search access
+- Designed for enterprise and corporate-level applications
+- Handles millions of scrapes per month, ensuring unlimited scalability
+- Trusted by top enterprises for mission-critical data needs
+- Interactive API documentation built on OpenAPI 3 specs for seamless integration
+- Backed by over 10 years of experience in real-time data provisioning
+- Lowest price guarantee for high volume use
+
 Get started [here](https://bit.ly/3AFPGZd).
 </details>
 

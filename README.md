@@ -9,6 +9,9 @@
   <a href="https://bit.ly/3SRximo" target="_blank">
     <img height="45px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proxycurl.png" alt="proxycurl">
   </a>
+  <a href="https://bit.ly/3AFPGZd" target="_blank">
+    <img height="70px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proapis.png" alt="proxycurl">
+  </a>
   <a href="https://bit.ly/3Mbksvd" style="margin-right:24px" target="_blank">
     <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/lix.png" alt="Lix">
   </a>
@@ -71,6 +74,14 @@ connections = api.get_profile_connections('1234asc12304')
 ## Commercial alternatives
 
 > This is a sponsored section
+
+<h3>
+<a href="https://proapis.com">
+iScraper by ProAPIs, Inc.
+</a>
+</h3>
+
+Access high-quality, real-time LinkedIn data at scale with [iScraper API](https://proapis.com), offering unlimited scalability and unmatched accuracy.
 
 <h3>
 <a href="https://prospeo.io/api/linkedin-email-finder">

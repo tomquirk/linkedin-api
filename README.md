@@ -19,7 +19,7 @@
     <img  height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/scrapin.png" alt="Scrapin">
   </a>
   <a href="https://bit.ly/3AFPGZd" target="_blank">
-    <img height="70px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proapis.png" alt="proxycurl">
+    <img height="70px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proapis.png" alt="iScraper by ProAPIs">
   </a>
 </p>
 

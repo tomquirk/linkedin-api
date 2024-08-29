@@ -9,9 +9,6 @@
   <a href="https://bit.ly/3SRximo" target="_blank">
     <img height="45px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proxycurl.png" alt="proxycurl">
   </a>
-  <a href="https://bit.ly/3AFPGZd" target="_blank">
-    <img height="70px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proapis.png" alt="proxycurl">
-  </a>
   <a href="https://bit.ly/3Mbksvd" style="margin-right:24px" target="_blank">
     <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/lix.png" alt="Lix">
   </a>
@@ -20,6 +17,9 @@
   </a>
   <a href="https://bit.ly/4fUyE9J" target="_blank">
     <img  height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/scrapin.png" alt="Scrapin">
+  </a>
+  <a href="https://bit.ly/3AFPGZd" target="_blank">
+    <img height="70px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proapis.png" alt="proxycurl">
   </a>
 </p>
 
@@ -74,14 +74,6 @@ connections = api.get_profile_connections('1234asc12304')
 ## Commercial alternatives
 
 > This is a sponsored section
-
-<h3>
-<a href="https://proapis.com">
-iScraper by ProAPIs, Inc.
-</a>
-</h3>
-
-Access high-quality, real-time LinkedIn data at scale with [iScraper API](https://proapis.com), offering unlimited scalability and unmatched accuracy.
 
 <h3>
 <a href="https://prospeo.io/api/linkedin-email-finder">
@@ -168,6 +160,28 @@ Scrape Any Data from LinkedIn, without limit with [ScrapIn API](https://bit.ly/4
 
 Try it for free. [Get your API key now](https://bit.ly/4fUyE9J) 
 
+
+</details>
+
+<h3>
+<a href="https://proapis.com">
+iScraper by ProAPIs, Inc.
+</a>
+</h3>
+
+Access high-quality, real-time LinkedIn data at scale with [iScraper API](https://proapis.com), offering unlimited scalability and unmatched accuracy.
+
+<details>
+
+<summary>Learn more</summary>
+- Real-time LinkedIn data scraping with unmatched accuracy
+- Hosted datasets with powerful Lucene search access
+- Designed for enterprise and corporate-level applications
+- Handles millions of scrapes per month, ensuring unlimited scalability
+- Trusted by top enterprises for mission-critical data needs
+- Interactive API documentation built on OpenAPI 3 specs for seamless integration
+- Backed by over 10 years of experience in real-time data provisioning
+- Lowest price guarantee for high volume use
 
 </details>
 

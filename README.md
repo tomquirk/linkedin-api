@@ -164,12 +164,12 @@ Try it for free. [Get your API key now](https://bit.ly/4fUyE9J)
 </details>
 
 <h3>
-<a href="https://proapis.com">
+<a href="https://bit.ly/3AFPGZd">
 iScraper by ProAPIs, Inc.
 </a>
 </h3>
 
-Access high-quality, real-time LinkedIn data at scale with [iScraper API](https://proapis.com), offering unlimited scalability and unmatched accuracy.
+Access high-quality, real-time LinkedIn data at scale with [iScraper API](https://bit.ly/3AFPGZd), offering unlimited scalability and unmatched accuracy.
 
 <details>
 
@@ -182,7 +182,7 @@ Access high-quality, real-time LinkedIn data at scale with [iScraper API](https:
 - Interactive API documentation built on OpenAPI 3 specs for seamless integration
 - Backed by over 10 years of experience in real-time data provisioning
 - Lowest price guarantee for high volume use
-
+Get started [here](https://bit.ly/3AFPGZd).
 </details>
 
 > End sponsored section

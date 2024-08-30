@@ -3,6 +3,9 @@
 <h3 align="center">Sponsors</h3>
 
 <p align="center" style="margin-bottom:24px" >
+  <a href="https://bit.ly/3AFPGZd" target="_blank">
+    <img height="70px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proapis.png" alt="iScraper by ProAPIs">
+  </a>
   <a href="https://bit.ly/3SWnB63" target="_blank">
     <img height="45px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/prospeo.png" alt="Prospeo">
   </a>
@@ -158,6 +161,30 @@ Scrape Any Data from LinkedIn, without limit with [ScrapIn API](https://bit.ly/4
 Try it for free. [Get your API key now](https://bit.ly/4fUyE9J) 
 
 
+</details>
+
+<h3>
+<a href="https://bit.ly/3AFPGZd">
+iScraper by ProAPIs, Inc.
+</a>
+</h3>
+
+Access high-quality, real-time LinkedIn data at scale with [iScraper API](https://bit.ly/3AFPGZd), offering unlimited scalability and unmatched accuracy.
+
+<details>
+
+<summary>Learn more</summary>
+
+- Real-time LinkedIn data scraping with unmatched accuracy
+- Hosted datasets with powerful Lucene search access
+- Designed for enterprise and corporate-level applications
+- Handles millions of scrapes per day, ensuring unlimited scalability
+- Trusted by top enterprises for mission-critical data needs
+- Interactive API documentation built on OpenAPI 3 specs for seamless integration
+- Backed by over 10 years of experience in real-time data provisioning
+- Lowest price guarantee for high volume use
+
+Get started [here](https://bit.ly/3AFPGZd).
 </details>
 
 > End sponsored section

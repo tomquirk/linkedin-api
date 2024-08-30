@@ -11,13 +11,16 @@ LinkedIn API for Python
    <h3 align="center">Sponsors</h3>
 
    <p align="center" style="margin-bottom:24px" >
+      <a href="https://bit.ly/3AFPGZd" target="_blank">
+         <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proapis.png" alt="iScraper by ProAPIs">
+      </a>
       <a href="https://bit.ly/3SWnB63" target="_blank">
-         <img height="45px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/prospeo.png" alt="Prospeo">
+         <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/prospeo.png" alt="Prospeo">
       </a>
       <a href="https://bit.ly/3SRximo" target="_blank">
-         <img height="45px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proxycurl.png" alt="proxycurl">
+         <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proxycurl.png" alt="proxycurl">
       </a>
-      <a href="https://bit.ly/3Mbksvd" style="margin-right:24px" target="_blank">
+      <a href="https://bit.ly/3Mbksvd" target="_blank">
          <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/lix.png" alt="Lix">
       </a>
       <a href="https://bit.ly/3WOIMrX" target="_blank">
@@ -32,9 +35,9 @@ LinkedIn API for Python
    <h5 align="center"><a href="https://github.com/sponsors/tomquirk/sponsorships?sponsor=tomquirk&tier_id=96653&preview=false" target="_blank">Become a sponsor</a></h5>
 
 
-Programmatically send messages, get jobs, and search profiles with a regular Linkedin user account.
+Programmatically send messages, get jobs, and search profiles with a regular LinkedIn user account.
 
-No "official" API access required - just use a valid Linkedin account!
+No "official" API access required - just use a valid LinkedIn account!
 
 **Caution**: This library is not officially supported by LinkedIn. Using it might violate LinkedIn's Terms of Service. Use it at your own risk.
 

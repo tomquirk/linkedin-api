@@ -8,7 +8,7 @@ before_install:
 install:
   - pipenv install --dev
 
-# reminder: we can't run tests because Linkedin always throws challenges (likely because of IP)
+# reminder: we can't run tests because LinkedIn always throws challenges (likely because of IP)
 script:
   - black --check .
   - pipenv run python -m pytest tests/test_cookie_repository.py tests/test_linkedin_api.py

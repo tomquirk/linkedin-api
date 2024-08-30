@@ -1,18 +1,18 @@
-# Linkedin API for Python
+# LinkedIn API for Python
 
 <h3 align="center">Sponsors</h3>
 
-<p align="center" style="margin-bottom:24px" >
+<p align="center" dir="auto" >
   <a href="https://bit.ly/3AFPGZd" target="_blank">
-    <img height="70px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proapis.png" alt="iScraper by ProAPIs">
+    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proapis.png" alt="iScraper by ProAPIs">
   </a>
   <a href="https://bit.ly/3SWnB63" target="_blank">
-    <img height="45px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/prospeo.png" alt="Prospeo">
+    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/prospeo.png" alt="Prospeo">
   </a>
   <a href="https://bit.ly/3SRximo" target="_blank">
-    <img height="45px" style="margin-right:24px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proxycurl.png" alt="proxycurl">
+    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proxycurl.png" alt="proxycurl">
   </a>
-  <a href="https://bit.ly/3Mbksvd" style="margin-right:24px" target="_blank">
+  <a href="https://bit.ly/3Mbksvd" target="_blank">
     <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/lix.png" alt="Lix">
   </a>
   <a href="https://bit.ly/3WOIMrX" target="_blank">
@@ -27,9 +27,9 @@
 
 ---
 
-Programmatically search profiles, send messages, and find jobs. All with a regular Linkedin user account.
+Programmatically search profiles, send messages, and find jobs. All with a regular LinkedIn user account.
 
-No "official" API access required - just use a valid Linkedin account!
+No "official" API access required - just use a valid LinkedIn account!
 
 **Caution**: This library is not officially supported by LinkedIn. Using it might violate LinkedIn's Terms of Service. Use it at your own risk.
 
@@ -246,11 +246,11 @@ Please add more as you come across them.
 
 ## How it works
 
-This project attempts to provide a simple Python interface for the Linkedin API.
+This project attempts to provide a simple Python interface for the LinkedIn API.
 
-> Do you mean the [legit Linkedin API](https://developer.linkedin.com/)?
+> Do you mean the [legit LinkedIn API](https://developer.linkedin.com/)?
 
-NO! To retrieve structured data, the [Linkedin Website](https://linkedin.com) uses a service they call **Voyager**. Voyager endpoints give us access to pretty much everything we could want from Linkedin: profiles, companies, connections, messages, etc. - anything that you can see on linkedin.com, we can get from Voyager.
+NO! To retrieve structured data, the [LinkedIn Website](https://linkedin.com) uses a service they call **Voyager**. Voyager endpoints give us access to pretty much everything we could want from LinkedIn: profiles, companies, connections, messages, etc. - anything that you can see on linkedin.com, we can get from Voyager.
 
 This project aims to provide complete coverage for Voyager.
 
@@ -274,11 +274,11 @@ https://www.linkedin.com/voyager/api /identity/profileView/tom-quirk
 
 They are authenticated with a simple cookie, which we send with every request, along with a bunch of headers.
 
-To get a cookie, we POST a given username and password (of a valid Linkedin user account) to `https://www.linkedin.com/uas/authenticate`.
+To get a cookie, we POST a given username and password (of a valid LinkedIn user account) to `https://www.linkedin.com/uas/authenticate`.
 
 ### Find new endpoints
 
-We're looking at the Linkedin website and we spot some data we want. What now?
+We're looking at the LinkedIn website and we spot some data we want. What now?
 
 The following describes the most reliable method to find relevant endpoints:
 

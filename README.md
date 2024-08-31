@@ -1,13 +1,11 @@
-<br>
-
-<div align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logo-dark.png">
-    <img alt="LinkedIn API Logo" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logo-light.png" width="250px">
-  </picture>
-</div>
 
 <br>
+
+
+
+<br>
+
+<h1 align="center" style="border:unset;">LinkedIn API for Python</h1>
 
 <div align="center">
 
@@ -19,13 +17,9 @@
 
 </div>
 
-<br>
-
-<h1 align="center">LinkedIn API for Python</h1>
-
 <div align="center">
 
-Search profiles, send messages, and find jobs in Python.
+Search profiles, send messages, find jobs and more in Python.
 
 No "official" API access required - just use a valid LinkedIn account!
 

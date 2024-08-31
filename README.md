@@ -13,13 +13,11 @@ Search profiles, send messages, find jobs and more in Python. No official API ac
     <a href="#quick-start">Quick Start</a>
     ·
     <a href="#how-it-works">How it works</a>
-    ·
-    <a href="https://bit.ly/4cCjbIq" target="_blank">Become a sponsor</a>
 </p>
 
 </div>
 
-<hr>
+<br>
 
 <h3 align="center">Sponsors</h3>
 
@@ -44,7 +42,7 @@ Search profiles, send messages, find jobs and more in Python. No official API ac
   </a>
 </p>
 
-<h4 align="center"><a href="https://bit.ly/4cCjbIq" target="_blank">Become a sponsor</a></h4>
+<p align="center"><a href="https://bit.ly/4cCjbIq" target="_blank">Become a sponsor</a></p>
 
 <br>
 

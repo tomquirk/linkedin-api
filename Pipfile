@@ -16,6 +16,7 @@ sphinx-rtd-theme = "*"
 setuptools = "*"
 wheel = "*"
 twine = "*"
+typing-extensions = "*"
 
 [scripts]
 lint = "black --check ."

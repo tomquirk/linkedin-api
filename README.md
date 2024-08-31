@@ -35,7 +35,7 @@ No "official" API access required - just use a valid LinkedIn account!
 
 ## Installation
 
-> Python >= 3.6 required
+> Python >= 3.8 required
 
 To install the linkedin_api package, use the following command:
 

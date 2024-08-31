@@ -1,4 +1,29 @@
-# LinkedIn API for Python
+<!-- <br>
+
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logo-dark.png">
+    <img alt="LinkedIn API Logo" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logo-light.png" width="40%">
+  </picture>
+</div> -->
+
+<br>
+
+<h1 align="center">LinkedIn API for Python</h1>
+
+<div align="center">
+
+![Build](https://img.shields.io/github/actions/workflow/status/tomquirk/linkedin-api/ci.yml?label=Build&logo=github)
+[![GitHub Release](https://img.shields.io/github/v/release/tomquirk/linkedin-api?label=Release&logo=python)](https://pypi.org/project/linkedin-api/)
+[![License](https://img.shields.io/badge/License-MIT-blue)](#license)
+[![Documentation](https://img.shields.io/github/v/release/tomquirk/linkedin-api?label=Docs&color=23cc71&logo=readthedocs)](https://linkedin-api.readthedocs.io)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/linkedin-api?label=Downloads)](https://pypi.org/project/linkedin-api/)
+
+</div>
+
+Search profiles, send messages, and find jobs in Python. No "official" API access required - just use a valid LinkedIn account!
+
+---
 
 <h3 align="center">Sponsors</h3>
 
@@ -23,18 +48,16 @@
   </a>
 </p>
 
-<h5 align="center"><a href="https://bit.ly/4cCjbIq" target="_blank">Become a sponsor</a></h5>
+<h4 align="center"><a href="https://bit.ly/4cCjbIq" target="_blank">Become a sponsor</a></h4>
 
 ---
 
-Programmatically search profiles, send messages, and find jobs. All with a regular LinkedIn user account.
-
-No "official" API access required - just use a valid LinkedIn account!
-
-**Caution**: This library is not officially supported by LinkedIn. Using it might violate LinkedIn's Terms of Service. Use it at your own risk.
+> [!IMPORTANT]
+> This library is not officially supported by LinkedIn. Using it might violate LinkedIn's Terms of Service. Use it at your own risk.
 
 ## Installation
 
+> [!NOTE]
 > Python >= 3.8 required
 
 To install the linkedin_api package, use the following command:
@@ -51,6 +74,7 @@ pip install git+https://github.com/tomquirk/linkedin-api.git
 
 ### Quick Start
 
+> [!TIP]
 > See all methods on the [documentation website](https://linkedin-api.readthedocs.io/).
 
 The following snippet demonstrates a few basic linkedin_api use cases:
@@ -70,6 +94,12 @@ contact_info = api.get_profile_contact_info('billy-g')
 # GET 1st degree connections of a given profile
 connections = api.get_profile_connections('1234asc12304')
 ```
+
+## Documentation
+
+For comprehensive documentation, including available methods and parameters, visit the [documentation](https://linkedin-api.readthedocs.io/).
+
+[Learn more](#how-it-works) about how it works.
 
 ## Commercial alternatives
 
@@ -158,8 +188,7 @@ Scrape Any Data from LinkedIn, without limit with [ScrapIn API](https://bit.ly/4
 - Interactive API documentation
 - A highly stable API, backed by over 4 years of experience in data provisioning, with the added reliability of two additional data provider brands owned by the company behind ScrapIn.
 
-Try it for free. [Get your API key now](https://bit.ly/4fUyE9J) 
-
+Try it for free. [Get your API key now](https://bit.ly/4fUyE9J)
 
 </details>
 
@@ -185,15 +214,10 @@ Access high-quality, real-time LinkedIn data at scale with [iScraper API](https:
 - Lowest price guarantee for high volume use
 
 Get started [here](https://bit.ly/3AFPGZd).
+
 </details>
 
 > End sponsored section
-
-## Documentation
-
-For comprehensive documentation, including available methods and parameters, visit the [documentation](https://linkedin-api.readthedocs.io/).
-
-[Learn more](#how-it-works) about how it works.
 
 ## Disclaimer
 

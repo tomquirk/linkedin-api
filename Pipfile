@@ -17,6 +17,7 @@ setuptools = "*"
 wheel = "*"
 twine = "*"
 typing-extensions = "*"
+tomli = "*"
 
 [scripts]
 lint = "black --check ."

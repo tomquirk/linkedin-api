@@ -1536,7 +1536,6 @@ class Linkedin(object):
             return {}
 
         return data
-    
 
     def get_post_reactions(self, urn_id, max_results=None, results=None):
         """Fetch social reactions for a given LinkedIn post.

@@ -1,27 +1,11 @@
 
-<br>
-
-
-
-<br>
-
-<h1 align="center" style="border:unset;">LinkedIn API for Python</h1>
-
 <div align="center">
 
-![Build](https://img.shields.io/github/actions/workflow/status/tomquirk/linkedin-api/ci.yml?label=Build&logo=github)
-[![GitHub Release](https://img.shields.io/github/v/release/tomquirk/linkedin-api?label=Release&logo=python)](https://pypi.org/project/linkedin-api/)
-[![License](https://img.shields.io/badge/License-MIT-blue)](#license)
-[![Documentation](https://img.shields.io/github/v/release/tomquirk/linkedin-api?label=Docs&color=23cc71&logo=readthedocs)](https://linkedin-api.readthedocs.io)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/linkedin-api?label=Downloads)](https://pypi.org/project/linkedin-api/)
+# LinkedIn API for Python
+![Build](https://img.shields.io/github/actions/workflow/status/tomquirk/linkedin-api/ci.yml?label=Build&logo=github) [![GitHub Release](https://img.shields.io/github/v/release/tomquirk/linkedin-api?label=Release&logo=python)](https://pypi.org/project/linkedin-api/) [![License](https://img.shields.io/badge/License-MIT-blue)](#license) [![Documentation](https://img.shields.io/github/v/release/tomquirk/linkedin-api?label=Docs&color=23cc71&logo=readthedocs)](https://linkedin-api.readthedocs.io) [![PyPI Downloads](https://img.shields.io/pypi/dm/linkedin-api?label=Downloads)](https://pypi.org/project/linkedin-api/)
 
-</div>
 
-<div align="center">
-
-Search profiles, send messages, find jobs and more in Python.
-
-No "official" API access required - just use a valid LinkedIn account!
+Search profiles, send messages, find jobs and more in Python. No official API access required.
 
 <p align="center">
     <a href="https://linkedin-api.readthedocs.io">Documentation</a>
@@ -35,7 +19,7 @@ No "official" API access required - just use a valid LinkedIn account!
 
 </div>
 
----
+<hr>
 
 <h3 align="center">Sponsors</h3>
 
@@ -62,7 +46,18 @@ No "official" API access required - just use a valid LinkedIn account!
 
 <h4 align="center"><a href="https://bit.ly/4cCjbIq" target="_blank">Become a sponsor</a></h4>
 
----
+<br>
+
+## Features
+
+- ✅ No official API access required. Just use a valid LinkedIn user account.
+- ✅ Direct HTTP API interface. No Selenium, Pupeteer, or other browser-based scraping methods.
+- ✅ Get and search people, companies, jobs, posts
+- ✅ Send and retrieve messages
+- ✅ Send and accept connection requests
+- ✅ Get and react to posts
+
+And more! [Read the docs](https://linkedin-api.readthedocs.io/en/latest/api.html) for all API methods.
 
 ## Installation
 

@@ -1,15 +1,13 @@
-<!-- <br>
+<br>
 
 <div align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logo-dark.png">
-    <img alt="LinkedIn API Logo" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logo-light.png" width="40%">
+    <img alt="LinkedIn API Logo" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logo-light.png" width="250px">
   </picture>
-</div> -->
+</div>
 
 <br>
-
-<h1 align="center">LinkedIn API for Python</h1>
 
 <div align="center">
 
@@ -21,7 +19,27 @@
 
 </div>
 
-Search profiles, send messages, and find jobs in Python. No "official" API access required - just use a valid LinkedIn account!
+<br>
+
+<h1 align="center">LinkedIn API for Python</h1>
+
+<div align="center">
+
+Search profiles, send messages, and find jobs in Python.
+
+No "official" API access required - just use a valid LinkedIn account!
+
+<p align="center">
+    <a href="https://linkedin-api.readthedocs.io">Documentation</a>
+    ·
+    <a href="#quick-start">Quick Start</a>
+    ·
+    <a href="#how-it-works">How it works</a>
+    ·
+    <a href="https://bit.ly/4cCjbIq" target="_blank">Become a sponsor</a>
+</p>
+
+</div>
 
 ---
 
@@ -52,10 +70,10 @@ Search profiles, send messages, and find jobs in Python. No "official" API acces
 
 ---
 
-> [!IMPORTANT]
-> This library is not officially supported by LinkedIn. Using it might violate LinkedIn's Terms of Service. Use it at your own risk.
-
 ## Installation
+
+> [!IMPORTANT]
+> This library is not officially supported by LinkedIn. Using this might violate LinkedIn's Terms of Service. Use it at your own risk.
 
 > [!NOTE]
 > Python >= 3.8 required

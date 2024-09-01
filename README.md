@@ -221,24 +221,22 @@ Get started [here](https://bit.ly/3AFPGZd).
 
 ### Dependencies
 
-- Python 3.7
 - A valid Linkedin user account (don't use your personal account, if possible)
-- [`pipenv`](https://pipenv.pypa.io/en/latest/) (optional)
+- [`poetry`](https://python-poetry.org/docs/) (optional)
 
 ### Development installation
 
-1. Create a `.env` config file. An example is provided in `.env.example` - you include at least all of the settings set there.
-2. Install dependencies with `pipenv`:
+1. Create a `.env` config file (use `.env.example` as a reference)
+2. Install dependencies with `poetry`:
 
    ```bash
-   pipenv install --dev
-   pipenv shell
+   poetry install
    ```
 
 ### Run tests
 
 ```bash
-pipenv run test
+poetry run test
 ```
 
 ### Troubleshooting
@@ -343,9 +341,10 @@ It could be possible to document (and implement a nice interface for) this query
 
 ### Release a new version
 
-1. Bump `__version__` in `__init__.py`
-1. `pipenv run build`
-1. `pipenv run publish`
+1. Bump `version` in `pyproject.toml`
+1. `poetry build`
+1. `poetry publish`
+1. Draft release notes in GitHub.
 
 ## Disclaimer
 

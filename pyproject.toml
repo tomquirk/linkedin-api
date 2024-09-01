@@ -30,6 +30,7 @@ pytest = "^8.3.2"
 
 [tool.poetry.scripts]
 lint = "black --check ."
+lint_fix = "black ."
 test = "python -m pytest tests"
 test_unit = "python -m pytest tests/unit"
 test_e2e = "python -m pytest tests/e2e"

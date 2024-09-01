@@ -221,13 +221,13 @@ Get started [here](https://bit.ly/3AFPGZd).
 
 ### Dependencies
 
+- [`poetry`](https://python-poetry.org/docs/)
 - A valid Linkedin user account (don't use your personal account, if possible)
-- [`poetry`](https://python-poetry.org/docs/) (optional)
 
 ### Development installation
 
 1. Create a `.env` config file (use `.env.example` as a reference)
-2. Install dependencies with `poetry`:
+2. Install dependencies using `poetry`:
 
    ```bash
    poetry install
@@ -235,8 +235,34 @@ Get started [here](https://bit.ly/3AFPGZd).
 
 ### Run tests
 
+Run all tests:
+
 ```bash
-poetry run test
+poetry run pytest
+```
+
+Run unit tests:
+
+```bash
+poetry run pytest tests/unit
+```
+
+Run E2E tests:
+
+```bash
+poetry run pytest tests/e2e
+```
+
+### Lint
+
+```bash
+poetry run black --check .
+```
+
+Or to fix:
+
+```bash
+poetry run black .
 ```
 
 ### Troubleshooting

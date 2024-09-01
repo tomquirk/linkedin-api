@@ -44,8 +44,8 @@ jobs:
 
     - name: Lint
       run: |
-        python -m poetry run lint
+        python -m poetry run black --check .
 
     - name: Unit tests
       run: |
-        python -m poetry run test_unit
+        python -m poetry run pytest tests/unit

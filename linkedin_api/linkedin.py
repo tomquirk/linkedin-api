@@ -6,9 +6,10 @@ import json
 import logging
 import random
 import uuid
+import re
 from operator import itemgetter
 from time import sleep
-from urllib.parse import urlencode
+from urllib.parse import urlencode, quote
 from typing import Dict, Union, Optional, List, Literal
 
 from linkedin_api.client import Client
@@ -860,6 +861,153 @@ class Linkedin(object):
         :rtype: list
         """
         return self.search_people(connection_of=urn_id, **kwargs)
+
+    def get_profile_experiences(self, urn_id: str) -> List:
+        """Fetch experiences for a given LinkedIn profile.
+
+        NOTE: data structure differs slightly from  Linkedin.get_profile() experiences.
+
+        :param urn_id: LinkedIn URN ID for a profile
+        :type urn_id: str
+
+        :return: List of experiences
+        :rtype: list
+        """
+        profile_urn = f"urn:li:fsd_profile:{urn_id}"
+        variables = ",".join(
+            [f"profileUrn:{quote(profile_urn)}", "sectionType:experience"]
+        )
+        query_id = (
+            "voyagerIdentityDashProfileComponents.7af5d6f176f11583b382e37e5639e69e"
+        )
+
+        res = self._fetch(
+            f"/graphql?variables=({variables})&queryId={query_id}&includeWebMetadata=true",
+            headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+        )
+
+        def parse_item(item, is_group_item=False):
+            """
+            Parse a single experience item.
+
+            Items as part of an 'experience group' (e.g. a company with multiple positions) have different data structures.
+            Therefore, some exceptions need to be made when parsing these items.
+            """
+            component = item["components"]["entityComponent"]
+            title = component["titleV2"]["text"]["text"]
+            subtitle = component["subtitle"]
+            company = subtitle["text"].split(" · ")[0] if subtitle else None
+            employment_type_parts = subtitle["text"].split(" · ") if subtitle else None
+            employment_type = (
+                employment_type_parts[1]
+                if employment_type_parts and len(employment_type_parts) > 1
+                else None
+            )
+            metadata = component.get("metadata", {}) or {}
+            location = metadata.get("text")
+
+            duration_text = component["caption"]["text"]
+            duration_parts = duration_text.split(" · ")
+            date_parts = duration_parts[0].split(" - ")
+
+            duration = (
+                duration_parts[1]
+                if duration_parts and len(duration_parts) > 1
+                else None
+            )
+            start_date = date_parts[0] if date_parts else None
+            end_date = date_parts[1] if date_parts and len(date_parts) > 1 else None
+
+            sub_components = component["subComponents"]
+            fixed_list_component = (
+                sub_components["components"][0]["components"]["fixedListComponent"]
+                if sub_components
+                else None
+            )
+
+            fixed_list_text_component = (
+                fixed_list_component["components"][0]["components"]["textComponent"]
+                if fixed_list_component
+                else None
+            )
+
+            # Extract additional description
+            description = (
+                fixed_list_text_component["text"]["text"]
+                if fixed_list_text_component
+                else None
+            )
+
+            # Create a dictionary with the extracted information
+            parsed_data = {
+                "title": title,
+                "companyName": company if not is_group_item else None,
+                "employmentType": company if is_group_item else employment_type,
+                "locationName": location,
+                "duration": duration,
+                "startDate": start_date,
+                "endDate": end_date,
+                "description": description,
+            }
+
+            return parsed_data
+
+        def get_grouped_item_id(item):
+            sub_components = item["components"]["entityComponent"]["subComponents"]
+            sub_components_components = (
+                sub_components["components"][0]["components"]
+                if sub_components
+                else None
+            )
+            paged_list_component_id = (
+                sub_components_components.get("*pagedListComponent", "")
+                if sub_components_components
+                else None
+            )
+            if (
+                paged_list_component_id
+                and "fsd_profilePositionGroup" in paged_list_component_id
+            ):
+                pattern = r"urn:li:fsd_profilePositionGroup:\([A-z0-9]+,[A-z0-9]+\)"
+                match = re.search(pattern, paged_list_component_id)
+                return match.group(0) if match else None
+
+        data = res.json()
+
+        items = []
+        for item in data["included"][0]["components"]["elements"]:
+            grouped_item_id = get_grouped_item_id(item)
+            # if the item is part of a group (e.g. a company with multiple positions),
+            # find the group items and parse them.
+            if grouped_item_id:
+                component = item["components"]["entityComponent"]
+                # use the company and location from the main item
+                company = component["titleV2"]["text"][
+                    "text"
+                ]
+
+                location = component["caption"]["text"] if component["caption"] else None
+
+                # find the group
+                group = [
+                    i
+                    for i in data["included"]
+                    if grouped_item_id in i.get("entityUrn", "")
+                ]
+                if not group:
+                    continue
+                for group_item in group[0]["components"]["elements"]:
+                    parsed_data = parse_item(group_item, is_group_item=True)
+                    parsed_data["companyName"] = company
+                    parsed_data["locationName"] = location
+                    items.append(parsed_data)
+                continue
+
+            # else, parse the regular item
+            parsed_data = parse_item(item)
+            items.append(parsed_data)
+
+        return items
 
     def get_company_updates(
         self,

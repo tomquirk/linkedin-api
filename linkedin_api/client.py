@@ -62,6 +62,43 @@ class Client(object):
 
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
 
+    @property
+    def cookies(self):
+        return self.session.cookies
+
+    def authenticate(self, username: str, password: str):
+        """
+        Authenticate the client with LinkedIn.
+        """
+        if self._use_cookie_cache:
+            self.logger.debug("Attempting to use cached cookies")
+            cookies = self._cookie_repository.get(username)
+            if not cookies:
+                return
+            
+            self.logger.debug("Using cached cookies")
+            self.set_session_cookies(cookies)
+        else:
+            self.logger.debug("Autheticating with Linkedin")
+            self._do_authentication_request(username, password)
+    
+        self._fetch_metadata()
+
+    def set_session_cookies(self, cookies: RequestsCookieJar):
+        """
+        Set the current session's cookies and relevant HTTP headers.
+        """
+        self.session.cookies = cookies
+        self.session.headers["csrf-token"] = self.session.cookies["JSESSIONID"].strip(
+            '"'
+        )
+
+    def refresh_cookies(self):
+        """
+        Refresh the current session's cookies.
+        """
+        self.set_session_cookies(self._request_session_cookies())
+
     def _request_session_cookies(self):
         """
         Return a new set of session cookies as given by Linkedin.
@@ -74,32 +111,6 @@ class Client(object):
             proxies=self.proxies,
         )
         return res.cookies
-
-    def _set_session_cookies(self, cookies: RequestsCookieJar):
-        """
-        Set cookies of the current session and save them to a file named as the username.
-        """
-        self.session.cookies = cookies
-        self.session.headers["csrf-token"] = self.session.cookies["JSESSIONID"].strip(
-            '"'
-        )
-
-    @property
-    def cookies(self):
-        return self.session.cookies
-
-    def authenticate(self, username: str, password: str):
-        if self._use_cookie_cache:
-            self.logger.debug("Attempting to use cached cookies")
-            cookies = self._cookie_repository.get(username)
-            if cookies:
-                self.logger.debug("Using cached cookies")
-                self._set_session_cookies(cookies)
-                self._fetch_metadata()
-                return
-
-        self._do_authentication_request(username, password)
-        self._fetch_metadata()
 
     def _fetch_metadata(self):
         """
@@ -141,7 +152,7 @@ class Client(object):
 
         Return a session object that is authenticated.
         """
-        self._set_session_cookies(self._request_session_cookies())
+        self.refresh_cookies()
 
         payload = {
             "session_key": username,
@@ -168,5 +179,5 @@ class Client(object):
         if res.status_code != 200:
             raise Exception()
 
-        self._set_session_cookies(res.cookies)
+        self.set_session_cookies(res.cookies)
         self._cookie_repository.save(res.cookies, username)

@@ -982,11 +982,11 @@ class Linkedin(object):
             if grouped_item_id:
                 component = item["components"]["entityComponent"]
                 # use the company and location from the main item
-                company = component["titleV2"]["text"][
-                    "text"
-                ]
+                company = component["titleV2"]["text"]["text"]
 
-                location = component["caption"]["text"] if component["caption"] else None
+                location = (
+                    component["caption"]["text"] if component["caption"] else None
+                )
 
                 # find the group
                 group = [

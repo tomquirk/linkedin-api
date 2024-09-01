@@ -1,9 +1,8 @@
-
 <div align="center">
 
 # LinkedIn API for Python
-![Build](https://img.shields.io/github/actions/workflow/status/tomquirk/linkedin-api/ci.yml?label=Build&logo=github) [![GitHub Release](https://img.shields.io/github/v/release/tomquirk/linkedin-api?label=Release&logo=python)](https://pypi.org/project/linkedin-api/) [![License](https://img.shields.io/badge/License-MIT-blue)](#license) [![Documentation](https://img.shields.io/github/v/release/tomquirk/linkedin-api?label=Docs&color=23cc71&logo=readthedocs)](https://linkedin-api.readthedocs.io) [![PyPI Downloads](https://img.shields.io/pypi/dm/linkedin-api?label=Downloads)](https://pypi.org/project/linkedin-api/)
 
+![Build](https://img.shields.io/github/actions/workflow/status/tomquirk/linkedin-api/ci.yml?label=Build&logo=github) [![Documentation](https://img.shields.io/readthedocs/linkedin-api?label=Docs)](https://linkedin-api.readthedocs.io) [![GitHub Release](https://img.shields.io/github/v/release/tomquirk/linkedin-api?label=PyPI&logo=python)](https://pypi.org/project/linkedin-api/) [![License](https://img.shields.io/badge/License-MIT-blue)](#license)
 
 Search profiles, send messages, find jobs and more in Python. No official API access required.
 
@@ -23,22 +22,22 @@ Search profiles, send messages, find jobs and more in Python. No official API ac
 
 <p align="center" dir="auto" >
   <a href="https://bit.ly/3AFPGZd" target="_blank">
-    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proapis.png" alt="iScraper by ProAPIs">
+    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/main/docs/assets/logos/proapis.png" alt="iScraper by ProAPIs">
   </a>
   <a href="https://bit.ly/3SWnB63" target="_blank">
-    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/prospeo.png" alt="Prospeo">
+    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/main/docs/assets/logos/prospeo.png" alt="Prospeo">
   </a>
   <a href="https://bit.ly/3SRximo" target="_blank">
-    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proxycurl.png" alt="proxycurl">
+    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/main/docs/assets/logos/proxycurl.png" alt="proxycurl">
   </a>
   <a href="https://bit.ly/3Mbksvd" target="_blank">
-    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/lix.png" alt="Lix">
+    <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/main/docs/assets/logos/lix.png" alt="Lix">
   </a>
   <a href="https://bit.ly/3WOIMrX" target="_blank">
-    <img  height="70px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/unipile.png" alt="Unipile">
+    <img  height="70px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/main/docs/assets/logos/unipile.png" alt="Unipile">
   </a>
   <a href="https://bit.ly/4fUyE9J" target="_blank">
-    <img  height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/scrapin.png" alt="Scrapin">
+    <img  height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/main/docs/assets/logos/scrapin.png" alt="Scrapin">
   </a>
 </p>
 
@@ -57,15 +56,15 @@ Search profiles, send messages, find jobs and more in Python. No official API ac
 
 And more! [Read the docs](https://linkedin-api.readthedocs.io/en/latest/api.html) for all API methods.
 
+> [!IMPORTANT]
+> This library is not officially supported by LinkedIn. Using this library might violate LinkedIn's Terms of Service. Use it at your own risk.
+
 ## Installation
 
-> [!IMPORTANT]
-> This library is not officially supported by LinkedIn. Using this might violate LinkedIn's Terms of Service. Use it at your own risk.
-
 > [!NOTE]
-> Python >= 3.8 required
+> Python >= 3.10 required
 
-To install the linkedin_api package, use the following command:
+###
 
 ```bash
 pip install linkedin-api
@@ -80,14 +79,14 @@ pip install git+https://github.com/tomquirk/linkedin-api.git
 ### Quick Start
 
 > [!TIP]
-> See all methods on the [documentation website](https://linkedin-api.readthedocs.io/).
+> See all API methods on the [docs](https://linkedin-api.readthedocs.io/en/latest/api.html).
 
 The following snippet demonstrates a few basic linkedin_api use cases:
 
 ```python
 from linkedin_api import Linkedin
 
-# Authenticate using any Linkedin account credentials
+# Authenticate using any Linkedin user account credentials
 api = Linkedin('reedhoffman@linkedin.com', '*******')
 
 # GET a profile
@@ -99,12 +98,6 @@ contact_info = api.get_profile_contact_info('billy-g')
 # GET 1st degree connections of a given profile
 connections = api.get_profile_connections('1234asc12304')
 ```
-
-## Documentation
-
-For comprehensive documentation, including available methods and parameters, visit the [documentation](https://linkedin-api.readthedocs.io/).
-
-[Learn more](#how-it-works) about how it works.
 
 ## Commercial alternatives
 
@@ -223,14 +216,6 @@ Get started [here](https://bit.ly/3AFPGZd).
 </details>
 
 > End sponsored section
-
-## Disclaimer
-
-This library is not endorsed or supported by LinkedIn. It is an unofficial library intended for educational purposes and personal use only. By using this library, you agree to not hold the author or contributors responsible for any consequences resulting from its usage.
-
-## Contributing
-
-We welcome contributions! [Learn how to find endpoints](#find-new-endpoints).
 
 ## Development
 
@@ -361,3 +346,7 @@ It could be possible to document (and implement a nice interface for) this query
 1. Bump `__version__` in `__init__.py`
 1. `pipenv run build`
 1. `pipenv run publish`
+
+## Disclaimer
+
+This library is not endorsed or supported by LinkedIn. It is an unofficial library intended for educational purposes and personal use only. By using this library, you agree to not hold the author or contributors responsible for any consequences resulting from its usage.

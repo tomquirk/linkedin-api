@@ -12,22 +12,22 @@ LinkedIn API for Python
 
    <p align="center" style="margin-bottom:24px" >
       <a href="https://bit.ly/3AFPGZd" target="_blank">
-         <img height="45px" style="height:45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proapis.png" alt="iScraper by ProAPIs">
+         <img height="45px" style="height:45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/main/docs/assets/logos/proapis.png" alt="iScraper by ProAPIs">
       </a>
       <a href="https://bit.ly/3SWnB63" target="_blank">
-         <img height="45px" style="height:45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/prospeo.png" alt="Prospeo">
+         <img height="45px" style="height:45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/main/docs/assets/logos/prospeo.png" alt="Prospeo">
       </a>
       <a href="https://bit.ly/3SRximo" target="_blank">
-         <img height="45px" style="height:45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/proxycurl.png" alt="proxycurl">
+         <img height="45px" style="height:45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/main/docs/assets/logos/proxycurl.png" alt="proxycurl">
       </a>
       <a href="https://bit.ly/3Mbksvd" target="_blank">
-         <img height="45px" style="height:45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/lix.png" alt="Lix">
+         <img height="45px" style="height:45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/main/docs/assets/logos/lix.png" alt="Lix">
       </a>
       <a href="https://bit.ly/3WOIMrX" target="_blank">
-         <img  height="70px" style="height:70px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/unipile.png" alt="Unipile">
+         <img  height="70px" style="height:70px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/main/docs/assets/logos/unipile.png" alt="Unipile">
       </a>
       <a href="https://bit.ly/4fUyE9J" target="_blank">
-         <img  height="45px" style="height:45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/master/assets/logos/scrapin.png" alt="Scrapin">
+         <img  height="45px" style="height:45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/main/docs/assets/logos/scrapin.png" alt="Scrapin">
       </a>
    </p>
 

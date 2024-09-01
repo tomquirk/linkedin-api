@@ -1,0 +1,39 @@
+[tool.poetry]
+name = "linkedin-api"
+version = "2.2.1"
+description = "LinkedIn API for Python"
+authors = ["Tom Quirk <tom@codalabs.au>"]
+maintainers = ["Tom Quirk <tom@codalabs.au>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/tomquirk/linkedin-api"
+repository = "https://github.com/tomquirk/linkedin-api"
+documentation = "https://linkedin-api.readthedocs.io"
+keywords = ["linkedin", "api", "automation", "scraper", "bot", "data", "sdk", "ai", "integration", "profiles", "network", "company"]
+packages = [{include = "linkedin_api"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+requests = "^2.32.3"
+beautifulsoup4 = "^4.12.3"
+lxml = "^5.3.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.8.0"
+
+[tool.poetry.group.docs.dependencies]
+sphinx = "^8.0.2"
+sphinx-book-theme = "^1.1.3"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.2"
+
+[tool.poetry.scripts]
+lint = "black --check ."
+test = "python -m pytest tests"
+test_unit = "python -m pytest tests/unit"
+test_e2e = "python -m pytest tests/e2e"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

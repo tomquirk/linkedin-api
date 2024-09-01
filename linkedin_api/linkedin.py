@@ -76,9 +76,19 @@ class Linkedin(object):
             if cookies:
                 # If the cookies are expired, the API won't work anymore since
                 # `username` and `password` are not used at all in this case.
-                self.client._set_session_cookies(cookies)
+                self.client.set_session_cookies(cookies)
             else:
                 self.client.authenticate(username, password)
+
+    @property
+    def session_cookies(self):
+        """Return cookies for the client's sessions"""
+        return self.client.session.cookies
+
+    @property
+    def session_headers(self):
+        """Return headers for the client's sessions"""
+        return self.client.session.headers
 
     def _fetch(self, uri: str, evade=default_evade, base_request=False, **kwargs):
         """GET request to Linkedin API"""
@@ -86,14 +96,6 @@ class Linkedin(object):
 
         url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
         return self.client.session.get(url, **kwargs)
-
-    def _cookies(self):
-        """Return client cookies"""
-        return self.client.cookies
-
-    def _headers(self):
-        """Return client cookies"""
-        return self.client.REQUEST_HEADERS
 
     def _post(self, uri: str, evade=default_evade, base_request=False, **kwargs):
         """POST request to Linkedin API"""
@@ -731,6 +733,7 @@ class Linkedin(object):
 
         :param public_id: LinkedIn public ID for a profile
         :type public_id: str, optional
+
         :param urn_id: LinkedIn URN ID for a profile
         :type urn_id: str, optional
 
@@ -743,7 +746,7 @@ class Linkedin(object):
 
         data = res.json()
         if data and "status" in data and data["status"] != 200:
-            self.logger.info("request failed: {}".format(data["message"]))
+            self.logger.error("request failed: {}".format(data["message"]))
             return {}
 
         # massage [profile] data

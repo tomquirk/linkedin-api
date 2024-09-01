@@ -231,6 +231,7 @@ Get started [here](https://bit.ly/3AFPGZd).
 
    ```bash
    poetry install
+   poetry self add poetry-plugin-dotenv
    ```
 
 ### Run tests

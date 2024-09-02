@@ -848,9 +848,7 @@ class Linkedin(object):
 
         return profile
 
-    def get_profile_connections(
-        self, urn_id: str, **kwargs
-    ) -> List:
+    def get_profile_connections(self, urn_id: str, **kwargs) -> List:
         """Fetch connections for a given LinkedIn profile.
 
         See Linkedin.search_people() for additional searching parameters.
@@ -1585,7 +1583,7 @@ class Linkedin(object):
         results.extend(data["elements"])
         self.logger.debug(f"results grew: {len(results)}")
 
-        return self.get_social_reactions(
+        return self.get_post_reactions(
             urn_id=urn_id,
             results=results,
             max_results=max_results,

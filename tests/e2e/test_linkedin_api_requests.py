@@ -348,3 +348,10 @@ def test_react_to_post(linkedin):
     post_urn = post["socialDetail"]["urn"].split(":")[-1]
     res = linkedin.react_to_post(post_urn, "PRAISE")
     assert res == False
+
+
+def test_get_profile_experiences(linkedin):
+    results = linkedin.get_profile_experiences(
+        "ACoAABQ11fIBQLGQbB1V1XPBZJsRwfK5r1U2Rzw"
+    )
+    assert results

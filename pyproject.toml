@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "linkedin-api"
-version = "2.2.1"
+version = "2.3.0"
 description = "LinkedIn API for Python"
 authors = ["Tom Quirk <tom@codalabs.au>"]
 maintainers = ["Tom Quirk <tom@codalabs.au>"]

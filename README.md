@@ -70,7 +70,7 @@ And more! [Read the docs](https://linkedin-api.readthedocs.io/en/latest/api.html
 pip install linkedin-api
 ```
 
-Or, for bleading edge:
+Or, for bleeding edge:
 
 ```bash
 pip install git+https://github.com/tomquirk/linkedin-api.git

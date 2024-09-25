@@ -40,11 +40,10 @@ class Client(object):
 
     # Settings for authenticating with Linkedin
     AUTH_REQUEST_HEADERS = {
-        "X-Li-User-Agent": "LIAuthLibrary:0.0.3 com.linkedin.android:4.1.881 Asus_ASUS_Z01QD:android_9",
-        "User-Agent": "ANDROID OS",
-        "X-User-Language": "en",
-        "X-User-Locale": "en_US",
-        "Accept-Language": "en-us",
+        "Accept": "*/*",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:128.0) Gecko/20100101 Firefox/128.0"
     }
 
     def __init__(

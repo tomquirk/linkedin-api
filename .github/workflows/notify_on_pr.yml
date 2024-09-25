@@ -1,0 +1,21 @@
+name: Notify on New PR
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Notification
+        run: |
+          curl -X POST https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=3f8ffb13-152b-466c-b6b2-db7f0e3c6680 \
+          -H "Content-Type: application/json" \
+          -d '{
+                "msgtype": "text",
+                "text": {
+                    "content": "【PR已创建】\n\n标题：${{ github.event.pull_request.title }}\n\n作者：${{ github.event.pull_request.user.login }}\n\n链接：${{ github.event.pull_request.html_url }}"
+                }
+              }'

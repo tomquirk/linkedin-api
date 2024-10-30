@@ -21,3 +21,4 @@ build
 .DS_Store
 .idea/
 venv/
+.venv/

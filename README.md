@@ -2,7 +2,7 @@
 
 # LinkedIn API for Python
 
-![Build](https://img.shields.io/github/actions/workflow/status/tomquirk/linkedin-api/ci.yml?label=Build&logo=github) [![Documentation](https://img.shields.io/readthedocs/linkedin-api?label=Docs)](https://linkedin-api.readthedocs.io) [![GitHub Release](https://img.shields.io/github/v/release/tomquirk/linkedin-api?label=PyPI&logo=python)](https://pypi.org/project/linkedin-api/) [![Discord](https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=ffffff)](https://discord.gg/BHSWgrdc)
+![Build](https://img.shields.io/github/actions/workflow/status/tomquirk/linkedin-api/ci.yml?label=Build&logo=github) [![Documentation](https://img.shields.io/readthedocs/linkedin-api?label=Docs)](https://linkedin-api.readthedocs.io) [![GitHub Release](https://img.shields.io/github/v/release/tomquirk/linkedin-api?label=PyPI&logo=python)](https://pypi.org/project/linkedin-api/) [![Discord](https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=ffffff)](https://discord.gg/hdd48NEB37)
 
 Search profiles, send messages, find jobs and more in Python. No official API access required.
 

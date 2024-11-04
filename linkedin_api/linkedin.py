@@ -1438,15 +1438,13 @@ class Linkedin(object):
 
         payload = {
             "invitee": {
-                "inviteeUnion": {
-                    "memberProfile": f"urn:li:fsd_profile:{profile_urn}"
-                }
+                "inviteeUnion": {"memberProfile": f"urn:li:fsd_profile:{profile_urn}"}
             },
-            "customMessage": message
+            "customMessage": message,
         }
         params = {
-            'action': 'verifyQuotaAndCreateV2',
-            'decorationId': 'com.linkedin.voyager.dash.deco.relationships.InvitationCreationResultWithInvitee-2',
+            "action": "verifyQuotaAndCreateV2",
+            "decorationId": "com.linkedin.voyager.dash.deco.relationships.InvitationCreationResultWithInvitee-2",
         }
 
         res = self._post(

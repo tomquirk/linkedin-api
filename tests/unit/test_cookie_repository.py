@@ -1,17 +1,15 @@
-import os
-import sys
-import pytest
-import requests
 from datetime import datetime
 
-from linkedin_api.cookie_repository import (
+from requests.cookies import RequestsCookieJar
+
+from linkedin_api.client.cookie_repository import (
     CookieRepository,
     LinkedinSessionExpired,
 )
 
 
 def mock_cookies(date=datetime.strptime("2050-05-04", "%Y-%m-%d")):
-    jar = requests.cookies.RequestsCookieJar()
+    jar = RequestsCookieJar()
     jar.set(
         "JSESSIONID",
         "1234",

@@ -1,7 +1,3 @@
-import os
-import sys
-import pytest
-
 from linkedin_api import Linkedin
 
 

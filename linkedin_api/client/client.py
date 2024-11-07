@@ -1,9 +1,12 @@
+import json
+import random
+from time import sleep
 import requests
 import logging
-from linkedin_api.cookie_repository import CookieRepository
+from linkedin_api.client.cookie_repository import CookieRepository
 from bs4 import BeautifulSoup, Tag
 from requests.cookies import RequestsCookieJar
-import json
+from urllib.parse import urlencode
 
 logger = logging.getLogger(__name__)
 
@@ -14,6 +17,14 @@ class ChallengeException(Exception):
 
 class UnauthorizedException(Exception):
     pass
+
+
+def default_evade():
+    """
+    A catch-all method to try and evade suspension from Linkedin.
+    Currenly, just delays the request by a random (bounded) time
+    """
+    sleep(random.randint(2, 5))  # sleep a random duration to try and evade suspention
 
 
 class Client(object):
@@ -32,11 +43,9 @@ class Client(object):
                 "Chrome/83.0.4103.116 Safari/537.36",
             ]
         ),
-        # "accept": "application/vnd.linkedin.normalized+json+2.1",
         "accept-language": "en-AU,en-GB;q=0.9,en-US;q=0.8,en;q=0.7",
         "x-li-lang": "en_US",
         "x-restli-protocol-version": "2.0.0",
-        # "x-li-track": '{"clientVersion":"1.2.6216","osName":"web","timezoneOffset":10,"deviceFormFactor":"DESKTOP","mpName":"voyager-web"}',
     }
 
     # Settings for authenticating with Linkedin
@@ -57,10 +66,79 @@ class Client(object):
         self.proxies = proxies
         self.logger = logger
         self.metadata = {}
+
         self._use_cookie_cache = not refresh_cookies
         self._cookie_repository = CookieRepository(cookies_dir=cookies_dir)
 
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
+
+    @property
+    def cookies(self) -> RequestsCookieJar:
+        return self.session.cookies
+
+    @cookies.setter
+    def cookies(self, cookies: RequestsCookieJar):
+        """
+        Set cookies of the current session and save them to a file named as the username.
+        """
+        self.session.cookies = cookies
+        self.session.headers["csrf-token"] = self.session.cookies["JSESSIONID"].strip(
+            '"'
+        )
+
+    def get(self, uri: str, evade=default_evade, base_request=False, **kwargs):
+        """GET request to Linkedin API"""
+        evade()
+
+        url = (
+            f"{self.API_BASE_URL if not base_request else self.LINKEDIN_BASE_URL}{uri}"
+        )
+        return self.session.get(url, **kwargs)
+
+    def get_graphql(
+        self,
+        variables: dict,
+        query_id: str | None = None,
+        query: str | None = None,
+        **kwargs,
+    ):
+        """GET request to Linkedin API GraphQL endpoint"""
+
+        variables_list = [f"{k}:{v}" for k, v in variables.items()]
+        variables_payload = f"({','.join(variables_list)})"
+
+        payload = {
+            "variables": variables_payload,
+        }
+        if query_id:
+            payload["queryId"] = query_id
+        if query:
+            payload["query"] = query
+        params = urlencode(payload, safe=":+()")
+
+        return self.get(f"/graphql", params=params, **kwargs)
+
+    def post(self, uri: str, evade=default_evade, base_request=False, **kwargs):
+        """POST request to Linkedin API"""
+        evade()
+
+        url = (
+            f"{self.API_BASE_URL if not base_request else self.LINKEDIN_BASE_URL}{uri}"
+        )
+        return self.session.post(url, **kwargs)
+
+    def authenticate(self, username: str, password: str):
+        if self._use_cookie_cache:
+            self.logger.debug("Attempting to use cached cookies")
+            cookies = self._cookie_repository.get(username)
+            if cookies:
+                self.logger.debug("Using cached cookies")
+                self.cookies = cookies
+                self._fetch_metadata()
+                return
+
+        self._do_authentication_request(username, password)
+        self._fetch_metadata()
 
     def _request_session_cookies(self):
         """
@@ -74,32 +152,6 @@ class Client(object):
             proxies=self.proxies,
         )
         return res.cookies
-
-    def _set_session_cookies(self, cookies: RequestsCookieJar):
-        """
-        Set cookies of the current session and save them to a file named as the username.
-        """
-        self.session.cookies = cookies
-        self.session.headers["csrf-token"] = self.session.cookies["JSESSIONID"].strip(
-            '"'
-        )
-
-    @property
-    def cookies(self):
-        return self.session.cookies
-
-    def authenticate(self, username: str, password: str):
-        if self._use_cookie_cache:
-            self.logger.debug("Attempting to use cached cookies")
-            cookies = self._cookie_repository.get(username)
-            if cookies:
-                self.logger.debug("Using cached cookies")
-                self._set_session_cookies(cookies)
-                self._fetch_metadata()
-                return
-
-        self._do_authentication_request(username, password)
-        self._fetch_metadata()
 
     def _fetch_metadata(self):
         """
@@ -141,7 +193,7 @@ class Client(object):
 
         Return a session object that is authenticated.
         """
-        self._set_session_cookies(self._request_session_cookies())
+        self.cookies = self._request_session_cookies()
 
         payload = {
             "session_key": username,
@@ -161,12 +213,10 @@ class Client(object):
 
         if data and data["login_result"] != "PASS":
             raise ChallengeException(data["login_result"])
-
         if res.status_code == 401:
             raise UnauthorizedException()
-
         if res.status_code != 200:
             raise Exception()
 
-        self._set_session_cookies(res.cookies)
+        self.cookies = res.cookies
         self._cookie_repository.save(res.cookies, username)

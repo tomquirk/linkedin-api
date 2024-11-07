@@ -4,34 +4,24 @@ Provides linkedin api-related code
 
 import json
 import logging
-import random
-import uuid
 import re
+import uuid
 from operator import itemgetter
-from time import sleep
-from urllib.parse import urlencode, quote
-from typing import Dict, Union, Optional, List, Literal
-
+from typing import Dict, List, Literal, Optional, Union
+from urllib.parse import quote, urlencode
 from linkedin_api.client import Client
-from linkedin_api.utils.helpers import (
-    get_id_from_urn,
-    get_urn_from_raw_update,
-    get_list_posts_sorted_without_promoted,
-    parse_list_raw_posts,
-    parse_list_raw_urns,
+from linkedin_api.helpers import (
     generate_trackingId,
     generate_trackingId_as_charString,
+    get_id_from_urn,
+    get_list_posts_sorted_without_promoted,
+    get_urn_from_raw_update,
+    parse_list_raw_posts,
+    parse_list_raw_urns,
 )
+from linkedin_api.services.company import CompanyService
 
 logger = logging.getLogger(__name__)
-
-
-def default_evade():
-    """
-    A catch-all method to try and evade suspension from Linkedin.
-    Currenly, just delays the request by a random (bounded) time
-    """
-    sleep(random.randint(2, 5))  # sleep a random duration to try and evade suspention
 
 
 class Linkedin(object):
@@ -70,38 +60,19 @@ class Linkedin(object):
             proxies=proxies,
             cookies_dir=cookies_dir,
         )
+
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
         self.logger = logger
+
+        self.company = CompanyService(self.client, self.logger)
 
         if authenticate:
             if cookies:
                 # If the cookies are expired, the API won't work anymore since
                 # `username` and `password` are not used at all in this case.
-                self.client._set_session_cookies(cookies)
+                self.client.cookies = cookies
             else:
                 self.client.authenticate(username, password)
-
-    def _fetch(self, uri: str, evade=default_evade, base_request=False, **kwargs):
-        """GET request to Linkedin API"""
-        evade()
-
-        url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
-        return self.client.session.get(url, **kwargs)
-
-    def _cookies(self):
-        """Return client cookies"""
-        return self.client.cookies
-
-    def _headers(self):
-        """Return client cookies"""
-        return self.client.REQUEST_HEADERS
-
-    def _post(self, uri: str, evade=default_evade, base_request=False, **kwargs):
-        """POST request to Linkedin API"""
-        evade()
-
-        url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
-        return self.client.session.post(url, **kwargs)
 
     def get_profile_posts(
         self,
@@ -137,7 +108,7 @@ class Linkedin(object):
             )
         url_params["profileUrn"] = profile_urn
         url = f"/identity/profileUpdatesV2"
-        res = self._fetch(url, params=url_params)
+        res = self.client.get(url, params=url_params)
         data = res.json()
         if data and "status" in data and data["status"] != 200:
             self.logger.info("request failed: {}".format(data["message"]))
@@ -148,7 +119,7 @@ class Linkedin(object):
             pagination_token = data["metadata"]["paginationToken"]
             url_params["start"] = url_params["start"] + self._MAX_POST_COUNT
             url_params["paginationToken"] = pagination_token
-            res = self._fetch(url, params=url_params)
+            res = self.client.get(url, params=url_params)
             data["metadata"] = res.json()["metadata"]
             data["elements"] = data["elements"] + res.json()["elements"]
             data["paging"] = res.json()["paging"]
@@ -173,7 +144,7 @@ class Linkedin(object):
         }
         url = f"/feed/comments"
         url_params["updateId"] = "activity:" + post_urn
-        res = self._fetch(url, params=url_params)
+        res = self.client.get(url, params=url_params)
         data = res.json()
         if data and "status" in data and data["status"] != 200:
             self.logger.info("request failed: {}".format(data["status"]))
@@ -185,7 +156,7 @@ class Linkedin(object):
             url_params["start"] = url_params["start"] + self._MAX_POST_COUNT
             url_params["count"] = self._MAX_POST_COUNT
             url_params["paginationToken"] = pagination_token
-            res = self._fetch(url, params=url_params)
+            res = self.client.get(url, params=url_params)
             if res.json() and "status" in res.json() and res.json()["status"] != 200:
                 self.logger.info("request failed: {}".format(data["status"]))
                 return [{}]
@@ -240,7 +211,7 @@ class Linkedin(object):
                 else ""
             )
 
-            res = self._fetch(
+            res = self.client.get(
                 f"/graphql?variables=(start:{default_params['start']},origin:{default_params['origin']},"
                 f"query:("
                 f"{keywords}"
@@ -627,7 +598,7 @@ class Linkedin(object):
                 "start": len(results) + offset,
             }
 
-            res = self._fetch(
+            res = self.client.get(
                 f"/voyagerJobsDashJobCards?{urlencode(default_params, safe='(),:')}",
                 headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
             )
@@ -668,7 +639,7 @@ class Linkedin(object):
         :return: Contact data
         :rtype: dict
         """
-        res = self._fetch(
+        res = self.client.get(
             f"/identity/profiles/{public_id or urn_id}/profileContactInfo"
         )
         data = res.json()
@@ -714,7 +685,7 @@ class Linkedin(object):
         :rtype: list
         """
         params = {"count": 100, "start": 0}
-        res = self._fetch(
+        res = self.client.get(
             f"/identity/profiles/{public_id or urn_id}/skills", params=params
         )
         data = res.json()
@@ -740,7 +711,7 @@ class Linkedin(object):
         """
         # NOTE this still works for now, but will probably eventually have to be converted to
         # https://www.linkedin.com/voyager/api/identity/profiles/ACoAAAKT9JQBsH7LwKaE9Myay9WcX8OVGuDq9Uw
-        res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")
+        res = self.client.get(f"/identity/profiles/{public_id or urn_id}/profileView")
 
         data = res.json()
         if data and "status" in data and data["status"] != 200:
@@ -881,7 +852,7 @@ class Linkedin(object):
             "voyagerIdentityDashProfileComponents.7af5d6f176f11583b382e37e5639e69e"
         )
 
-        res = self._fetch(
+        res = self.client.get(
             f"/graphql?variables=({variables})&queryId={query_id}&includeWebMetadata=true",
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
         )
@@ -1038,7 +1009,7 @@ class Linkedin(object):
             "start": len(results),
         }
 
-        res = self._fetch(f"/feed/updates", params=params)
+        res = self.client.get(f"/feed/updates", params=params)
 
         data = res.json()
 
@@ -1087,7 +1058,7 @@ class Linkedin(object):
             "start": len(results),
         }
 
-        res = self._fetch(f"/feed/updates", params=params)
+        res = self.client.get(f"/feed/updates", params=params)
 
         data = res.json()
 
@@ -1117,7 +1088,7 @@ class Linkedin(object):
         :return: Profile view data
         :rtype: dict
         """
-        res = self._fetch(f"/identity/wvmpCards")
+        res = self.client.get(f"/identity/wvmpCards")
 
         data = res.json()
 
@@ -1137,6 +1108,9 @@ class Linkedin(object):
 
         :return: School data
         :rtype: dict
+
+        .. deprecated:: 3.1
+           Use :py:func:`company.get_company` instead.
         """
         params = {
             "decorationId": "com.linkedin.voyager.deco.organization.web.WebFullCompanyMain-12",
@@ -1144,7 +1118,7 @@ class Linkedin(object):
             "universalName": public_id,
         }
 
-        res = self._fetch(f"/organization/companies?{urlencode(params)}")
+        res = self.client.get(f"/organization/companies?{urlencode(params)}")
 
         data = res.json()
 
@@ -1164,6 +1138,9 @@ class Linkedin(object):
 
         :return: Company data
         :rtype: dict
+
+        .. deprecated:: 3.1
+           Use :py:func:`company.get_company` instead.
         """
         params = {
             "decorationId": "com.linkedin.voyager.deco.organization.web.WebFullCompanyMain-12",
@@ -1171,7 +1148,7 @@ class Linkedin(object):
             "universalName": public_id,
         }
 
-        res = self._fetch(f"/organization/companies", params=params)
+        res = self.client.get(f"/organization/companies", params=params)
 
         data = res.json()
 
@@ -1196,7 +1173,7 @@ class Linkedin(object):
         """
         payload = json.dumps({"patch": {"$set": {"following": following}}})
 
-        res = self._post(
+        res = self.client.post(
             f"/feed/dash/followingStates/{following_state_urn}", data=payload
         )
 
@@ -1213,7 +1190,7 @@ class Linkedin(object):
         """
         # passing `params` doesn't work properly, think it's to do with List().
         # Might be a bug in `requests`?
-        res = self._fetch(
+        res = self.client.get(
             f"/messaging/conversations?\
             keyVersion=LEGACY_INBOX&q=participants&recipients=List({profile_urn_id})"
         )
@@ -1236,7 +1213,7 @@ class Linkedin(object):
         """
         params = {"keyVersion": "LEGACY_INBOX"}
 
-        res = self._fetch(f"/messaging/conversations", params=params)
+        res = self.client.get(f"/messaging/conversations", params=params)
 
         return res.json()
 
@@ -1249,7 +1226,7 @@ class Linkedin(object):
         :return: Conversation data
         :rtype: dict
         """
-        res = self._fetch(f"/messaging/conversations/{conversation_urn_id}/events")
+        res = self.client.get(f"/messaging/conversations/{conversation_urn_id}/events")
 
         return res.json()
 
@@ -1295,7 +1272,7 @@ class Linkedin(object):
         }
 
         if conversation_urn_id and not recipients:
-            res = self._post(
+            res = self.client.post(
                 f"/messaging/conversations/{conversation_urn_id}/events",
                 params=params,
                 data=json.dumps(message_event),
@@ -1307,7 +1284,7 @@ class Linkedin(object):
                 "keyVersion": "LEGACY_INBOX",
                 "conversationCreate": message_event,
             }
-            res = self._post(
+            res = self.client.post(
                 f"/messaging/conversations",
                 params=params,
                 data=json.dumps(payload),
@@ -1326,7 +1303,7 @@ class Linkedin(object):
         """
         payload = json.dumps({"patch": {"$set": {"read": True}}})
 
-        res = self._post(
+        res = self.client.post(
             f"/messaging/conversations/{conversation_urn_id}", data=payload
         )
 
@@ -1340,7 +1317,7 @@ class Linkedin(object):
         """
         me_profile = self.client.metadata.get("me", {})
         if not self.client.metadata.get("me") or not use_cache:
-            res = self._fetch(f"/me")
+            res = self.client.get(f"/me")
             me_profile = res.json()
             # cache profile
             self.client.metadata["me"] = me_profile
@@ -1365,7 +1342,7 @@ class Linkedin(object):
             "q": "receivedInvitation",
         }
 
-        res = self._fetch(
+        res = self.client.get(
             "/relationships/invitationViews",
             params=params,
         )
@@ -1401,7 +1378,7 @@ class Linkedin(object):
             }
         )
 
-        res = self._post(
+        res = self.client.post(
             f"/relationships/invitations/{invitation_id}",
             params=params,
             data=payload,
@@ -1448,7 +1425,7 @@ class Linkedin(object):
                 }
             },
         }
-        res = self._post(
+        res = self.client.post(
             "/growth/normInvitations",
             data=json.dumps(payload),
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
@@ -1465,7 +1442,7 @@ class Linkedin(object):
         :return: Error state. True if error occurred
         :rtype: boolean
         """
-        res = self._post(
+        res = self.client.post(
             f"/identity/profiles/{public_profile_id}/profileActions?action=disconnect",
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
         )
@@ -1474,7 +1451,7 @@ class Linkedin(object):
 
     def track(self, eventBody, eventInfo):
         payload = {"eventBody": eventBody, "eventInfo": eventInfo}
-        res = self._post(
+        res = self.client.post(
             "/li/track",
             base_request=True,
             headers={
@@ -1495,7 +1472,7 @@ class Linkedin(object):
         :return: Privacy settings data
         :rtype: dict
         """
-        res = self._fetch(
+        res = self.client.get(
             f"/identity/profiles/{public_profile_id}/privacySettings",
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
         )
@@ -1514,7 +1491,7 @@ class Linkedin(object):
         :return: Badges data
         :rtype: dict
         """
-        res = self._fetch(
+        res = self.client.get(
             f"/identity/profiles/{public_profile_id}/memberBadges",
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
         )
@@ -1540,7 +1517,7 @@ class Linkedin(object):
         :return: Network data
         :rtype: dict
         """
-        res = self._fetch(
+        res = self.client.get(
             f"/identity/profiles/{public_profile_id}/networkinfo",
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
         )
@@ -1560,7 +1537,7 @@ class Linkedin(object):
         :rtype: boolean
         """
         payload = {"urn": f"urn:li:fs_followingInfo:{urn_id}"}
-        res = self._post(
+        res = self.client.post(
             "/feed/follows?action=unfollowByEntityUrn",
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
             data=json.dumps(payload),
@@ -1611,7 +1588,7 @@ class Linkedin(object):
                 "q": "chronFeed",
                 "start": len(l_urns) + offset,
             }
-            res = self._fetch(
+            res = self.client.get(
                 f"/feed/updatesV2",
                 params=params,
                 headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
@@ -1679,7 +1656,7 @@ class Linkedin(object):
             "decorationId": "com.linkedin.voyager.deco.jobs.web.shared.WebLightJobPosting-23",
         }
 
-        res = self._fetch(f"/jobs/jobPostings/{job_id}", params=params)
+        res = self.client.get(f"/jobs/jobPostings/{job_id}", params=params)
 
         data = res.json()
 
@@ -1714,7 +1691,7 @@ class Linkedin(object):
             "threadUrn": urn_id,
         }
 
-        res = self._fetch("/voyagerSocialDashReactions", params=params)
+        res = self.client.get("/voyagerSocialDashReactions", params=params)
 
         data = res.json()
 
@@ -1750,7 +1727,7 @@ class Linkedin(object):
         params = {"threadUrn": f"urn:li:activity:{post_urn_id}"}
         payload = {"reactionType": reaction_type}
 
-        res = self._post(
+        res = self.client.post(
             "/voyagerSocialDashReactions",
             params=params,
             data=json.dumps(payload),
@@ -1770,7 +1747,7 @@ class Linkedin(object):
             "decorationId": "com.linkedin.voyager.dash.deco.assessments.FullJobSkillMatchInsight-17",
         }
         # https://www.linkedin.com/voyager/api/voyagerAssessmentsDashJobSkillMatchInsight/urn%3Ali%3Afsd_jobSkillMatchInsight%3A3894460323?decorationId=com.linkedin.voyager.dash.deco.assessments.FullJobSkillMatchInsight-17
-        res = self._fetch(
+        res = self.client.get(
             f"/voyagerAssessmentsDashJobSkillMatchInsight/urn%3Ali%3Afsd_jobSkillMatchInsight%3A{job_id}",
             params=params,
         )

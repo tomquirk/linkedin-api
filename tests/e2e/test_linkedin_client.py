@@ -2,7 +2,7 @@ import pytest
 import json
 import os
 import sys
-from linkedin_api.client import Client
+from linkedin_api.client.client import Client
 
 TEST_LINKEDIN_USERNAME = os.getenv("LINKEDIN_USERNAME")
 TEST_LINKEDIN_PASSWORD = os.getenv("LINKEDIN_PASSWORD")

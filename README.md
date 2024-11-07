@@ -370,6 +370,7 @@ It could be possible to document (and implement a nice interface for) this query
 
 1. Bump `version` in `pyproject.toml`
 1. `poetry build`
+1. `poetry publish -r test-pypi`
 1. `poetry publish`
 1. Draft release notes in GitHub.
 

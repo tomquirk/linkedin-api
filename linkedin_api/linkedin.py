@@ -1436,25 +1436,29 @@ class Linkedin(object):
             # We extract the last part of the string
             profile_urn = profile_urn_string.split(":")[-1]
 
-        trackingId = generate_trackingId()
         payload = {
-            "trackingId": trackingId,
-            "message": message,
-            "invitations": [],
-            "excludeInvitations": [],
             "invitee": {
-                "com.linkedin.voyager.growth.invitation.InviteeProfile": {
-                    "profileId": profile_urn
-                }
+                "inviteeUnion": {"memberProfile": f"urn:li:fsd_profile:{profile_urn}"}
             },
+            "customMessage": message,
         }
+        params = {
+            "action": "verifyQuotaAndCreateV2",
+            "decorationId": "com.linkedin.voyager.dash.deco.relationships.InvitationCreationResultWithInvitee-2",
+        }
+
         res = self._post(
-            "/growth/normInvitations",
+            "/voyagerRelationshipsDashMemberRelationships",
             data=json.dumps(payload),
             headers={"accept": "application/vnd.linkedin.normalized+json+2.1"},
+            params=params,
         )
-
-        return res.status_code != 201
+        # Check for connection_response.status_code == 400 and connection_response.json().get('data', {}).get('code') == 'CANT_RESEND_YET'
+        # If above condition is True then request has been already sent, (might be pending or already connected)
+        if res.ok:
+            return False
+        else:
+            return True
 
     def remove_connection(self, public_profile_id: str):
         """Remove a given profile as a connection.

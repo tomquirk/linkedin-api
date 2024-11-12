@@ -20,6 +20,12 @@ Search profiles, send messages, find jobs and more in Python. No official API ac
 
 <h3 align="center">Sponsors</h3>
 
+<p align="center">
+<a href="https://bit.ly/4fUyE9J" target="_blank">
+    <img width="450px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/main/docs/assets/logos/scrapin-banner.png" alt="Scrapin">
+  </a>
+</p>
+
 <p align="center" dir="auto" >
   <a href="https://bit.ly/3AFPGZd" target="_blank">
     <img height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/main/docs/assets/logos/proapis.png" alt="iScraper by ProAPIs">
@@ -35,9 +41,6 @@ Search profiles, send messages, find jobs and more in Python. No official API ac
   </a>
   <a href="https://bit.ly/3WOIMrX" target="_blank">
     <img  height="70px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/main/docs/assets/logos/unipile.png" alt="Unipile">
-  </a>
-  <a href="https://bit.ly/4fUyE9J" target="_blank">
-    <img  height="45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/main/docs/assets/logos/scrapin.png" alt="Scrapin">
   </a>
 </p>
 

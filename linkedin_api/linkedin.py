@@ -142,7 +142,7 @@ class Linkedin(object):
         if data and "status" in data and data["status"] != 200:
             self.logger.info("request failed: {}".format(data["message"]))
             return [{}]
-        while data and data["metadata"]["paginationToken"] != "":
+        while data and "paginationToken" in data["metadata"] and data["metadata"]["paginationToken"] != "":
             if len(data["elements"]) >= post_count:
                 break
             pagination_token = data["metadata"]["paginationToken"]
@@ -178,7 +178,7 @@ class Linkedin(object):
         if data and "status" in data and data["status"] != 200:
             self.logger.info("request failed: {}".format(data["status"]))
             return [{}]
-        while data and data["metadata"]["paginationToken"] != "":
+        while data and "paginationToken" in data["metadata"] and data["metadata"]["paginationToken"] != "":
             if len(data["elements"]) >= comment_count:
                 break
             pagination_token = data["metadata"]["paginationToken"]

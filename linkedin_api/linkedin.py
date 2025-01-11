@@ -142,7 +142,11 @@ class Linkedin(object):
         if data and "status" in data and data["status"] != 200:
             self.logger.info("request failed: {}".format(data["message"]))
             return [{}]
-        while data and "paginationToken" in data["metadata"] and data["metadata"]["paginationToken"] != "":
+        while (
+            data
+            and "paginationToken" in data["metadata"]
+            and data["metadata"]["paginationToken"] != ""
+        ):
             if len(data["elements"]) >= post_count:
                 break
             pagination_token = data["metadata"]["paginationToken"]
@@ -178,7 +182,11 @@ class Linkedin(object):
         if data and "status" in data and data["status"] != 200:
             self.logger.info("request failed: {}".format(data["status"]))
             return [{}]
-        while data and "paginationToken" in data["metadata"] and data["metadata"]["paginationToken"] != "":
+        while (
+            data
+            and "paginationToken" in data["metadata"]
+            and data["metadata"]["paginationToken"] != ""
+        ):
             if len(data["elements"]) >= comment_count:
                 break
             pagination_token = data["metadata"]["paginationToken"]
@@ -1139,7 +1147,9 @@ class Linkedin(object):
             "com.linkedin.voyager.identity.me.wvmpOverview.WvmpViewersCard"
         ]["insightCards"][0]["value"][
             "com.linkedin.voyager.identity.me.wvmpOverview.WvmpSummaryInsightCard"
-        ]["numViews"]
+        ][
+            "numViews"
+        ]
 
     def get_school(self, public_id):
         """Fetch data about a given LinkedIn school.

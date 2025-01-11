@@ -126,7 +126,7 @@ def test_follow_company(linkedin):
         company["followingInfo"]["dashFollowingStateUrn"],
         not company["followingInfo"]["following"],
     )
-    
+
     assert not err
 
 

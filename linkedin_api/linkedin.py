@@ -968,14 +968,28 @@ class Linkedin(object):
                 paged_list_component_id
                 and "fsd_profilePositionGroup" in paged_list_component_id
             ):
-                pattern = r"urn:li:fsd_profilePositionGroup:\([A-z0-9]+,[A-z0-9]+\)"
+                pattern = r"urn:li:fsd_profilePositionGroup:\([^)]+\)"
                 match = re.search(pattern, paged_list_component_id)
                 return match.group(0) if match else None
 
         data = res.json()
 
         items = []
-        for item in data["included"][0]["components"]["elements"]:
+
+        # Find the index with the most items
+        # When dealing with grouped experiences (e.g. multiple positions at the same company),
+        # the API response will contain multiple indexes in data["included"].
+        # The index with the most elements will contain all experiences, both grouped and individual,
+        # while other indexes may only contain partial data for the grouped experiences.
+        # Therefore, we want to use the index with the most items to ensure we process all experiences.
+        max_items_index = max(
+            range(len(data["included"])),
+            key=lambda i: len(
+                data["included"][i].get("components", {}).get("elements", [])
+            ),
+        )
+
+        for item in data["included"][max_items_index]["components"]["elements"]:
             grouped_item_id = get_grouped_item_id(item)
             # if the item is part of a group (e.g. a company with multiple positions),
             # find the group items and parse them.
@@ -1125,9 +1139,7 @@ class Linkedin(object):
             "com.linkedin.voyager.identity.me.wvmpOverview.WvmpViewersCard"
         ]["insightCards"][0]["value"][
             "com.linkedin.voyager.identity.me.wvmpOverview.WvmpSummaryInsightCard"
-        ][
-            "numViews"
-        ]
+        ]["numViews"]
 
     def get_school(self, public_id):
         """Fetch data about a given LinkedIn school.

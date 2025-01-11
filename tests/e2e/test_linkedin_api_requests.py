@@ -122,11 +122,12 @@ def test_follow_company(linkedin):
     assert company["followingInfo"]
     assert "following" in company["followingInfo"]
     assert "dashFollowingStateUrn" in company["followingInfo"]
-    done = linkedin.follow_company(
+    err = linkedin.follow_company(
         company["followingInfo"]["dashFollowingStateUrn"],
         not company["followingInfo"]["following"],
     )
-    assert done is True
+    
+    assert not err
 
 
 def test_search(linkedin):

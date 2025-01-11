@@ -1212,7 +1212,7 @@ class Linkedin(object):
             f"/feed/dash/followingStates/{following_state_urn}", data=payload
         )
 
-        return res.status_code != 200
+        return res.status_code != 201
 
     def get_conversation_details(self, profile_urn_id):
         """Fetch conversation (message thread) details for a given LinkedIn profile.

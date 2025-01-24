@@ -84,6 +84,26 @@ class Client(object):
             '"'
         )
 
+    def authenticate_with_cookies(self, jsessionid: str, li_at: str):
+        """
+        Authenticate using JSESSIONID and li_at cookies taken from a browser.
+        """
+
+        self.logger.debug("Attempting authentication using provided cookies.")
+
+        # Create a cookie jar with the provided cookies
+        cookies = RequestsCookieJar()
+        cookies.set("JSESSIONID", jsessionid, domain=".linkedin.com")
+        cookies.set("li_at", li_at, domain=".linkedin.com")
+
+        try:
+            self._set_session_cookies(cookies)
+            self._fetch_metadata()  # Validate cookies and fetch metadata
+            self.logger.info("Successfully authenticated using cookies.")
+        except Exception as e:
+            self.logger.error(f"Cookie-based authentication failed: {str(e)}")
+            raise UnauthorizedException("Failed to authenticate using provided cookies.")
+        
     @property
     def cookies(self):
         return self.session.cookies
@@ -97,8 +117,18 @@ class Client(object):
                 self._set_session_cookies(cookies)
                 self._fetch_metadata()
                 return
-
-        self._do_authentication_request(username, password)
+        
+        try:
+            self._do_authentication_request(username, password)
+        except ChallengeException:
+            self.logger.warning("ChallengeException encountered during authentication.")
+            jsessionid = input("Enter your JSESSIONID cookie from the browser: ")
+            li_at = input("Enter your li_at cookie from the browser: ")
+            try:
+                self.authenticate_with_cookies(jsessionid, li_at)
+            except UnauthorizedException:
+                self.logger.error("Fallback authentication using cookies failed.")
+                return
         self._fetch_metadata()
 
     def _fetch_metadata(self):

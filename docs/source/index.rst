@@ -11,6 +11,12 @@ LinkedIn API for Python
    <h3 align="center">Sponsors</h3>
 
    <p align="center" style="margin-bottom:24px" >
+   <p align="center">
+
+      <a href="https://bit.ly/4fUyE9J" target="_blank">
+         <img width="450px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/main/docs/assets/logos/scrapin-banner.png" alt="Scrapin">
+      </a>
+
       <a href="https://bit.ly/3AFPGZd" target="_blank">
          <img height="45px" style="height:45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/main/docs/assets/logos/proapis.png" alt="iScraper by ProAPIs">
       </a>
@@ -25,9 +31,6 @@ LinkedIn API for Python
       </a>
       <a href="https://bit.ly/3WOIMrX" target="_blank">
          <img  height="70px" style="height:70px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/main/docs/assets/logos/unipile.png" alt="Unipile">
-      </a>
-      <a href="https://bit.ly/4fUyE9J" target="_blank">
-         <img  height="45px" style="height:45px" src="https://raw.githubusercontent.com/tomquirk/linkedin-api/main/docs/assets/logos/scrapin.png" alt="Scrapin">
       </a>
    </p>
 

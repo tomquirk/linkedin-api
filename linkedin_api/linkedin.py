@@ -310,6 +310,86 @@ class Linkedin(object):
 
         return results
 
+    def search_with_filters(self, params: Dict, limit=-1, offset=0) -> List:
+        """
+        Perform a LinkedIn search based on the given filters.
+
+        :param params: Search parameters, including filters for querying companies.
+        :type params: dict
+        :param limit: Maximum number of results to return, defaults to -1 (no limit).
+        :type limit: int, optional
+        :param offset: Starting index for search results.
+        :type offset: int, optional
+
+        :return: List of search results.
+        :rtype: list
+        """
+        count = Linkedin._MAX_SEARCH_COUNT
+        if limit is None:
+            limit = -1
+
+        results = []
+        while True:
+            if limit > -1 and limit - len(results) < count:
+                count = limit - len(results)
+
+            # Prepare the default parameters
+            default_params = {
+                "count": str(count),
+                "filters": "List()",
+                "origin": "GLOBAL_SEARCH_HEADER",
+                "q": "all",
+                "start": len(results) + offset,
+                "queryContext": "List(spellCorrectionEnabled->true,relatedSearchesEnabled->true,kcardTypes->PROFILE|COMPANY)",
+                "includeWebMetadata": "true",
+            }
+
+            # Update with any custom filters or search params
+            default_params.update(params)
+
+            # Send the request to LinkedIn
+            res = self._fetch(
+                f"/graphql?variables=(start:{default_params['start']},origin:{default_params['origin']},"
+                f"query:("
+                f"flagshipSearchIntent:SEARCH_SRP,"
+                f"queryParameters:{default_params['filters']},"
+                f"includeFiltersInResponse:false))&queryId=voyagerSearchDashClusters"
+                f".b0928897b71bd00a5a7291755dcd64f0"
+            )
+            data = res.json()
+
+            data_clusters = data.get("data", {}).get("searchDashClustersByAll", [])
+
+            if not data_clusters:
+                return []
+
+            if not data_clusters.get("_type", []) == "com.linkedin.restli.common.CollectionResponse":
+                return []
+
+            new_elements = []
+            for it in data_clusters.get("elements", []):
+                if not it.get("_type", []) == "com.linkedin.voyager.dash.search.SearchClusterViewModel":
+                    continue
+
+                for el in it.get("items", []):
+                    if not el.get("_type", []) == "com.linkedin.voyager.dash.search.SearchItem":
+                        continue
+
+                    e = el.get("item", {}).get("entityResult", [])
+                    if not e:
+                        continue
+                    if not e.get("_type", []) == "com.linkedin.voyager.dash.search.EntityResultViewModel":
+                        continue
+                    new_elements.append(e)
+
+            results.extend(new_elements)
+
+            # Stop if we've reached the limit or if no new elements were found
+            if (-1 < limit <= len(results)) or len(new_elements) == 0:
+                break
+
+        return results
+
     def search_people(
         self,
         keywords: Optional[str] = None,
@@ -486,6 +566,53 @@ class Linkedin(object):
         results = []
         for item in data:
             if "company" not in item.get("trackingUrn"):
+                continue
+            results.append(
+                {
+                    "urn_id": get_id_from_urn(item.get("trackingUrn", None)),
+                    "name": (item.get("title") or {}).get("text", None),
+                    "headline": (item.get("primarySubtitle") or {}).get("text", None),
+                    "subline": (item.get("secondarySubtitle") or {}).get("text", None),
+                }
+            )
+
+        return results
+
+    def search_companies_filtered(self, filters: Optional[Dict[str, str]] = None, limit=-1, offset=0) -> List:
+        """
+        Perform a LinkedIn search for companies based on filters.
+
+        :param filters: A dictionary of filter parameters (e.g., location, industry).
+        :type filters: dict, optional
+        :param limit: Maximum number of results to return, defaults to -1 (no limit).
+        :type limit: int, optional
+        :param offset: The starting point for search results, defaults to 0.
+        :type offset: int, optional
+
+        :return: List of companies matching the search filters.
+        :rtype: list
+        """
+        # Default filter to search for companies
+        search_filters = ["(key:resultType,value:List(COMPANIES))"]
+
+        # Add any additional filters provided (e.g., industry, location, etc.)
+        if filters:
+            for key, value in filters.items():
+                search_filters.append(f"(key:{key},value:List({value}))")
+
+        # Create the search parameters
+        params: Dict[str, Union[str, List[str]]] = {
+            "filters": "List({})".format(",".join(search_filters)),
+            "queryContext": "List(spellCorrectionEnabled->true)",
+        }
+
+        # Perform the search using the updated filters and params
+        data = self.search_with_filters(params, limit=limit, offset=offset)
+
+        # Process and return the results
+        results = []
+        for item in data:
+            if "company" not in item.get("trackingUrn", ""):
                 continue
             results.append(
                 {

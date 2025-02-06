@@ -1,6 +1,9 @@
 How To Add Connections Using the LinkedIn API
 =======================================
 
+.. note::
+    This guide uses the unofficial `linkedin-api <https://github.com/tomquirk/linkedin-api>`_ Python package. While this package provides convenient access to LinkedIn's API, please note that it is not officially supported by LinkedIn.
+
 Introduction
 -----------
 

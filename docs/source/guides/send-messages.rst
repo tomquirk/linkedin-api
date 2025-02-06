@@ -1,10 +1,13 @@
 How To Send Messages Using the LinkedIn API
 ======================================
 
+.. note::
+    This guide uses the unofficial `linkedin-api <https://github.com/tomquirk/linkedin-api>`_ Python package. While this package provides convenient access to LinkedIn's API, please note that it is not officially supported by LinkedIn.
+
 Introduction
 -----------
 
-Sending messages programmatically through LinkedIn can help automate your networking, follow up with connections, or manage communication at scale. In this guide, we'll show you how to use the ``send_message()`` method to send messages to your LinkedIn connections.
+Sending messages programmatically through LinkedIn can help automate networking, follow up with connections, or manage communication at scale. In this guide, we'll show you how to use the ``send_message()`` method to send messages to your LinkedIn connections.
 
 Prerequisites
 ------------
@@ -36,10 +39,13 @@ If you already have a conversation with someone, you can send a message using th
 .. code-block:: python
 
     # Send a message to an existing conversation
-    api.send_message(
+    success = api.send_message(
         message_body="Hi! Thanks for connecting. I'd love to learn more about your work.",
         conversation_urn_id="123456789"
     )
+
+    if not success:
+        print("Message sent successfully!")
 
 Step 3 — Starting a New Conversation
 ------------------------------
@@ -49,10 +55,13 @@ To start a new conversation with someone, you'll need their profile URN:
 .. code-block:: python
 
     # Start a new conversation
-    api.send_message(
+    success = api.send_message(
         message_body="Hello! I saw your work on AI and would love to connect.",
         recipients=["urn:li:fs_miniProfile:AbC123_dEf"]
     )
+
+    if not success:
+        print("New conversation started successfully!")
 
 Understanding Message Parameters
 ---------------------------
@@ -63,21 +72,27 @@ Here are the key parameters for sending messages:
 * **conversation_urn_id**: ID of an existing conversation
 * **recipients**: List of profile URNs for new conversations
 
-Getting Conversation Details
-------------------------
+Working with Conversations
+---------------------
 
-You can fetch details about your conversations:
+Here's how to manage your conversations effectively:
 
 .. code-block:: python
 
-    # Get all conversations
-    conversations = api.get_conversations()
-
-    # Get details of a specific conversation
-    conversation = api.get_conversation("123456789")
-    
-    # Mark a conversation as seen
-    api.mark_conversation_as_seen("123456789")
+    def send_message_with_retry(api, message, conversation_id=None, recipients=None, max_retries=3):
+        for attempt in range(max_retries):
+            try:
+                success = api.send_message(
+                    message_body=message,
+                    conversation_urn_id=conversation_id,
+                    recipients=recipients
+                )
+                if not success:
+                    return True
+            except Exception as e:
+                print(f"Attempt {attempt + 1} failed: {str(e)}")
+                time.sleep(2 ** attempt)  # Exponential backoff
+        return False
 
 Troubleshooting Common Issues
 -------------------------
@@ -92,42 +107,57 @@ Here are some common issues you might encounter:
 Best Practices and Tips
 --------------------
 
-1. **Personalize Your Messages**:
+1. **Message Templates**:
 
    .. code-block:: python
 
-       # Example of a personalized message
-       message = f"""
-       Hi {recipient_name},
-       
-       I noticed your work on {project_name} and would love to discuss it.
-       
-       Best regards,
-       {your_name}
-       """
+       def create_message_template(template_type="follow_up"):
+           templates = {
+               "follow_up": """Hi {name},
+               Thanks for connecting! I noticed you work in {industry} 
+               and would love to learn more about your experience.
+               
+               Best regards,
+               {sender}""",
+               "introduction": """Hi {name},
+               I came across your profile and was impressed by {detail}.
+               Would you be open to a brief conversation about {topic}?
+               
+               Best,
+               {sender}"""
+           }
+           return templates.get(template_type, templates["follow_up"])
 
-2. **Handle Message Status**:
+2. **Handle Rate Limits**:
 
    .. code-block:: python
 
-       try:
-           success = api.send_message(
-               message_body="Hello!",
-               conversation_urn_id="123456789"
-           )
-           if not success:
-               print("Message sent successfully")
-       except Exception as e:
-           print(f"Failed to send message: {str(e)}")
+       import time
+       from random import uniform
 
-3. **Respect LinkedIn's Guidelines**:
-   * Don't send too many messages too quickly
-   * Avoid spammy or promotional content
-   * Respect user privacy settings
+       def send_bulk_messages(api, recipients, message_template, delay_range=(1, 3)):
+           results = []
+           for recipient in recipients:
+               success = api.send_message(
+                   message_body=message_template.format(**recipient),
+                   recipients=[recipient['urn']]
+               )
+               results.append({
+                   'recipient': recipient['urn'],
+                   'success': not success
+               })
+               time.sleep(uniform(*delay_range))  # Random delay between messages
+           return results
+
+3. **Best Practices for Messaging**:
+   * Personalize each message
+   * Respect LinkedIn's messaging limits
+   * Add delays between messages
+   * Keep track of sent messages
 
 Conclusion
 ---------
 
-You now know how to send messages using the LinkedIn API. This functionality is perfect for building networking tools, automated follow-up systems, or communication management applications.
+You now know how to send messages programmatically using the LinkedIn API. This functionality is perfect for building networking tools, automated follow-up systems, or communication management applications.
 
 For more advanced usage, check out our other guides on managing connections and tracking conversations. 

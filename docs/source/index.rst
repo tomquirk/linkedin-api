@@ -50,7 +50,7 @@ No "official" API access required - just use a valid LinkedIn account!
    :caption: Usage
 
    key_concepts
-   guides and examples
+   guides
 
 .. toctree::
    :maxdepth: 2

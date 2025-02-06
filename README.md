@@ -9,6 +9,8 @@ Search profiles, send messages, find jobs and more in Python. No official API ac
 <p align="center">
     <a href="https://linkedin-api.readthedocs.io">Documentation</a>
     ·
+    <a href="https://linkedin-api.readthedocs.io/en/latest/guides">Guides</a>
+    ·
     <a href="#quick-start">Quick Start</a>
     ·
     <a href="#how-it-works">How it works</a>

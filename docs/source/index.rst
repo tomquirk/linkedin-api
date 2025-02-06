@@ -50,7 +50,17 @@ No "official" API access required - just use a valid LinkedIn account!
    :caption: Usage
 
    key_concepts
-   examples
+   guides
+   guides/fetch-profile
+   guides/search-jobs
+   guides/send-messages
+   guides/search-people
+   guides/track-profile-views
+   guides/add-connection
+   guides/get-company
+   guides/get-profile-skills
+   guides/get-profile-contact
+   guides/get-conversations
 
 .. toctree::
    :maxdepth: 2

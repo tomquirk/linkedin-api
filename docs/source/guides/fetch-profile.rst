@@ -114,4 +114,6 @@ Conclusion
 
 You now know how to fetch and work with LinkedIn profile data using the LinkedIn API wrapper. This functionality is perfect for building applications that need to analyze professional networks, automate recruiting processes, or gather professional data.
 
-For more advanced usage, check out our other guides on searching profiles, sending messages, and managing connections. 
+For more advanced usage, check out our other guides on searching profiles, sending messages, and managing connections.
+
+Get the complete example source code here: https://github.com/tomquirk/linkedin-api/tree/main/examples/get_profile.py

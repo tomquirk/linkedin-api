@@ -60,10 +60,11 @@ The API supports several useful filters to narrow down your search:
     # Search with multiple filters
     jobs = api.search_jobs(
         keywords='Data Scientist',
-        remote=[2],              # Remote jobs only
+        remote=['2'],              # Remote jobs only
         experience=['2', '3'],   # Entry level and Associate
         job_type=['F', 'C'],    # Full-time and Contract
-        location_name='London'
+        location_name='London',
+        limit=5
     )
 
 Understanding Search Parameters
@@ -107,10 +108,18 @@ Let's look at how to process and analyze the search results:
         # Get full job details
         details = api.get_job(job_id)
         
-        print(f"Title: {details['title']}")
-        print(f"Company: {details['companyName']}")
-        print(f"Description: {details['description']}")
-        print(f"Listed: {details['listedAt']}")
+        print(f"Title: {details.get('title', 'unknown')}")
+        print(f"Company: {details.get('companyDetails', {}).get('name', 'unknown')}")
+        print(f"Location: {details.get('formattedLocation', 'unknown')}")
+        print(f"Remote? {details.get('workRemoteAllowed', 'unknown')}")
+        print(f"Description: {details.get('description', 'unknown')}")
+        
+        # Get job skills
+        skills = api.get_job_skills(job_id)
+        if skills:
+            print("\nRequired Skills:")
+            for skill in skills.get('skillMatchStatuses', []):
+                print(f"- {skill.get('skill', {}).get('name', 'unknown')}")
         print("---")
 
 Troubleshooting Common Issues
@@ -155,4 +164,6 @@ Conclusion
 
 You now know how to search for jobs using the LinkedIn API. This functionality is perfect for building job tracking applications, automated job search tools, or market research applications.
 
-For more advanced usage, check out our other guides on company information and job analytics. 
+For more advanced usage, check out our other guides on company information and job analytics.
+
+Get the complete example source code here: https://github.com/tomquirk/linkedin-api/tree/main/examples/search_jobs_example.py 

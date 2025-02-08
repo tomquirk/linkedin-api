@@ -21,3 +21,5 @@ build
 .DS_Store
 .idea/
 venv/
+
+cache

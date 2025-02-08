@@ -751,7 +751,9 @@ class Linkedin(object):
         res = self._fetch(f"/identity/profiles/{public_id or urn_id}/profileView")
         if res.status_code != 200:
             self.logger.info("request failed [status={}]".format(res.status_code))
-            raise Exception("Request failed: get_profile. Try refreshing cookies or solving challenge in a browser.")
+            raise Exception(
+                "Request failed: get_profile. Try refreshing cookies or solving challenge in a browser."
+            )
 
         data = res.json()
         if data and "status" in data and data["status"] != 200:

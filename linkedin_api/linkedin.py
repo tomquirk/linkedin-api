@@ -196,13 +196,11 @@ class Linkedin(object):
             res = self._fetch(url, params=url_params)
             if res.json() and "status" in res.json() and res.json()["status"] != 200:
                 self.logger.info("request failed: {}".format(data["status"]))
-                return [{}]
+                break
             data["metadata"] = res.json()["metadata"]
             """ When the number of comments exceed total available 
             comments, the api starts returning an empty list of elements"""
-            if res.json()["elements"] and len(res.json()["elements"]) == 0:
-                break
-            if data["elements"] and len(res.json()["elements"]) == 0:
+            if len(res.json()["elements"]) == 0:
                 break
             data["elements"] = data["elements"] + res.json()["elements"]
             data["paging"] = res.json()["paging"]

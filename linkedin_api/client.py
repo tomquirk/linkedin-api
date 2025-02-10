@@ -49,7 +49,7 @@ class Client(object):
     }
 
     def __init__(
-        self, *, debug=False, refresh_cookies=False, proxies={}, cookies_dir: str = ""
+        self, *, debug=False, refresh_cookies=False, proxies={}, cookies_dir: str = "", challenge_prompt_enabled=False
     ):
         self.session = requests.session()
         self.session.proxies.update(proxies)
@@ -59,6 +59,7 @@ class Client(object):
         self.metadata = {}
         self._use_cookie_cache = not refresh_cookies
         self._cookie_repository = CookieRepository(cookies_dir=cookies_dir)
+        self.challenge_prompt_enabled=challenge_prompt_enabled
 
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
 
@@ -121,14 +122,15 @@ class Client(object):
         try:
             self._do_authentication_request(username, password)
         except ChallengeException:
-            self.logger.warning("ChallengeException encountered during authentication.")
-            jsessionid = input("Enter your JSESSIONID cookie from the browser: ")
-            li_at = input("Enter your li_at cookie from the browser: ")
-            try:
-                self.authenticate_with_cookies(jsessionid, li_at)
-            except UnauthorizedException:
-                self.logger.error("Fallback authentication using cookies failed.")
-                return
+            if self.challenge_prompt_enabled:
+                self.logger.warning("ChallengeException encountered during authentication.")
+                jsessionid = input("Enter your JSESSIONID cookie from the browser: ")
+                li_at = input("Enter your li_at cookie from the browser: ")
+                try:
+                    self.authenticate_with_cookies(jsessionid, li_at)
+                except UnauthorizedException:
+                    self.logger.error("Fallback authentication using cookies failed.")
+                    return
         self._fetch_metadata()
 
     def _fetch_metadata(self):

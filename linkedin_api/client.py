@@ -49,7 +49,7 @@ class Client(object):
     }
 
     def __init__(
-        self, *, debug=False, refresh_cookies=False, proxies={}, cookies_dir: str = ""
+        self, *, debug=False, refresh_cookies=False, proxies={}, cookies_dir: str = "", challenge_prompt_enabled=False, jsessionid="", li_at=""
     ):
         self.session = requests.session()
         self.session.proxies.update(proxies)
@@ -59,6 +59,9 @@ class Client(object):
         self.metadata = {}
         self._use_cookie_cache = not refresh_cookies
         self._cookie_repository = CookieRepository(cookies_dir=cookies_dir)
+        self.challenge_prompt_enabled=challenge_prompt_enabled
+        self.jsessionid=jsessionid
+        self.li_at=li_at
 
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
 
@@ -84,6 +87,26 @@ class Client(object):
             '"'
         )
 
+    def authenticate_with_cookies(self, jsessionid: str, li_at: str):
+        """
+        Authenticate using JSESSIONID and li_at cookies taken from a browser.
+        """
+
+        self.logger.debug("Attempting authentication using provided cookies.")
+
+        # Create a cookie jar with the provided cookies
+        cookies = RequestsCookieJar()
+        cookies.set("JSESSIONID", jsessionid, domain=".linkedin.com")
+        cookies.set("li_at", li_at, domain=".linkedin.com")
+
+        try:
+            self._set_session_cookies(cookies)
+            self._fetch_metadata()  # Validate cookies and fetch metadata
+            self.logger.info("Successfully authenticated using cookies.")
+        except Exception as e:
+            self.logger.error(f"Cookie-based authentication failed: {str(e)}")
+            raise UnauthorizedException("Failed to authenticate using provided cookies.")
+        
     @property
     def cookies(self):
         return self.session.cookies
@@ -97,8 +120,20 @@ class Client(object):
                 self._set_session_cookies(cookies)
                 self._fetch_metadata()
                 return
-
-        self._do_authentication_request(username, password)
+        
+        try:
+            self._do_authentication_request(username, password)
+        except ChallengeException:
+            if self.challenge_prompt_enabled:
+                self.logger.warning("ChallengeException encountered during authentication.")
+                if(self.jsessionid=="" and self.li_at==""):
+                    self.jsessionid = input("Enter your JSESSIONID cookie from the browser: ")
+                    self.li_at = input("Enter your li_at cookie from the browser: ")
+                try:
+                    self.authenticate_with_cookies(self.jsessionid, self.li_at)
+                except UnauthorizedException:
+                    self.logger.error("Fallback authentication using cookies failed.")
+                    return
         self._fetch_metadata()
 
     def _fetch_metadata(self):

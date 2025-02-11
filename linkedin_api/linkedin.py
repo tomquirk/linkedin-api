@@ -63,6 +63,8 @@ class Linkedin(object):
         cookies=None,
         cookies_dir: str = "",
         challenge_prompt_enabled=False,
+        jsession="",
+        li_at=""
     ):
         """Constructor method"""
         self.client = Client(
@@ -70,7 +72,9 @@ class Linkedin(object):
             debug=debug,
             proxies=proxies,
             cookies_dir=cookies_dir,
-            challenge_prompt_enabled=challenge_prompt_enabled
+            challenge_prompt_enabled=challenge_prompt_enabled,
+            jsession=jsession,
+            li_at=li_at
         )
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
         self.logger = logger
